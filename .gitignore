@@ -5,6 +5,8 @@ Server/.env
 # frontend
 Frontend/node_modules/
 Frontend/.env
+frontend/.next/
+
 
 # common
 .env
