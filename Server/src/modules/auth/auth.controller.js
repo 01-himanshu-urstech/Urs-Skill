@@ -26,3 +26,10 @@ export const customerLoginController = async (req, res, next) => {
     next(error);
   }
 };
+
+export const logoutController = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+};

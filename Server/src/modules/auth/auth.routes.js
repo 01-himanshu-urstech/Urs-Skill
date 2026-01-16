@@ -2,8 +2,10 @@ import express from 'express';
 import {
   adminLoginController,
   customerSignupController,
-  customerLoginController
+  customerLoginController,
+  logoutController
 } from './auth.controller.js';
+import { authMiddleware } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -12,6 +14,13 @@ export default (app) => {
   router.post('/admin/login', adminLoginController);
   router.post('/customer/signup', customerSignupController);
   router.post('/customer/login', customerLoginController);
+
+    
+  router.post(
+    '/logout',
+    authMiddleware,
+    logoutController
+  );
 
   // 🔥 FIX IS HERE
   app.use('/api/v1/auth', router);

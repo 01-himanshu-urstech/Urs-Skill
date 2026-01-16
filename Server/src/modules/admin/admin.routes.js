@@ -4,7 +4,8 @@ import {
   getAdminsController,
   updateAdminController,
   deleteAdminController,
-  getAdminByIdController
+  getAdminByIdController,
+  getMyProfileController
 } from './admin.controller.js';
 
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
@@ -14,6 +15,15 @@ import { errorMiddleware } from '../../middlewares/error.middleware.js';
 const router = express.Router();
 
 export default (app) => {
+
+  router.get(
+  '/me',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  getMyProfileController
+);
+
+
   // Only SUPERADMIN can manage admins
   router.get(
     '/getall-admins',

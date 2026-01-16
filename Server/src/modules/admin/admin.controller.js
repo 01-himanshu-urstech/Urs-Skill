@@ -12,6 +12,17 @@ export const createAdminController = async (req, res, next) => {
   }
 };
 
+export const getMyProfileController = async (req, res, next) => {
+  try {
+    // req.user is set by authMiddleware
+    const result = await adminService.getMyProfile(req.user.adminId);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 export const getAdminsController = async (req, res, next) => {
   try {
     const result = await adminService.getAdmins();

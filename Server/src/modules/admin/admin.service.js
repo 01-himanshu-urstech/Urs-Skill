@@ -59,6 +59,20 @@ async createAdmin(data,performedBy) {
   };
 }
 
+async getMyProfile(adminId) {
+  const admin = await Admin.findById(adminId).select('-password');
+
+  if (!admin) {
+    throw APIError.notFound('Admin not found');
+  }
+
+  return {
+    success: true,
+    statusCode: 200,
+    data: { admin }
+  };
+}
+
 
   /* ---------------- LIST ---------------- */
   async getAdmins() {
