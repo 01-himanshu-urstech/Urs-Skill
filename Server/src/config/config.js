@@ -24,7 +24,11 @@ const _config = {
     process.env.JWT_ACCESS_SECRET,
   JWT_ACCESS_EXPIRES_IN:
     process.env.JWT_ACCESS_EXPIRES_IN || '7d',
-  ENABLE_LOGS: process.env.ENABLE_LOGS !== 'false'
+  ENABLE_LOGS: process.env.ENABLE_LOGS !== 'false',
+
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || ''
 };
 
 console.log('🔐 JWT SECRET LOADED:', _config.JWT_ACCESS_SECRET);

@@ -5,7 +5,8 @@ export const createBannerController = async (req, res, next) => {
   try {
     const result = await bannerService.createBanner(
       req.body,
-      req.user.adminId
+      req.user.adminId,
+      req.file
     );
     res.status(result.statusCode).json(result);
   } catch (error) {
@@ -23,23 +24,23 @@ export const getBannersController = async (req, res, next) => {
   }
 };
 
+/* GET BY ID */
 export const getBannerByIdController = async (req, res, next) => {
   try {
     const result = await bannerService.getBannerById(req.params.id);
     res.status(result.statusCode).json(result);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
-
-
 
 /* UPDATE */
 export const updateBannerController = async (req, res, next) => {
   try {
     const result = await bannerService.updateBanner(
       req.params.id,
-      req.body
+      req.body,
+      req.file
     );
     res.status(result.statusCode).json(result);
   } catch (error) {

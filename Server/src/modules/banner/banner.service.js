@@ -1,21 +1,30 @@
 import { Banner } from './banner.model.js';
 import APIError from '../../utils/apiError.js';
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary
+} from '../../utils/cloudinary.js';
 
 class BannerService {
-  /* ---------- CREATE ---------- */
-  async createBanner(data, adminId) {
-    console.log('🖼️ BannerService: createBanner');
 
-    if (!data.image) {
+  /* ---------- CREATE ---------- */
+  async createBanner(data, adminId, file) {
+    console.log('🖼 Creating banner');
+
+    if (!file) {
       throw APIError.validation('Banner image is required');
     }
 
+    const uploaded = await uploadToCloudinary(file.buffer, 'banners');
+
     const banner = await Banner.create({
       ...data,
+      image: {
+        url: uploaded.secure_url,
+        publicId: uploaded.public_id
+      },
       createdBy: adminId
     });
-
-    console.log(' Banner created:', banner._id);
 
     return {
       success: true,
@@ -27,8 +36,6 @@ class BannerService {
 
   /* ---------- LIST ---------- */
   async getBanners({ position, isActive }) {
-    console.log(' BannerService: getBanners');
-
     const query = {};
     if (position) query.position = position;
     if (isActive !== undefined) query.isActive = isActive;
@@ -43,29 +50,30 @@ class BannerService {
   }
 
   /* ---------- GET BY ID ---------- */
-async getBannerById(id) {
-  console.log(' BannerService: getBannerById', id);
+  async getBannerById(id) {
+    const banner = await Banner.findById(id);
+    if (!banner) throw APIError.notFound('Banner not found');
 
-  const banner = await Banner.findById(id);
-  if (!banner) {
-    throw APIError.notFound('Banner not found');
+    return {
+      success: true,
+      statusCode: 200,
+      data: { banner }
+    };
   }
 
-  return {
-    success: true,
-    statusCode: 200,
-    data: { banner }
-  };
-}
-
-
   /* ---------- UPDATE ---------- */
-  async updateBanner(id, data) {
-    console.log(' BannerService: updateBanner', id);
-
+  async updateBanner(id, data, file) {
     const banner = await Banner.findById(id);
-    if (!banner) {
-      throw APIError.notFound('Banner not found');
+    if (!banner) throw APIError.notFound('Banner not found');
+
+    if (file) {
+      await deleteFromCloudinary(banner.image.publicId);
+
+      const uploaded = await uploadToCloudinary(file.buffer, 'banners');
+      banner.image = {
+        url: uploaded.secure_url,
+        publicId: uploaded.public_id
+      };
     }
 
     Object.assign(banner, data);
@@ -81,13 +89,10 @@ async getBannerById(id) {
 
   /* ---------- DELETE ---------- */
   async deleteBanner(id) {
-    console.log(' BannerService: deleteBanner', id);
-
     const banner = await Banner.findById(id);
-    if (!banner) {
-      throw APIError.notFound('Banner not found');
-    }
+    if (!banner) throw APIError.notFound('Banner not found');
 
+    await deleteFromCloudinary(banner.image.publicId);
     await banner.deleteOne();
 
     return {
