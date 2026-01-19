@@ -3,6 +3,11 @@ import { Blog } from './blog.model.js';
 import APIError from '../../utils/apiError.js';
 import { activityLogService } from '../logs/activityLog.service.js';
 import slugify from 'slugify';
+import {
+  uploadToCloudinary,
+  deleteFromCloudinary
+} from '../../utils/cloudinary.js';
+
 
 /* ---------- helper for unique slug ---------- */
 const generateUniqueSlug = async (title, blogId = null) => {
@@ -25,42 +30,93 @@ const generateUniqueSlug = async (title, blogId = null) => {
 class BlogService {
 
   /* ================= CREATE ================= */
-  async createBlog(data, performedBy) {
-    if (!data.title || !data.content) {
-      throw APIError.validation('Title and content are required');
-    }
+async createBlog(data, performedBy, file) {
+  if (!data.title || !data.content) {
+    throw APIError.validation('Title and content are required');
+  }
 
-    const slug = await generateUniqueSlug(data.title);
+  const slug = await generateUniqueSlug(data.title);
 
-    const blog = await Blog.create({
-      ...data,
-      slug,
-      createdBy: performedBy
-    });
+  let coverImage = null;
 
-    await activityLogService.log({
-      action: 'CREATE_BLOG',
-      performedBy,
-      target: { entity: 'BLOG', entityId: blog._id }
-    });
+  if (file) {
+    const uploaded = await uploadToCloudinary(
+      file.buffer,
+      'blogs'
+    );
 
-    return {
-      success: true,
-      statusCode: 201,
-      data: { blog }
+    coverImage = {
+      url: uploaded.secure_url,
+      publicId: uploaded.public_id
     };
   }
 
+  const blog = await Blog.create({
+    ...data,
+    slug,
+    coverImage,
+    createdBy: performedBy
+  });
+
+  await activityLogService.log({
+    action: 'CREATE_BLOG',
+    performedBy,
+    target: { entity: 'BLOG', entityId: blog._id }
+  });
+
+  return {
+    success: true,
+    statusCode: 201,
+    data: { blog }
+  };
+}
+
+/* ================= GET BY ID ================= */
+async getBlogById(id) {
+  if (!id) {
+    throw APIError.validation('Blog ID is required');
+  }
+
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    throw APIError.notFound('Blog not found');
+  }
+
+  return {
+    success: true,
+    statusCode: 200,
+    data: { blog }
+  };
+}
+
+
+
   /* ================= UPDATE ================= */
-  async updateBlog(id, data, performedBy) {
+  async updateBlog(id, data, performedBy, file) {
     const blog = await Blog.findById(id);
     if (!blog) {
       throw APIError.notFound('Blog not found');
     }
 
-    // If title changes → regenerate slug
     if (data.title && data.title !== blog.title) {
       blog.slug = await generateUniqueSlug(data.title, blog._id);
+    }
+
+    // Replace cover image if new file uploaded
+    if (file) {
+      if (blog.coverImage?.publicId) {
+        await deleteFromCloudinary(blog.coverImage.publicId);
+      }
+
+      const uploaded = await uploadToCloudinary(
+        file.buffer,
+        'blogs'
+      );
+
+      blog.coverImage = {
+        url: uploaded.secure_url,
+        publicId: uploaded.public_id
+      };
     }
 
     Object.assign(blog, data);

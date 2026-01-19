@@ -14,6 +14,27 @@ const router = express.Router();
 
 export default (app) => {
 
+
+/**
+ * CUSTOMER
+ * GET OWN PROFILE
+ */
+  router.get(
+    '/me',
+    authMiddleware,
+    (req, res, next) => {
+      // ✅ Only check customerId from JWT
+      if (!req.user.customerId) {
+        return next(APIError.unauthorized('Customer not authenticated'));
+      }
+
+      // Map JWT → controller param
+      req.params.customerId = req.user.customerId;
+      next();
+    },
+    getCustomerByIdController
+  );
+
   /**
    * ADMIN / SUBADMIN
    * GET ALL CUSTOMERS

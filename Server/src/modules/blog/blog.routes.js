@@ -6,11 +6,13 @@ import {
   deleteBlogController,
   getAllBlogsAdminController,
   getPublicBlogsController,
+  getBlogByIdController,
   getBlogBySlugController
 } from './blog.controller.js';
 
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { roleMiddleware } from '../../middlewares/role.middleware.js';
+import {upload} from '../../middlewares/upload.middleware.js';
 
 const router = express.Router();
 
@@ -21,13 +23,27 @@ export default (app) => {
     '/create',
     authMiddleware,
     roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+    upload.single('coverImage'),
     createBlogController
   );
+
+  /**
+ * ADMIN / SUBADMIN
+ * GET BLOG BY ID
+ */
+router.get(
+  '/by-id/:id',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  getBlogByIdController
+);
+
 
   router.patch(
     '/update/:id',
     authMiddleware,
     roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+    upload.single('coverImage'),
     updateBlogController
   );
 

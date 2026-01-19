@@ -13,7 +13,8 @@ export const createBlogController = async (req, res, next) => {
       {
         userId: req.user.adminId,
         role: req.user.role
-      }
+      },
+      req.file
     );
 
     res.status(result.statusCode).json(result);
@@ -21,6 +22,20 @@ export const createBlogController = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * GET BLOG BY ID (ADMIN / SUBADMIN)
+ * GET /api/v1/blogs/by-id/:id
+ */
+export const getBlogByIdController = async (req, res, next) => {
+  try {
+    const result = await blogService.getBlogById(req.params.id);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 /**
  * UPDATE BLOG (ADMIN / SUBADMIN)
@@ -34,7 +49,8 @@ export const updateBlogController = async (req, res, next) => {
       {
         userId: req.user.adminId,
         role: req.user.role
-      }
+      },
+      req.file
     );
 
     res.status(result.statusCode).json(result);

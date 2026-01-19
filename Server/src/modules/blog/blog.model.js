@@ -7,7 +7,10 @@ const blogSchema = new mongoose.Schema(
     slug: { type: String, unique: true, index: true },
     excerpt: String,
     content: { type: String, required: true }, // HTML / Markdown
-    coverImage: String,
+    coverImage: {
+      url: String,
+      publicId: String,
+    },
 
     seo: {
       metaTitle: String,
