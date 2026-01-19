@@ -1,14 +1,63 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const transactionSchema = new mongoose.Schema({
-  transactionId: String,
-  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-  course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-  amount: Number,
-  status: {
-    type: String,
-    enum: ['PENDING', 'SUCCESS', 'FAILED']
-  }
-}, { timestamps: true });
+const transactionSchema = new mongoose.Schema(
+  {
+    transactionId: {
+      type: String,
+      required: true,
+      unique: true
+    },
 
-module.exports = mongoose.model('Transaction', transactionSchema);
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Customer',
+      required: true
+    },
+
+    courseId: {
+      type: Number,
+      required: true
+    },
+
+    amount: {
+      type: Number,
+      required: true
+    },
+
+    couponCode: {
+      type: String
+    },
+
+    discountAmount: {
+      type: Number,
+      default: 0
+    },
+
+    finalAmount: {
+      type: Number,
+      required: true
+    },
+
+    status: {
+      type: String,
+      enum: ['PENDING', 'SUCCESS', 'FAILED'],
+      default: 'PENDING'
+    },
+
+    paymentGateway: {
+      type: String,
+      default: 'CASHFREE'
+    },
+
+    paymentSessionId: {
+      type: String
+    },
+
+    transactionValidity: {
+      type: Date
+    }
+  },
+  { timestamps: true }
+);
+
+export const Transaction = mongoose.model('Transaction', transactionSchema);

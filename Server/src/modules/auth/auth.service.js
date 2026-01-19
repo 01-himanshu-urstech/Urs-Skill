@@ -33,11 +33,20 @@ class AuthService {
     console.log('✅ Admin logged in:', admin._id);
 
     return {
-      success: true,
-      statusCode: 200,
-      message: 'Admin login successful',
-      data: { token }
-    };
+        success: true,
+        statusCode: 200,
+        message: 'Admin login successful',
+        data: { 
+            token,
+            user: {
+                _id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+                permissions: admin.permissions // Crucial for your Sidebar filter
+            }
+          }
+        }
   }
 
   /* ================= CUSTOMER SIGNUP ================= */

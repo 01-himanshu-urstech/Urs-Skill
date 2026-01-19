@@ -8,6 +8,8 @@ const router = express.Router();
 /* PUBLIC */
 router.post('/', ContactController.createContact);
 
+
+
 /* ADMIN */
 router.get(
   '/',
@@ -15,6 +17,15 @@ router.get(
   roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
   ContactController.getAllContacts
 );
+
+/* ADMIN - Get contact by ID */
+router.get(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  ContactController.getContactById
+);
+
 
 router.patch(
   '/:id/status',

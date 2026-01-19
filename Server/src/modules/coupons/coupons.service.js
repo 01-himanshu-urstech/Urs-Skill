@@ -50,6 +50,68 @@ class CouponService {
     };
   }
 
+  /* ---------------- GET COUPON BY ID ---------------- */
+async getCouponById(couponId) {
+  const coupon = await Coupon.findById(couponId);
+
+  if (!coupon) {
+    throw APIError.notFound('Coupon not found');
+  }
+
+  return {
+    success: true,
+    statusCode: 200,
+    data: { coupon }
+  };
+}
+
+
+/* ---------------- UPDATE COUPON BY ID ---------------- */
+async updateCouponById(couponId, updateData, performedBy) {
+
+  const coupon = await Coupon.findById(couponId);
+  if (!coupon) {
+    throw APIError.notFound('Coupon not found');
+  }
+
+  // ❌ Prevent updating coupon code (best practice)
+  if (updateData.code) {
+    throw APIError.validation('Coupon code cannot be updated');
+  }
+
+  // ⏱ Convert dates if present
+  if (updateData.validFrom) {
+    updateData.validFrom = convertISTToUTC(updateData.validFrom);
+  }
+
+  if (updateData.validTill) {
+    updateData.validTill = convertISTToUTC(updateData.validTill);
+  }
+
+  Object.assign(coupon, updateData);
+  await coupon.save();
+
+  // 🧾 Activity Log
+  await ActivityLog.create({
+    action: 'UPDATE_COUPON',
+    performedBy,
+    target: {
+      entity: 'COUPON',
+      entityId: coupon._id
+    },
+    metadata: {
+      updatedFields: Object.keys(updateData)
+    }
+  });
+
+  return {
+    success: true,
+    statusCode: 200,
+    message: 'Coupon updated successfully',
+    data: { coupon }
+  };
+}
+
   /* ---------------- LIST COUPONS ---------------- */
   async getCoupons() {
     console.log(' Fetching coupons');
@@ -110,20 +172,21 @@ class CouponService {
     const finalAmount = Math.max(cartAmount - discount, 0);
 
     // ✅ SAVE COUPON USAGE (THIS FIXES YOUR ERROR)
-    await CouponUsage.create({
-      couponId: coupon._id,
-      couponCode: coupon.code,
-      customerId: customer.customerId,
-      customerEmail: customer.email,
-      relatedSubAdmin: subAdminId || null,
-      cartAmount,
-      discountAmount: discount,
-      finalAmount
-    });
+    // await CouponUsage.create({
+    //   couponId: coupon._id,
+    //   couponCode: coupon.code,
+    //   customerId: customer.customerId,
+    //   customerEmail: customer.email,
+    //   relatedSubAdmin: subAdminId || null,
+    //   cartAmount,
+    //   discountAmount: discount,
+    //   finalAmount
+    // });
 
-    // ✅ increment usage count
-    coupon.usedCount += 1;
-    await coupon.save();
+    // // ✅ increment usage count
+    // coupon.usedCount += 1;
+    // await coupon.save();
+    
 
     return {
       success: true,

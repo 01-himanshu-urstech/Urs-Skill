@@ -33,6 +33,22 @@ class ContactController {
     }
   }
 
+  async getContactById(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const contact = await ContactService.getContactById(id);
+
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
   async updateContactStatus(req, res, next) {
     try {
       const { id } = req.params;

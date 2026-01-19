@@ -1,4 +1,5 @@
 import { couponService } from './coupons.service.js';
+import { updateCouponSchema } from './coupons.validation.js';
 
 /* ---------------- CREATE COUPON ---------------- */
 export const createCouponController = async (req, res, next) => {
@@ -14,6 +15,48 @@ export const createCouponController = async (req, res, next) => {
     next(error);
   }
 };
+
+/* ---------------- GET COUPON BY ID ---------------- */
+export const getCouponByIdController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const result = await couponService.getCouponById(id);
+
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/* ---------------- UPDATE COUPON ---------------- */
+export const updateCouponController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const admin = req.user;
+
+    // ✅ VALIDATION HAPPENS HERE
+    const { error, value } = updateCouponSchema.validate(req.body);
+    if (error) {
+      return next(error);
+    }
+
+    const result = await couponService.updateCouponById(
+      id,
+      value, // ✅ use validated data
+      {
+        userId: admin.adminId,
+        role: admin.role
+      }
+    );
+
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 /* ---------------- LIST COUPONS ---------------- */
 export const getCouponsController = async (req, res, next) => {

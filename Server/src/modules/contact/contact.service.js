@@ -12,6 +12,17 @@ class ContactService {
     return Contact.find().sort({ createdAt: -1 });
   }
 
+  async getContactById(contactId) {
+  const contact = await Contact.findById(contactId);
+
+  if (!contact) {
+    throw APIError.notFound('Contact not found');
+  }
+
+  return contact;
+}
+
+
   async updateStatus(contactId, status) {
     const contact = await Contact.findById(contactId);
     if (!contact) {

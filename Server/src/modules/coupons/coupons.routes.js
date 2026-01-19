@@ -2,7 +2,9 @@ import express from 'express';
 import {
   createCouponController,
   getCouponsController,
-  applyCouponController
+  applyCouponController,
+  getCouponByIdController,
+  updateCouponController
 } from './coupons.controller.js';
 
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
@@ -35,6 +37,29 @@ export default (app) => {
     roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
     getCouponsController
   );
+
+  /**
+ * GET COUPON BY ID
+ * SUPERADMIN / SUBADMIN
+ */
+router.get(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  getCouponByIdController
+);
+
+/**
+ * UPDATE COUPON BY ID
+ * SUPERADMIN / SUBADMIN
+ */
+router.patch(
+  '/editcoupon/:id',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  updateCouponController
+);
+
 
   /* ================= CUSTOMER COUPON APPLY ================= */
 
