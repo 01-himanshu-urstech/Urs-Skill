@@ -52,7 +52,7 @@ export default function FAQSection() {
 
   return (
     <section className="bg-gradient-to-b from-white to-[#FCFFF9]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-[5.6em] py-20">
+      <div className="max-w-6xl mx-auto px-6 lg:px-[5.6em] py-20">
 
 {/* HEADING */}
 <div className="mb-10 sm:text-center lg:text-left">

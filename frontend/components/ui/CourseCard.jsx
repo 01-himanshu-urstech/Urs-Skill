@@ -5,7 +5,11 @@ export default function CourseCard({ course }) {
   return (
     <Link href={course.link} className="block">
       {/* OUTER CARD */}
-      <div className="bg-[#12064C] rounded-[22px] p-[10px] h-[480px] hover:scale-[1.03] transition-all duration-300 hover:shadow-[0_20px_60px_rgba(109,74,255,0.25)]">
+      <div className=" group
+  bg-[#12064C] rounded-[18px] p-[10px] h-[480px]
+  transition-all duration-500 ease-out
+  hover:-translate-y-2 hover:scale-[1.03]
+  hover:shadow-[0_30px_80px_rgba(109,74,255,0.35)]">
 
         {/* INNER CARD */}
         <div className="flex flex-col h-full rounded-[18px] overflow-hidden">
@@ -65,7 +69,11 @@ export default function CourseCard({ course }) {
                   Learn More
                 </span>
 
-                <div className="w-[28px] h-[28px] bg-white rounded-full flex items-center justify-center">
+                <div className=" w-[28px] h-[28px]
+  bg-white rounded-full
+  flex items-center justify-center
+  transition-transform duration-300
+  group-hover:translate-x-1">
                   <svg
                     className="w-[14px]"
                     viewBox="0 0 24 24"

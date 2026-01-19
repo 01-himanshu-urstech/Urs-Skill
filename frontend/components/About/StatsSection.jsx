@@ -29,7 +29,7 @@ export default function StatsSection() {
 
   return (
     <section id="stats-section" className="py-20 lg:py-32 px-6 md:px-12 lg:px-16 bg-white">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-12 lg:gap-20">
           <StatCard
             target={50}

@@ -27,7 +27,7 @@ const HeroSectionWithTextBox = () => {
   }, []);
 
   return (
-    <section className="relative bg-gradient-to-br from-green-50 via-blue-50 to-green-100 py-16 lg:py-24 overflow-hidden min-h-screen">
+    <section className="relative bg-gradient-to-br from-green-50 via-blue-50 to-green-100 py-10 lg:py-16 overflow-hidden ">
       {/* World Map Background */}
       <div className="absolute inset-0 opacity-20">
         <Image

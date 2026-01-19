@@ -46,7 +46,14 @@ const UpperNavbar = () => {
                         <a
                             href="#need-help"
                             onClick={scrollToNeedHelp}
-                            className="hover:text-blue-900 cursor-pointer"
+                            className="  hidden md:inline-flex items-center px-1.5 py-0 rounded-lg
+                        bg-gradient-to-r from-purple-600 to-purple-700
+                        text-white text-xs 
+                        shadow-md
+                        transition-all duration-300 ease-out
+                        hover:from-purple-700 hover:to-purple-800
+                        hover:shadow-lg hover:-translate-y-[1px]
+                        active:translate-y-0 active:scale-95"
                         >
                             Get a query contact us
                         </a>

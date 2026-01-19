@@ -3,7 +3,7 @@
 export default function AdmissionProcess() {
     return (
         <section className="relative bg-[#2b193f] py-24 overflow-hidden">
-            <div className="relative z-10 max-w-7xl mx-auto px-10">
+            <div className="relative z-10 max-w-6xl mx-auto px-10">
 
                 {/* HEADER */}
                 <div className="flex justify-between items-center mb-16">
@@ -26,7 +26,7 @@ export default function AdmissionProcess() {
                 <div className="grid grid-cols-3 gap-x-10 gap-y-20 relative">
 
                     {/* FLOW CONNECTOR — ORANGE UNCHANGED */}
-                    <div
+                    {/* <div
                         className="absolute left-0 right-0 pointer-events-none z-0"
                         style={{ top: '125px', height: '500px' }}
                     >
@@ -50,7 +50,7 @@ export default function AdmissionProcess() {
                                 strokeDasharray="6 6"
                             />
                         </svg>
-                    </div>
+                    </div> */}
 
                     <StepCard
                         step="1"

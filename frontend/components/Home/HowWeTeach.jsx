@@ -1,10 +1,10 @@
 export default function HowWeTeach() {
     return (
         <section className="bg-gradient-to-br from-purple-50 to-purple-100 py-20">
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-20">
+            <div className="max-w-[1400px] mx-auto px-6 sm:px-8 md:px-12 lg:px-24">
 
                 {/* HEADER */}
-                <div className="max-w-3xl mb-16">
+                <div className="max-w-4xl mb-8">
                     <h1 className="text-purple-900 text-2xl sm:text-3xl md:text-3xl font-playfair italic font-extrabold leading-tight">
                         How We Teach
                     </h1>

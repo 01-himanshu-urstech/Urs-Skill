@@ -9,7 +9,7 @@ import Image from "next/image";
 import HeroSection from "@/components/Home/HeroSection";
 import ReusableHeroSection from "@/components/Home/ReusableHeroSection";
 import TechMarquee from "@/components/Home/TechMarquee";
-import MediaSection from "@/components/Home/PopularBlogs";
+import PopularBlogs from "@/components/Home/PopularBlogs";
 import ExploreCoursesSection from "@/components/Home/ExploreCoursesSection";
 import KnowledgePartners from "@/components/Home/KnowledgePartners";
 import HowWeTeach from "@/components/Home/HowWeTeach";
@@ -29,8 +29,8 @@ export default function Home() {
       {/* <TrainingOptions /> */}
       {/* <PartnersLogo /> */}
 
-      <VideoSection />    
-      <MediaSection />
+      <VideoSection />
+      <PopularBlogs />
       {/* <MentorSection /> */}
       <NeedHelpForm />
       {/* <ReusableHeroSection /> */}

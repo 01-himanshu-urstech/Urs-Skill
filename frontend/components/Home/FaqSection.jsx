@@ -32,7 +32,7 @@ const faqs = [
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 p-6 lg:p-12 max-w-7xl mx-auto">
+    <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 max-w-[1400px] mx-auto px-6 sm:px-8 md:px-12 lg:px-24 py-12">
       {/* Left Section - Title */}
       <div className="lg:w-2/5">
         <h1 className="text-4xl lg:text-5xl font-bold leading-tight">

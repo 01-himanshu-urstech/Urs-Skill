@@ -4,15 +4,22 @@ import { Facebook, X, Instagram, Linkedin } from "lucide-react";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useDispatch, useSelector } from 'react-redux';
+import { submitContact, resetContactState } from '@/store/slices/contactSlice';
+import { useEffect } from 'react';
+
 
 export default function ContactSection() {
+  const dispatch = useDispatch();
+  const { loading, success, error } = useSelector((state) => state.contact);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     message: ""
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [submitMessage, setSubmitMessage] = useState(null);
 
@@ -24,55 +31,76 @@ export default function ContactSection() {
     setFormData({ ...formData, phone });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
 
-    try {
-      const phoneNumber = formData.phone.replace(/^\d{1,3}/, '').slice(-10);
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        phone: Number(phoneNumber),
-        description: formData.message
-      };
+  //   try {
+  //     const phoneNumber = formData.phone.replace(/^\d{1,3}/, '').slice(-10);
+  //     const payload = {
+  //       name: formData.name,
+  //       email: formData.email,
+  //       phone: Number(phoneNumber),
+  //       description: formData.message
+  //     };
 
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + "/contact-create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+  //     if (response.ok) {
+  //       setSubmitMessage({
+  //         type: "success",
+  //         text: "Thank you! Your message has been sent successfully. We'll get back to you soon."
+  //       });
+  //       setShowModal(true);
+  //       setFormData({
+  //         name: "",
+  //         email: "",
+  //         phone: "",
+  //         message: ""
+  //       });
+  //     } else {
+  //       throw new Error("Failed to send message");
+  //     }
+  //   } catch (error) {
+  //     setSubmitMessage({
+  //       type: "error",
+  //       text: "Invalid credentials. Please try again."
+  //     });
+  //     setShowModal(true);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
-      if (response.ok) {
-        setSubmitMessage({
-          type: "success",
-          text: "Thank you! Your message has been sent successfully. We'll get back to you soon."
-        });
-        setShowModal(true);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          message: ""
-        });
-      } else {
-        throw new Error("Failed to send message");
-      }
-    } catch (error) {
-      setSubmitMessage({
-        type: "error",
-        text: "Invalid credentials. Please try again."
-      });
-      setShowModal(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  dispatch(submitContact(formData));
+};
+
+useEffect(() => {
+  if (success) {
+    setSubmitMessage({
+      type: "success",
+      text: "Thank you! Your message has been sent successfully. We'll get back to you soon."
+    });
+    setShowModal(true);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      message: ""
+    });
+    dispatch(resetContactState());
+  }
+
+  if (error) {
+    setSubmitMessage({
+      type: "error",
+      text: error
+    });
+    setShowModal(true);
+    dispatch(resetContactState());
+  }
+}, [success, error, dispatch]);
+
 
   const closeModal = () => {
     setShowModal(false);
@@ -112,7 +140,7 @@ export default function ContactSection() {
                 )}
               </div>
 
-              <h3 className={`text-2xl font-bold text-center mb-3 ${
+              <h3 className={`text-xl font-bold text-center mb-3 ${
                 submitMessage.type === "success" ? "text-green-600" : "text-red-600"
               }`}>
                 {submitMessage.type === "success" ? "Success!" : "Error!"}
@@ -137,7 +165,7 @@ export default function ContactSection() {
         )}
 
         {/* Hero Banner */}
-        <div className="w-full min-h-[40vh] relative flex items-center overflow-hidden">
+        {/* <div className="w-full min-h-[40vh] relative flex items-center overflow-hidden">
           <Image
             src="/contact-header.webp"
             alt="Contact Us"
@@ -147,10 +175,10 @@ export default function ContactSection() {
             quality={90}
             sizes="100vw"
           />
-        </div>
+        </div> */}
 
         {/* Contact Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Contact Information - Left Side */}
             <div className="space-y-6">
@@ -158,7 +186,7 @@ export default function ContactSection() {
                 <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 text-sm font-bold rounded-full mb-4 border border-blue-200">
                   CONTACT INFO
                 </span>
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">
+                <h3 className="text-xl sm:text-2xl md:text-xl font-extrabold text-gray-800 mb-4">
                   Let&apos;s Connect & <span className="text-blue-600">Collaborate</span>
                 </h3>
                 <p className="text-base text-gray-600 leading-relaxed">
@@ -167,7 +195,7 @@ export default function ContactSection() {
               </div>
 
               {/* Contact Cards */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {/* Email */}
                 <div className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl hover:shadow-xl transition-all duration-300 p-6 border border-blue-100 transform hover:-translate-y-1">
                   <div className="flex items-start gap-4">
@@ -177,7 +205,7 @@ export default function ContactSection() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-lg text-gray-800 mb-1">Email Address</h3>
+                      <h3 className="font-bold text-md text-gray-800 mb-1">Email Address</h3>
                       <a href="mailto:connect@urstechsolution.com" className="text-sm text-gray-600 hover:text-blue-600 transition-colors break-words font-medium">
                         connect@urstechsolution.com
                       </a>
@@ -194,7 +222,7 @@ export default function ContactSection() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-800 mb-1">Phone Number</h3>
+                      <h3 className="font-bold text-md text-gray-800 mb-1">Phone Number</h3>
                       <a href="tel:+919811255599" className="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">
                         +91 98112 55599
                       </a>
@@ -212,7 +240,7 @@ export default function ContactSection() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-800 mb-1">Office Address</h3>
+                      <h3 className="font-bold text-md text-gray-800 mb-1">Office Address</h3>
                       <p className="text-sm text-gray-600 leading-relaxed font-medium">
                         Urs Skill, Urs Group of Companies <br />
                         15th Floor, E SQUARE, C2, Sector 96,<br />
@@ -231,7 +259,7 @@ export default function ContactSection() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg text-gray-800 mb-3">Follow Us</h3>
+                      <h3 className="font-bold text-md text-gray-800 mb-3">Follow Us</h3>
                       <div className="flex gap-3">
                         <a href="#" className="w-10 h-10 bg-white hover:bg-[#1877f2] rounded-xl flex items-center justify-center text-blue-600 hover:text-white transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 shadow-md border border-blue-200">
                           <Facebook className="w-5 h-5" />
@@ -259,7 +287,7 @@ export default function ContactSection() {
                   <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 text-sm font-bold rounded-full mb-4 border border-blue-200">
                     SEND MESSAGE
                   </span>
-                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 mb-3">
+                  <h3 className="text-xl sm:text-2xl md:text-xl font-extrabold text-gray-800 mb-3">
                     Drop Us a <span className="text-blue-600">Line</span>
                   </h3>
                   <p className="text-gray-600 text-sm sm:text-base">
@@ -363,10 +391,10 @@ export default function ContactSection() {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={loading}
                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1 hover:scale-[1.02] flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? (
+                    {loading ? (
                       <>
                         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

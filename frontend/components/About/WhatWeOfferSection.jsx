@@ -47,7 +47,7 @@ export default function WhatWeOfferSection() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-400 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 mb-16">
           <div>

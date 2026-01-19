@@ -8,21 +8,21 @@ export default function TrainingOptions() {
       icon: <Calendar className="w-12 h-12 text-emerald-600" />,
       title: 'Offline & Corporate Training Options',
       description: 'Our hands-on classroom sessions bring real-time learning to your workplace. We offer customized workshops and offline training modules tailored for teams and professionals.',
-      cta: 'Learn More',
+      // cta: 'Learn More',
       bgColor: 'bg-[#E8F5E8]'
     },
     {
       icon: <CalendarClock className="w-12 h-12 text-blue-600" />,
       title: 'Flexible Learning',
       description: 'Weekends, weekdays, and workshops designed to enhance your business skills without compromising on work.',
-      cta: 'Learn More',
+      // cta: 'Learn More',
       bgColor: 'bg-[#EBF3FD]'
     },
     {
       icon: <File className="w-12 h-12 text-blue-600" />,
       title: 'Project-Based Learning',
       description: 'Every module includes building dashboards and tools from scratch and ML tools.',
-      cta: 'Learn More',
+      // cta: 'Learn More',
       bgColor: 'bg-[#EBF3FD]'
     },
     {
@@ -48,20 +48,20 @@ export default function TrainingOptions() {
       ),
       title: 'AI-Driven Innovation',
       description: 'Our curriculum leverages cutting-edge AI, including TensorFlow, Python APIs.',
-      cta: 'Learn More',
+      // cta: 'Learn More',
       bgColor: 'bg-[#EBF3FD]'
     }
   ];
 
   return (
     <section className="py-20 px-6 md:px-12 lg:px-16">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header - Smaller fonts */}
         <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl md:text-2xl lg:text-2xl font-bold text-gray-900 mb-4">
             Unlock the Future with Full Stack Development & AI
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-md md:text-lg text-gray-600 max-w-3xl mx-auto">
             From frontend to backend systems, our training program is designed to build real-world tech stacks and integration skills using modern tools.
           </p>
         </div>
@@ -82,12 +82,12 @@ export default function TrainingOptions() {
               <p className="text-gray-700 text-xs md:text-sm flex-grow mb-6 leading-relaxed">
                 {card.description}
               </p>
-              <button className="group flex items-center text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors">
+              {/* <button className="group flex items-center text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors">
                 <span>{card.cta}</span>
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </button>
+              </button> */}
             </div>
           ))}
         </div>

@@ -3,11 +3,15 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Logo from '@/components/ui/Logo';
 import SearchBar from '@/components/ui/SearchBar';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut, Handshake } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '@/store/slices/authSlice';
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   // Detect scroll
   useEffect(() => {
@@ -46,29 +50,44 @@ const Navbar = () => {
             {/* Right Section */}
             <div className="flex items-center space-x-3">
               <Link
-                href="/"
-                className="hidden md:inline-flex items-center px-4 py-1.5 rounded-lg bg-purple-700 text-white text-sm font-medium hover:bg-purple-900 transition"
-              >
-                B2B Partnership
-              </Link>
-              <Link
                 href="/contact"
-                className="hidden md:inline-flex items-center px-4 py-1.5 rounded-lg bg-purple-700 text-white text-sm font-medium hover:bg-purple-900 transition"
+                className="hidden md:inline-flex items-center px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700
+              text-white text-sm font-medium hover:from-purple-700 hover:to-purple-800
+                transition"
               >
                 Get in Touch
               </Link>
 
+              {!isAuthenticated ? (
+                <Link
+                  href="/login"
+                  className="hidden md:inline-flex items-center px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700
+              text-white text-sm font-medium hover:from-purple-700 hover:to-purple-800
+                transition"
+                >
+                  Login
+                </Link>
+              ) : (
+                <Link
+                  href="/profile"
+                  className="hidden md:inline-flex items-center gap-1 px-3 text-sm font-medium"
+                >
+                  <User size={16} />
+                  My Profile
+                </Link>
+              )}
+
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 className="
-                p-2 rounded-lg
-                transition-all duration-200
-                hover:bg-gray-100
-                hover:scale-110
-                active:scale-95
-              "
+                  p-2 rounded-lg
+                  transition-all duration-200
+                  hover:bg-gray-100
+                  hover:scale-110
+                  active:scale-95
+                "
               >
-                <Menu className="w-5 h-5 text-gray-700 transition-transform duration-200 hover:rotate-5 hover:cursor-pointer" />
+                <Menu className="w-5 h-5 text-purple-700" />
               </button>
             </div>
 
@@ -79,48 +98,106 @@ const Navbar = () => {
       {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="
-            fixed inset-0 z-40
-            bg-black/40
-            backdrop-blur-[2px]
-            transition-opacity duration-300
-            animate-fadeIn
-          "
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-lg transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
+        className={`fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-lg transform transition-transform duration-300 ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
       >
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-lg font-semibold">Menu</span>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="
-                p-2 rounded-lg
-                transition-all duration-200
-                hover:bg-gray-100
-                hover:rotate-90
-                hover:scale-110
-                active:scale-95
-              "
+            className="p-2 rounded-lg hover:bg-gray-100"
           >
-            <X className="w-6 h-6 text-gray-700 hover:cursor-pointer" />
+            <X className="w-6 h-6 text-gray-700" />
           </button>
         </div>
 
-        <div className="flex flex-col p-4 space-y-4">
-          <Link href="/about" onClick={() => setIsSidebarOpen(false)}>
+        {/* Top Menu */}
+        <div className="flex flex-col p-4 space-y-3">
+          <Link
+            href="/about"
+            onClick={() => setIsSidebarOpen(false)}
+            className="
+              flex items-center gap-2 px-3 py-2 rounded-md
+              transition-all duration-200
+              hover:bg-purple-50 hover:text-purple-700
+              hover:translate-x-1
+            "
+          >
             About Us
           </Link>
-          <Link href="/contact" onClick={() => setIsSidebarOpen(false)}>
+
+          <Link
+            href="/contact"
+            onClick={() => setIsSidebarOpen(false)}
+            className="
+              flex items-center gap-2 px-3 py-2 rounded-md
+              transition-all duration-200
+              hover:bg-purple-50 hover:text-purple-700
+              hover:translate-x-1
+            "
+          >
             Contact Us
           </Link>
+
+          <Link
+            href="/"
+            onClick={() => setIsSidebarOpen(false)}
+            className="
+              flex items-center gap-2 px-3 py-2 rounded-md
+              transition-all duration-200
+              hover:bg-purple-50 hover:text-purple-700
+              hover:translate-x-1
+            "
+          >
+            <Handshake size={18} />
+            B2B Partnership
+          </Link>
+
+          {isAuthenticated && (
+            <Link
+              href="/profile"
+              onClick={() => setIsSidebarOpen(false)}
+              className="
+                flex items-center gap-2 px-3 py-2 rounded-md
+                transition-all duration-200
+                hover:bg-purple-50 hover:text-purple-700
+                hover:translate-x-1
+              "
+            >
+              <User size={18} />
+              My Profile
+            </Link>
+          )}
         </div>
+
+        {/* Bottom Logout */}
+        {isAuthenticated && (
+          <div className="absolute bottom-0 w-full p-4 border-t">
+            <button
+              onClick={() => {
+                dispatch(logout());
+                setIsSidebarOpen(false);
+              }}
+              className="  flex items-center gap-2
+              text-red-600 font-medium
+              transition-all duration-300
+              hover:text-red-700
+              hover:translate-x-1
+              active:scale-95"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
