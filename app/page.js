@@ -1,65 +1,114 @@
-import Image from "next/image";
+"use client"; //
+import { useState, useEffect } from "react";
+import StatsGrid from "./dashboard/StatsGrid";
+import PageHeader from "../components/ui/PageHeader";
+import { ArrowUpRight, Zap, Clock } from "lucide-react";
 
-export default function Home() {
+export default function DashboardPage() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // ✅ Live Clock Effect: Updates every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="p-4 sm:p-8 min-h-screen bg-gray-50/30">
+      <PageHeader
+        title="System Overview"
+        description="Live insights aggregated from all platform modules."
+      />
+
+      {/* Live Stats Component */}
+      <StatsGrid />
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Recent Quick Actions Card */}
+        <div className="xl:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                <Zap size={20} />
+              </div>
+              <h3 className="font-black text-gray-800 uppercase tracking-tight text-sm">Shortcut Management</h3>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <QuickActionLink title="Create New Blog" href="/blog/create" color="text-orange-500" />
+            <QuickActionLink title="Launch Coupon Rule" href="/coupon/add" color="text-purple-500" />
+            <QuickActionLink title="Update Home Banners" href="/banners" color="text-blue-500" />
+            <QuickActionLink title="Review Customers" href="/customer/list" color="text-emerald-500" />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* System Status Card */}
+        <div className="bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] rounded-[2.5rem] p-8 text-white shadow-xl shadow-indigo-200/50 flex flex-col justify-between">
+          <div>
+            <h3 className="font-black uppercase tracking-[2px] text-xs opacity-70 mb-6">Database Health</h3>
+            <div className="space-y-6">
+              <HealthItem label="API Connectivity" status="Stable" />
+              <HealthItem label="Cloudinary Sync" status="Active" />
+              <HealthItem label="User Authentication" status="Secure" />
+            </div>
+          </div>
+
+          {/* ✅ Real-time Clock Section */}
+          <div className="mt-10 p-5 bg-white/10 rounded-3xl border border-white/10 backdrop-blur-md relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+              <Clock size={80} />
+            </div>
+
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
+              Live System Time
+            </p>
+
+            {/* tabular-nums ensures the width doesn't jump as seconds change */}
+            <p className="text-2xl font-black tracking-tighter tabular-nums">
+              {currentTime.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+              })}
+            </p>
+
+            <p className="text-[9px] font-bold opacity-60 uppercase mt-1">
+              {currentTime.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </p>
+          </div>
         </div>
-      </main>
+      </div>
+    </main>
+  );
+}
+
+function QuickActionLink({ title, href, color }) {
+  return (
+    <a href={href} className="group flex items-center justify-between p-5 bg-gray-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-gray-100 hover:shadow-lg transition-all duration-300">
+      <span className={`text-[11px] font-black uppercase tracking-widest ${color}`}>{title}</span>
+      <ArrowUpRight size={18} className="text-gray-300 group-hover:text-gray-900 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+    </a>
+  );
+}
+
+function HealthItem({ label, status }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm font-bold opacity-90">{label}</span>
+      <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">
+        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+        {status}
+      </span>
     </div>
   );
 }
