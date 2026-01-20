@@ -50,7 +50,7 @@ router.get(
   router.delete(
     '/delete/:id',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     deleteBlogController
   );
 

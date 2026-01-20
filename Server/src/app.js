@@ -26,18 +26,21 @@ try {
 
   console.log(' Middlewares initialized');
 
-  // Load routes dynamically
-  const loadDynamicRoutes = async () => {
-    try {
-      console.log('📦 Loading routes dynamically...');
-      await loadRoutes(app);
-      console.log(' Routes loaded successfully');
-    } catch (error) {
-      console.error(' Error loading routes:', error.message);
-    }
-  };
+  // // Load routes dynamically
+  // const loadDynamicRoutes = async () => {
+  //   try {
+  //     console.log('📦 Loading routes dynamically...');
+  //     await loadRoutes(app);
+  //     console.log(' Routes loaded successfully');
+  //   } catch (error) {
+  //     console.error(' Error loading routes:', error.message);
+  //   }
+  // };
 
-  loadDynamicRoutes();
+  //  loadDynamicRoutes();
+
+  await loadRoutes(app);
+
 
 } catch (error) {
   console.error(' App initialization failed:', error.message);
@@ -50,13 +53,5 @@ app.get('/api/v1', (req, res) => {
 
 app.use(errorMiddleware);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(' Global error:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Internal Server Error'
-  });
-});
 
 export default app;

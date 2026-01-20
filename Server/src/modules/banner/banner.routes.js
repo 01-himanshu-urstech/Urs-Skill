@@ -45,7 +45,7 @@ export default (app) => {
   router.delete(
     '/:id',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     deleteBannerController
   );
 

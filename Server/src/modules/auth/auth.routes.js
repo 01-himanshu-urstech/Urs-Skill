@@ -3,7 +3,9 @@ import {
   adminLoginController,
   customerSignupController,
   customerLoginController,
-  logoutController
+  logoutController,
+  resendEmailOTPController,
+  verifyEmailOTPController,
 } from './auth.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 
@@ -14,7 +16,8 @@ export default (app) => {
   router.post('/admin/login', adminLoginController);
   router.post('/customer/signup', customerSignupController);
   router.post('/customer/login', customerLoginController);
-
+  router.post('/verify-email-otp', verifyEmailOTPController);
+  router.post('/resend-email-otp', resendEmailOTPController);
     
   router.post(
     '/logout',

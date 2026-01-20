@@ -1,44 +1,29 @@
 import APIError from '../utils/apiError.js';
-
 export const errorMiddleware = (error, req, res, next) => {
-    let statusCode = 500;
-    let message = 'Internal Server Error';
-    const response = {
-        success: false,
-    };
+  let statusCode = 500;
+  let message = 'Internal Server Error';
 
-    // Custom application errors
-    if (error instanceof APIError) {
-        statusCode = error.statusCode;
-        message = error.message;
-    }
+  if (error instanceof APIError) {
+    statusCode = error.statusCode;
+    message = error.message;
+  }
+  else if (error.isAxiosError && error.response) {
+    statusCode = error.response.status;
+    message = error.response.data?.error?.description || 'External service request failed';
+  }
+  else if (error.message) {
+    statusCode = 400;
+    message = error.message;
+  }
 
-    // Axios  errors
-    else if (error.isAxiosError && error.response) {
-        statusCode = error.response.status;
-        message =
-            error.response.data?.error?.description ||
-            'Razorpay request failed';
+  // Log full error on server for debugging
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(' Error:', error);
+  }
 
-        // Optional: expose Razorpay error in dev
-        if (process.env.NODE_ENV === 'development') {
-            response.razorpay = error.response.data;
-        }
-    }
-
-    //  Generic JS errors (e.g. throw new Error())
-    else if (error.message) {
-        statusCode = 400;
-        message = error.message;
-    }
-
-    response.message = message;
-
-    // Stack only in development
-    if (process.env.NODE_ENV === 'development') {
-        response.stack = error.stack;
-    }
-
-    console.error('Global Error:', message);
-    res.status(statusCode).json(response);
+  // Send ONLY safe data to client (no stack trace)
+  res.status(statusCode).json({
+    success: false,
+    message
+  });
 };

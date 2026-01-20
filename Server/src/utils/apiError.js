@@ -6,15 +6,15 @@ class APIError extends Error {
     this.statusCode = statusCode;
 
     // Optional metadata (useful for debugging / logs)
-    this.meta = meta;
+    // this.meta = meta;
 
     // Mark as operational error (helps in monitoring tools)
-    this.isOperational = true;
+    // this.isOperational = true;
 
     // Proper stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
+    // if (Error.captureStackTrace) {
+    //   Error.captureStackTrace(this, this.constructor);
+    // }
   }
 
   /* =======================

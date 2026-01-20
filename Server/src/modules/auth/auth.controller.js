@@ -18,6 +18,25 @@ export const customerSignupController = async (req, res, next) => {
   }
 };
 
+export const verifyEmailOTPController = async (req, res, next) => {
+  try {
+    const result = await authService.verifyEmailOTP(req.body);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const resendEmailOTPController = async (req, res, next) => {
+  try {
+    const result = await authService.resendEmailOTP(req.body);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const customerLoginController = async (req, res, next) => {
   try {
     const result = await authService.login(req.body);

@@ -32,7 +32,7 @@ export const loadRoutes = async (app) => {
       );
 
       if (routeFiles.length === 0) {
-        console.log(`ℹ️ No route file for module: ${moduleName}`);
+        console.log(`ℹ No route file for module: ${moduleName}`);
         continue;
       }
 
@@ -60,9 +60,9 @@ export const loadRoutes = async (app) => {
       }
     }
 
-    console.log('🚀 All routes loaded successfully');
+    console.log(' All routes loaded successfully');
   } catch (error) {
-    console.error('🔥 Route loader crashed:', error.message);
+    console.error(' Route loader crashed:', error.message);
     throw error;
   }
 };

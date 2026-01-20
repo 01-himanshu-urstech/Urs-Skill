@@ -1,50 +1,67 @@
 import { Customer } from '../customer/customer.model.js';
 import APIError from '../../utils/apiError.js';
 import {activityLogService} from '../logs/activityLog.service.js';
-import { hashPassword } from '../../utils/password.js';
+import { hashPassword, comparePassword } from '../../utils/password.js';
 
 
 
 class CustomerService {
-  /* ---------------- CREATE ---------------- */
-async createCustomer(data, performedBy) {
-  const { phone, password } = data;
+/* ---------------- CREATE BY ADMIN (Manual Password) ---------------- */
 
-  if (!phone || !password) {
-    throw APIError.validation('Phone and password are required');
+async createCustomerByAdmin(data, performedBy) {
+  // 1. Destructure password from data
+  const { name, email, phone, password } = data;
+
+  // 2. Validation: Ensure Admin provided a password
+  if (!password) {
+    throw APIError.validation('Password is required for account creation');
   }
 
-  const exists = await Customer.findOne({ phone });
-  if (exists) {
+  // 3. Check if customer already exists
+  const existingCustomer = await Customer.findOne({
+    $or: [{ email }, { phone }]
+  });
+
+  if (existingCustomer) {
     throw APIError.conflict('Customer already exists');
   }
 
+  // 4. Hash the password provided by the Admin
   const hashedPassword = await hashPassword(password);
 
+  // 5. Create the customer record
   const customer = await Customer.create({
-    ...data,
-    password: hashedPassword
+    name,
+    email,
+    phone,
+    password: hashedPassword,
+    createdBy: 'ADMIN',
+    isEmailVerified: true // Set to true so user can login immediately
   });
 
+  // 6. Log the activity
   await activityLogService.log({
-    action: 'CREATE_CUSTOMER',
+    action: 'CREATE_CUSTOMER_BY_ADMIN',
     performedBy,
-    target: {
-      entity: 'CUSTOMER',
-      entityId: customer._id
-    }
+    target: { entity: 'CUSTOMER', entityId: customer._id }
   });
-
-  const customerObj = customer.toObject();
-  delete customerObj.password;
 
   return {
     success: true,
-    statusCode: 201,
+    statusCode: 201, // Fixes the undefined error
     message: 'Customer created successfully',
-    data: { customer: customerObj }
+    data: { 
+      customer: { 
+        id: customer._id,
+        name, 
+        email, 
+        phone 
+      } 
+    }
   };
 }
+
+  
 
   /* ---------------- LIST ---------------- */
   async getCustomers() {
@@ -67,7 +84,9 @@ async getCustomerById(customerId) {
     throw APIError.validation('Customer ID is required');
   }
 
-  const customer = await Customer.findById(customerId);
+  // Add .select('+password') here so the frontend receives the hash
+  const customer = await Customer.findById(customerId).select('+password');
+  
   if (!customer) {
     throw APIError.notFound('Customer not found');
   }
@@ -77,6 +96,70 @@ async getCustomerById(customerId) {
     statusCode: 200,
     message: 'Customer fetched successfully',
     data: { customer }
+  };
+}
+/* ---------------- SELF UPDATE (For Customer) ---------------- */
+async updateOwnProfile(customerId, data) {
+  console.log('👤 CustomerService: updateOwnProfile', customerId);
+// 1. Find the customer (Include password for comparison)
+  const customer = await Customer.findById(customerId).select('+password');
+  if (!customer) {
+    throw APIError.notFound('Customer not found');
+  }
+  // 2. Destructure fields including passwords
+  const { name, email, phone, oldPassword, newPassword } = data;
+  // 3. Duplicate Checks (Keep existing logic)
+  if (email || phone) {
+    const existing = await Customer.findOne({
+      _id: { $ne: customerId },
+      $or: [
+        ...(email ? [{ email }] : []),
+        ...(phone ? [{ phone }] : [])
+      ]
+    });
+    if (existing) {
+      throw APIError.conflict('Email or Phone already in use');
+    }
+  }
+  // 4. Update basic fields
+  if (name) customer.name = name;
+  if (email) customer.email = email;
+  if (phone) customer.phone = phone;
+  // 5. SECURE PASSWORD CHANGE LOGIC
+  if (newPassword) {
+    if (!oldPassword) {
+      throw APIError.validation('Current password is required to set a new password');
+    }
+
+    // Verify old password matches hashed database password
+    const isMatch = await comparePassword(oldPassword, customer.password);
+    if (!isMatch) {
+      throw APIError.unauthorized('Current password is incorrect');
+    }
+
+    customer.password = await hashPassword(newPassword);
+  }
+  // 6. Save and Log
+  await customer.save();
+  // 7. Log Activity
+  await activityLogService.log({
+    action: 'CUSTOMER_SELF_UPDATE',
+    performedBy: { userId: customerId, role: 'CUSTOMER' },
+    target: { entity: 'CUSTOMER', entityId: customerId },
+    metadata: { fieldsUpdated: Object.keys(data).filter(k => k !== 'password') }
+  });
+  return {
+    success: true,
+    statusCode: 200,
+    message: 'Profile updated successfully',
+    data: {
+      customer: {
+        id: customer._id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone
+      }
+    }
   };
 }
 

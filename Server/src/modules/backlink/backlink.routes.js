@@ -24,7 +24,7 @@ export default (app) => {
   router.post(
     '/create',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     createBacklinkController
   );
 
@@ -36,7 +36,7 @@ export default (app) => {
   router.get(
     '/getallbacklinks',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     getAllBacklinksController
   );
 
@@ -48,7 +48,7 @@ export default (app) => {
   router.patch(
     '/update/:id',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     updateBacklinkController
   );
 
@@ -60,7 +60,7 @@ export default (app) => {
   router.delete(
     '/delete/:id',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     deleteBacklinkController
   );
 

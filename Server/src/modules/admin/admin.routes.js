@@ -28,7 +28,7 @@ export default (app) => {
   router.get(
     '/getall-admins',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
     getAdminsController
   );
 

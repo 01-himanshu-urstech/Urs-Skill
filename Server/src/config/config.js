@@ -28,7 +28,9 @@ const _config = {
 
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || ''
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || ''
 };
 
 console.log('🔐 JWT SECRET LOADED:', _config.JWT_ACCESS_SECRET);

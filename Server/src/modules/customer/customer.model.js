@@ -5,7 +5,8 @@ const customerSchema = new mongoose.Schema(
     name: String,
     email: {
       type: String,
-      unique: true
+      unique: true,
+      required: true
     },
     phone: {
       type: String,
@@ -15,6 +16,21 @@ const customerSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
+    },
+
+    // 🔐 Email verification
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
+    emailOTP: String,
+    emailOTPExpires: Date,
+
+    // 🧠 IMPORTANT
+    createdBy: {
+      type: String,
+      enum: ['SELF', 'ADMIN'],
+      default: 'SELF'
     }
   },
   { timestamps: true }

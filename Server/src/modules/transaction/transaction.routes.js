@@ -37,7 +37,7 @@ export default (app) => {
   router.get(
     '/',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     getAllTransactionsController
   );
 

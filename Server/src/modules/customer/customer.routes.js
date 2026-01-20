@@ -4,7 +4,8 @@ import {
   getCustomersController,
   getCustomerByIdController,
   updateCustomerController,
-  deleteCustomerController
+  deleteCustomerController,
+  updateOwnProfileController
 } from './customer.controller.js';
 
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
@@ -27,13 +28,22 @@ export default (app) => {
       if (!req.user.customerId) {
         return next(APIError.unauthorized('Customer not authenticated'));
       }
-
       // Map JWT → controller param
       req.params.customerId = req.user.customerId;
       next();
     },
     getCustomerByIdController
   );
+
+/**
+ * CUSTOMER: Update Own Profile
+ * PATCH /api/v1/customers/update-me
+ */
+router.patch(
+  '/update-me',
+  authMiddleware, // Ensures user is logged in
+  updateOwnProfileController
+);
 
   /**
    * ADMIN / SUBADMIN
@@ -64,7 +74,7 @@ export default (app) => {
   router.post(
     '/create',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     createCustomerController
   );
 
@@ -75,7 +85,7 @@ export default (app) => {
   router.patch(
     '/update/:customerId',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     updateCustomerController
   );
 
@@ -86,7 +96,7 @@ export default (app) => {
   router.delete(
     '/delete/:customerId',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     deleteCustomerController
   );
 

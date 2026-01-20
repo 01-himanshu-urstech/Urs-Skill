@@ -19,7 +19,7 @@ export default (app) => {
   router.get(
     '/',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     getAllLogsController
   );
 
@@ -30,7 +30,7 @@ export default (app) => {
   router.get(
     '/admin',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     getAdminLogsController
   );
 
@@ -41,7 +41,7 @@ export default (app) => {
   router.get(
     '/customers',
     authMiddleware,
-    roleMiddleware(['SUPERADMIN']),
+    roleMiddleware(['SUPERADMIN','SUBADMIN']),
     getCustomerLogsController
   );
 
