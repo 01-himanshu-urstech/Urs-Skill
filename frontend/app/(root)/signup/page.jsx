@@ -17,7 +17,7 @@ export default function SignupPage() {
   const validate = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[6-9]\d{9}$/; // Indian mobile standard
-    
+
     if (form.name.length < 3) return "Name must be at least 3 characters";
     if (!emailRegex.test(form.email)) return "Invalid email address";
     if (!phoneRegex.test(form.phone)) return "Enter a valid 10-digit Indian number";
@@ -47,7 +47,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Container with responsive max-width */}
       <div className="w-full max-w-[450px] bg-white rounded-2xl shadow-2xl shadow-purple-100 overflow-hidden border border-purple-50">
-        
+
         {/* Header Section */}
         <div className="bg-purple-700 p-6 sm:p-8 text-center text-white">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Join Urs Skill</h2>
@@ -56,7 +56,7 @@ export default function SignupPage() {
 
         {/* Form Section */}
         <form onSubmit={submit} className="p-6 sm:p-8 space-y-4 sm:space-y-5">
-          
+
           {/* Name Input */}
           <div className="group space-y-1">
             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Full Name</label>
@@ -129,9 +129,8 @@ export default function SignupPage() {
           {/* Submit Button */}
           <button
             disabled={loading}
-            className={`w-full mt-4 bg-purple-700 hover:bg-purple-800 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 group shadow-lg shadow-purple-100 active:scale-[0.98] ${
-              loading ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
+            className={`w-full mt-4 bg-purple-700 hover:bg-purple-800 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 group shadow-lg shadow-purple-100 active:scale-[0.98] ${loading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -149,10 +148,10 @@ export default function SignupPage() {
           {/* Login Link */}
           <p className="text-center text-sm text-gray-500 pt-2">
             Already have an account?{' '}
-            <button 
+            <button
               type="button"
               onClick={() => router.push('/login')}
-              className="text-purple-700 font-bold hover:underline hover"
+              className="text-purple-700 font-bold hover:underline hover:cursor-pointer"
             >
               Sign In
             </button>
