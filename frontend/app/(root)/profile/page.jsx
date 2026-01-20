@@ -6,24 +6,24 @@ import { useRouter } from 'next/navigation';
 import { useGetMyProfileQuery, useUpdateMyProfileMutation } from '@/store/api/customerApi';
 import { logout } from '@/store/slices/authSlice';
 import toast from 'react-hot-toast'; // Changed import
-import { 
-  User, Mail, Phone, Calendar, LogOut, 
-  ShieldCheck, Settings, Lock, BookOpen, ExternalLink, Save, X, Eye, EyeOff 
+import {
+  User, Mail, Phone, Calendar, LogOut,
+  ShieldCheck, Settings, Lock, BookOpen, ExternalLink, Save, X, Eye, EyeOff
 } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [showPass, setShowPass] = useState(false);
-  const [formData, setFormData] = useState({ 
-    name: '', 
-    email: '', 
-    phone: '', 
-    oldPassword: '', 
-    newPassword: '' 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    oldPassword: '',
+    newPassword: ''
   });
 
   const { data, isLoading } = useGetMyProfileQuery(undefined, { skip: !isAuthenticated });
@@ -33,12 +33,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (customer) {
-      setFormData({ 
-        name: customer.name || '', 
-        email: customer.email || '', 
-        phone: customer.phone || '', 
-        oldPassword: '', 
-        newPassword: '' 
+      setFormData({
+        name: customer.name || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+        oldPassword: '',
+        newPassword: ''
       });
     }
   }, [customer, isEditing]);
@@ -58,7 +58,7 @@ export default function ProfilePage() {
     if (!isNameChanged && !isEmailChanged && !isPhoneChanged && !isPasswordChanging) {
       toast("No changes detected.", { icon: 'ℹ️' }); // react-hot-toast info equivalent
       setIsEditing(false);
-      return; 
+      return;
     }
 
     // Start a loading toast
@@ -80,7 +80,7 @@ export default function ProfilePage() {
       }
 
       await updateProfile(payload).unwrap();
-      
+
       // Update the existing loading toast to success
       toast.success("Profile updated successfully!", { id: loadingToast });
       setIsEditing(false);
@@ -108,9 +108,10 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-6xl mx-auto relative">
-        <button 
-          onClick={handleLogout} 
-          className="absolute -top-2 right-0 flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100"
+        <button
+          onClick={handleLogout}
+          className="absolute -top-2 right-0 flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100
+          hover:cursor-pointer"
         >
           <LogOut size={18} />
           <span className="hidden sm:inline">Logout</span>
@@ -128,21 +129,21 @@ export default function ProfilePage() {
               <div className="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 border-4 border-purple-50 mb-4">
                 <User size={48} />
               </div>
-              
+
               {isEditing ? (
-                <input 
-                  className="text-xl font-bold text-gray-900 border-b border-purple-300 focus:outline-none text-center w-full mb-2 bg-transparent" 
-                  value={formData.name} 
-                  onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                <input
+                  className="text-xl font-bold text-gray-900 border-b border-purple-300 focus:outline-none text-center w-full mb-2 bg-transparent"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               ) : (
                 <h2 className="text-xl font-bold text-gray-900">{customer?.name}</h2>
               )}
               <p className="text-gray-500 text-sm mb-6 uppercase tracking-widest font-semibold">Student Account</p>
-              
-              <button 
+
+              <button
                 onClick={() => setIsEditing(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 hover:bg-purple-50 text-purple-700 border border-purple-100 rounded-xl transition-all font-semibold"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 hover:bg-purple-50 text-purple-700 border border-purple-100 rounded-xl transition-all font-semibold hover:cursor-pointer"
               >
                 <Lock size={18} /> {isEditing ? "Editing Mode" : "Change Password"}
               </button>
@@ -153,7 +154,7 @@ export default function ProfilePage() {
             <div className="absolute top-6 right-6 flex gap-2">
               {isEditing ? (
                 <>
-                  <button onClick={handleSave} disabled={isUpdating} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all">
+                  <button onClick={handleSave} disabled={isUpdating} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all cursor-pointer">
                     <Save size={22} />
                   </button>
                   <button onClick={() => setIsEditing(false)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all">
@@ -177,10 +178,10 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3 text-gray-700 font-medium">
                   <Mail size={18} className="text-purple-600" />
                   {isEditing ? (
-                    <input 
-                      className="border-b w-full focus:outline-none border-purple-200 py-1" 
-                      value={formData.email} 
-                      onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                    <input
+                      className="border-b w-full focus:outline-none border-purple-200 py-1"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                   ) : customer?.email}
                 </div>
@@ -191,10 +192,10 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3 text-gray-700 font-medium">
                   <Phone size={18} className="text-purple-600" />
                   {isEditing ? (
-                    <input 
-                      className="border-b w-full focus:outline-none border-purple-200 py-1" 
-                      value={formData.phone} 
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})} 
+                    <input
+                      className="border-b w-full focus:outline-none border-purple-200 py-1"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     />
                   ) : (customer?.phone || 'Not Provided')}
                 </div>
@@ -206,21 +207,21 @@ export default function ProfilePage() {
                   <Lock size={18} className="text-purple-600 mt-1" />
                   {isEditing ? (
                     <div className="w-full flex flex-col gap-3 pr-8">
-                      <input 
-                        type={showPass ? "text" : "password"} 
-                        placeholder="Current Password" 
-                        className="border-b w-full focus:outline-none border-purple-200 py-1 text-sm" 
-                        value={formData.oldPassword} 
-                        onChange={(e) => setFormData({...formData, oldPassword: e.target.value})} 
+                      <input
+                        type={showPass ? "text" : "password"}
+                        placeholder="Current Password"
+                        className="border-b w-full focus:outline-none border-purple-200 py-1 text-sm"
+                        value={formData.oldPassword}
+                        onChange={(e) => setFormData({ ...formData, oldPassword: e.target.value })}
                       />
-                      <input 
-                        type={showPass ? "text" : "password"} 
-                        placeholder="New Password" 
-                        className="border-b w-full focus:outline-none border-purple-200 py-1 text-sm" 
-                        value={formData.newPassword} 
-                        onChange={(e) => setFormData({...formData, newPassword: e.target.value})} 
+                      <input
+                        type={showPass ? "text" : "password"}
+                        placeholder="New Password"
+                        className="border-b w-full focus:outline-none border-purple-200 py-1 text-sm"
+                        value={formData.newPassword}
+                        onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
                       />
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setShowPass(!showPass)}
                         className="absolute right-0 top-1 text-gray-400 hover:text-purple-600"
@@ -268,7 +269,7 @@ export default function ProfilePage() {
               <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                 <BookOpen size={40} className="mx-auto text-gray-300 mb-3" />
                 <p className="text-gray-500 font-medium">No courses enrolled yet.</p>
-                <button 
+                <button
                   onClick={() => router.push('/courses')}
                   className="mt-4 text-purple-700 font-bold hover:underline"
                 >

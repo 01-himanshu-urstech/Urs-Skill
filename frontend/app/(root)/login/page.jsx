@@ -78,16 +78,15 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700 transition-colors cursor-pointer"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
 
         <button
-          className={`w-full bg-purple-700 text-white py-2 rounded transition-all ${
-            loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-purple-800'
-          }`}
+          className={`w-full hover:cursor-pointer bg-purple-700 text-white py-2 rounded transition-all ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-purple-800'
+            }`}
           disabled={loading}
         >
           {loading ? 'Logging in...' : 'Login'}

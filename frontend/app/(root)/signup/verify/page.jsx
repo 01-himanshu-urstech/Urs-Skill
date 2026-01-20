@@ -11,8 +11,8 @@ function VerifyOTPContent() {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email'); 
-  
+  const email = searchParams.get('email');
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const { loading } = useSelector((state) => state.auth);
@@ -52,7 +52,7 @@ function VerifyOTPContent() {
   const handleVerify = async (e) => {
     e.preventDefault();
     const finalOtp = otp.join('');
-    
+
     if (finalOtp.length !== 6) {
       return toast.error("Please enter the full 6-digit code");
     }
@@ -74,7 +74,7 @@ function VerifyOTPContent() {
 
   const handleResend = async () => {
     const resendToast = toast.loading('Sending new OTP...');
-    
+
     try {
       const res = await dispatch(resendEmailOTP({ email }));
       if (res.meta.requestStatus === 'fulfilled') {
@@ -93,9 +93,9 @@ function VerifyOTPContent() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gray-50">
       <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-purple-100 border border-purple-50">
-        
+
         {/* Back Button */}
-        <button 
+        <button
           onClick={() => router.back()}
           className="flex items-center text-gray-400 hover:text-purple-700 transition-colors mb-8 group text-sm font-medium"
         >
@@ -107,7 +107,7 @@ function VerifyOTPContent() {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-50 rounded-2xl mb-6 transform rotate-3">
             <ShieldCheck size={40} className="text-purple-700 transform -rotate-3" />
           </div>
-          
+
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Check your email</h1>
           <div className="flex flex-col items-center justify-center text-gray-500 mb-8 space-y-1">
             <div className="flex items-center text-sm sm:text-base">
@@ -158,7 +158,7 @@ function VerifyOTPContent() {
             ) : (
               <button
                 onClick={handleResend}
-                className="inline-flex items-center text-purple-700 font-bold hover:text-purple-900 transition-all hover:scale-105"
+                className="inline-flex items-center text-purple-700 font-bold hover:text-purple-900 transition-all hover:scale-105 hover:cursor-pointer"
               >
                 <RefreshCcw size={16} className="mr-2" />
                 Resend New OTP

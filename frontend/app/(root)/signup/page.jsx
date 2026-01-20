@@ -152,7 +152,7 @@ export default function SignupPage() {
             <button 
               type="button"
               onClick={() => router.push('/login')}
-              className="text-purple-700 font-bold hover:underline"
+              className="text-purple-700 font-bold hover:underline hover"
             >
               Sign In
             </button>
