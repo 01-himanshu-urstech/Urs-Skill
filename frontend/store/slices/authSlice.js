@@ -39,6 +39,31 @@ export const customerSignup = createAsyncThunk(
   }
 );
 
+// Add these to your existing authSlice.js thunks
+export const verifyEmailOTP = createAsyncThunk(
+  'auth/verifyEmailOTP',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${API_URL}/api/v1/auth/verify-email-otp`, payload);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Verification failed');
+    }
+  }
+);
+
+export const resendEmailOTP = createAsyncThunk(
+  'auth/resendEmailOTP',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${API_URL}/api/v1/auth/resend-email-otp`, payload);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to resend OTP');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {

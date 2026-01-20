@@ -28,7 +28,7 @@ export default function NeedhelpCourses() {
 
   return (
     <section
-      id="need-help"
+      id="need-help-course"
       className="bg-gradient-to-br from-purple-200 via-purple-50 to-purple-100 relative overflow-hidden px-4 sm:px-6 py-12"
     >
       <div className="max-w-6xl mx-auto">

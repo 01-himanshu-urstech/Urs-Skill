@@ -6,6 +6,7 @@ import AdmissionProcess from './AdmissionProcess';
 import FaqSectionCourse from './FaqSectionCourse';
 import KnowledgePartners from '@/components/Home/KnowledgePartners';
 import NeedhelpCourses from '@/components/course/NeedhelpCourses';
+import HowWeTeach from '../Home/HowWeTeach';
 
 export default function BusinessAdminCoursePage() {
   return (
@@ -14,6 +15,7 @@ export default function BusinessAdminCoursePage() {
       <CourseMeta course="mba" />
 
       <KnowledgePartners />
+      <HowWeTeach/>
 
       <CourseDetails course="mba" />
       <CareerSection />

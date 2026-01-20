@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { publicBannerApi } from './api/publicBannerApi';
 import { publicBlogApi } from './api/BlogApi';
 import { customerApi } from './api/customerApi';
-import { transactionApi } from './api/transactionApi'; // ✅ ADD
+import { transactionApi } from './api/transactionApi'; 
 import contactReducer from './slices/contactSlice.js';
 import authReducer from './slices/authSlice.js';
 
@@ -11,7 +11,7 @@ export const store = configureStore({
     [publicBannerApi.reducerPath]: publicBannerApi.reducer,
     [publicBlogApi.reducerPath]: publicBlogApi.reducer,
     [customerApi.reducerPath]: customerApi.reducer,
-    [transactionApi.reducerPath]: transactionApi.reducer, // ✅ ADD
+    [transactionApi.reducerPath]: transactionApi.reducer, 
     contact: contactReducer,
     auth: authReducer,
   },
@@ -20,5 +20,5 @@ export const store = configureStore({
       .concat(publicBannerApi.middleware)
       .concat(publicBlogApi.middleware)
       .concat(customerApi.middleware)
-      .concat(transactionApi.middleware), // ✅ ADD
+      .concat(transactionApi.middleware), 
 });
