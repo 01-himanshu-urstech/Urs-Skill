@@ -118,7 +118,7 @@ export default function AddCustomerPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="flex-1 px-8 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] text-white rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70"
+                                className="flex-1 px-8 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] text-white rounded-xl hover:cursor-pointer font-bold transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70"
                             >
                                 {isLoading ? (
                                     <>

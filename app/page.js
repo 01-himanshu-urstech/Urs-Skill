@@ -7,7 +7,7 @@ import { ArrowUpRight, Zap, Clock } from "lucide-react";
 export default function DashboardPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // ✅ Live Clock Effect: Updates every second
+  //    Live Clock Effect: Updates every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -57,7 +57,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ✅ Real-time Clock Section */}
+          {/*    Real-time Clock Section */}
           <div className="mt-10 p-5 bg-white/10 rounded-3xl border border-white/10 backdrop-blur-md relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
               <Clock size={80} />

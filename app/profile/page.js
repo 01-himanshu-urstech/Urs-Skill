@@ -57,11 +57,11 @@ export default function SettingsPage() {
     );
 }
 
-// ✅ TabButton
+//    TabButton
 const TabButton = ({ active, onClick, icon, label }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 text-sm font-semibold transition-all border-b-2 w-full sm:flex-1 ${active
+        className={`flex items-center gap-2 px-4 py-3 hover:cursor-pointer sm:px-6 sm:py-4 text-sm font-semibold transition-all border-b-2 w-full sm:flex-1 ${active
             ? "border-primary text-primary bg-white shadow-sm"
             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200"
             }`}
@@ -71,7 +71,7 @@ const TabButton = ({ active, onClick, icon, label }) => (
     </button>
 );
 
-// ✅ Profile Tab
+//    Profile Tab
 const ProfileTab = ({ saved, onSave }) => (
     <div className="space-y-5 sm:space-y-6">
         <InputField label="Admin Name" defaultValue="Ankit Sharma" />
@@ -80,7 +80,7 @@ const ProfileTab = ({ saved, onSave }) => (
         <div className="pt-4 sm:pt-6">
             <button
                 onClick={onSave}
-                className="w-full sm:w-auto bg-[#7C3AED] hover:bg-[#7C3AED]/90 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-sm sm:text-base"
+                className="w-full sm:w-auto bg-[#7C3AED] hover:cursor-pointer hover:bg-[#7C3AED]/90 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-sm sm:text-base"
             >
                 {saved ? (
                     <>
@@ -98,14 +98,14 @@ const ProfileTab = ({ saved, onSave }) => (
     </div>
 );
 
-// ✅ Security Tab
+//    Security Tab
 const SecurityTab = () => (
     <div className="space-y-5 sm:space-y-6">
         <InputField label="Current Password" type="password" placeholder="Enter current password" />
         <InputField label="New Password" type="password" placeholder="Enter new password" />
         <InputField label="Confirm New Password" type="password" placeholder="Confirm new password" />
         <div className="pt-4 sm:pt-6">
-            <button className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm sm:text-base">
+            <button className="w-full sm:w-auto bg-emerald-500 hover:cursor-pointer hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-sm sm:text-base">
                 <Lock size={16} className="sm:w-5 sm:h-5" />
                 Update Password
             </button>
@@ -113,7 +113,7 @@ const SecurityTab = () => (
     </div>
 );
 
-// ✅ Notifications Tab
+//    Notifications Tab
 const NotificationsTab = () => (
     <div className="space-y-5 sm:space-y-6">
         <div className="space-y-3 sm:space-y-4">
@@ -123,14 +123,14 @@ const NotificationsTab = () => (
             <NotificationToggle label="Marketing Emails" id="market_notif" />
         </div>
         <div className="pt-4 sm:pt-6">
-            <button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md text-sm sm:text-base">
+            <button className="w-full sm:w-auto bg-blue-500 hover:cursor-pointer hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md text-sm sm:text-base">
                 Save Notification Settings
             </button>
         </div>
     </div>
 );
 
-// ✅ Notification Toggle
+//    Notification Toggle
 const NotificationToggle = ({ label, id }) => {
     const [isChecked, setIsChecked] = useState(false);
 
@@ -162,7 +162,7 @@ const NotificationToggle = ({ label, id }) => {
     );
 };
 
-// ✅ Updated InputField with black text and dark gray placeholder
+//    Updated InputField with black text and dark gray placeholder
 const InputField = ({ label, ...props }) => (
     <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold text-gray-900">{label}</label>

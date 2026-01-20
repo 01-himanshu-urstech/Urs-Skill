@@ -89,7 +89,7 @@ export default function EditBannerPage() {
                         </div>
 
                         <div className="flex gap-4">
-                            <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-emerald-500 hover:cursor-pointer text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
                                 {isUpdating ? "Processing..." : "Commit Changes"} <Check size={16} />
                             </button>
                         </div>

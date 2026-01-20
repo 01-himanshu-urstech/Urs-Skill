@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PageHeader from "../../../../components/ui/PageHeader";
 import PermissionGuardian from "../../../../components/auth/PermissionGuardian";
-import { User, Mail, Phone, Check, ArrowLeft, Loader2, Shield, Lock } from "lucide-react";
+import { User, Mail, Phone, Check, Loader2, Shield, Info } from "lucide-react";
 import Link from "next/link";
 import { useGetCustomerByIdQuery, useUpdateCustomerMutation } from "../../../../redux/service/adminApi";
 
@@ -11,38 +11,64 @@ export default function EditCustomerPage() {
     const { id } = useParams();
     const router = useRouter();
 
-    // API Calls
-    const { data: response, isLoading: isFetching, isError } = useGetCustomerByIdQuery(id);
+    const { data: response, isLoading: isFetching } = useGetCustomerByIdQuery(id);
     const [updateCustomer, { isLoading: isUpdating }] = useUpdateCustomerMutation();
 
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: ""
-    });
+    //    Track initial state to detect changes
+    const [initialData, setInitialData] = useState(null);
+    const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
     const [submitError, setSubmitError] = useState("");
 
     useEffect(() => {
         if (response) {
-            console.log("Full API Response:", response); // 🔍 Debugging: Check console
-
-            // ✅ Fix: Handling nested data vs flat data
-            // Agar backend response.data ke andar ek aur data object bhej raha hai
             const customerData = response.data?.customer || response.data || response;
-
-            setFormData({
-                // Default value "" rakhein taaki N/A na dikhe agar data fetch ho raha ho
+            const mappedData = {
                 name: customerData.name || "",
                 email: customerData.email || "",
                 phone: customerData.phone || ""
-            });
+            };
+            setFormData(mappedData);
+            setInitialData(mappedData); //    Save reference for comparison
         }
     }, [response]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name === "phone") {
+            const onlyNums = value.replace(/[^0-9]/g, '');
+            if (onlyNums.length <= 10) setFormData(prev => ({ ...prev, [name]: onlyNums }));
+            return;
+        }
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (submitError) setSubmitError("");
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        //    Fix: Only compare if initialData is not null
+        const isUnchanged =
+            initialData &&
+            formData.name === initialData.name &&
+            formData.email === initialData.email &&
+            formData.phone === initialData.phone;
+
+        if (isUnchanged) {
+            return setSubmitError("No changes detected. Update is not required.");
+        }
+
+        //    2. Validations
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) return setSubmitError("Please enter a valid email address.");
+        if (formData.phone.length !== 10) return setSubmitError("Phone number must be exactly 10 digits.");
+
         try {
-            await updateCustomer({ id, email: formData.email }).unwrap();
+            await updateCustomer({
+                id,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone
+            }).unwrap();
             router.push("/customer/list");
         } catch (err) {
             setSubmitError(err?.data?.message || "Failed to update customer");
@@ -61,55 +87,27 @@ export default function EditCustomerPage() {
     return (
         <PermissionGuardian permissionId="customers">
             <main className="p-4 sm:p-8 min-h-screen bg-gray-50/30">
-                <div className="flex items-center gap-4 mb-2">
-                    <Link href="/customer/list" className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 hover:bg-gray-50 rounded-xl transition-all">
-                        <ArrowLeft size={20} className="text-gray-400" />
-                    </Link>
-                    <PageHeader title="Edit Customer" description="Verify and update official security credentials." />
-                </div>
+                <PageHeader title="Edit Customer" description="Modify customer contact and identity details." />
 
                 <div className="max-w-4xl mt-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 sm:p-10">
                             <div className="flex items-center gap-3 mb-8 border-b border-gray-50 pb-6">
                                 <Shield className="text-emerald-500 w-6 h-6" />
-                                <h3 className="font-black text-gray-800 uppercase tracking-tight text-sm">Identity Verification</h3>
+                                <h3 className="font-black text-gray-800 uppercase tracking-tight text-sm">Identity & Contact</h3>
                             </div>
 
                             {submitError && (
-                                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-800 text-xs font-bold uppercase tracking-wider">
-                                    ⚠️ {submitError}
+                                <div className={`mb-6 p-4 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${submitError.includes("No changes") ? "bg-amber-50 border border-amber-200 text-amber-700" : "bg-red-50 border border-red-200 text-red-800"
+                                    }`}>
+                                    {submitError.includes("No changes") ? <Info size={16} /> : "⚠️"} {submitError}
                                 </div>
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {/* LOCKED NAME */}
-                                <InputField
-                                    label="Full Name (Locked)"
-                                    value={formData.name}
-                                    readOnly
-                                    icon={<Lock size={16} className="text-gray-300" />}
-                                    className="bg-gray-50/70 cursor-not-allowed border-gray-200 text-gray-400"
-                                />
-
-                                {/* EDITABLE EMAIL */}
-                                <InputField
-                                    label="Email Address"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                                    required
-                                    icon={<Mail size={18} className="text-emerald-500" />}
-                                />
-
-                                {/* LOCKED PHONE */}
-                                <InputField
-                                    label="Phone Number (Locked)"
-                                    value={formData.phone}
-                                    readOnly
-                                    icon={<Lock size={16} className="text-gray-300" />}
-                                    className="bg-gray-50/70 cursor-not-allowed border-gray-200 text-gray-500"
-                                />
+                                <InputField label="Full Name" name="name" value={formData.name} onChange={handleChange} required icon={<User size={18} className="text-emerald-500" />} />
+                                <InputField label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} required icon={<Mail size={18} className="text-emerald-500" />} />
+                                <InputField label="Phone Number (10 Digits)" name="phone" type="text" value={formData.phone} onChange={handleChange} required icon={<Phone size={18} className="text-emerald-500" />} />
                             </div>
                         </div>
 
@@ -117,15 +115,12 @@ export default function EditCustomerPage() {
                             <button
                                 type="submit"
                                 disabled={isUpdating}
-                                className="px-12 py-4 bg-[#00C885] hover:bg-[#00B074] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="px-12 py-4 bg-[#00C885] hover:bg-[#00B074] text-white hover:cursor-pointer rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
                             >
                                 {isUpdating ? "Syncing..." : "Update Profile"}
                                 {!isUpdating && <Check size={18} />}
                             </button>
-                            <Link
-                                href="/customer/list"
-                                className="px-12 py-4 bg-white border border-gray-100 text-gray-400 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all text-center shadow-sm"
-                            >
+                            <Link href="/customer/list" className="px-12 py-4 bg-white border border-gray-100 text-gray-400 hover:cursor-pointer rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all text-center shadow-sm hover:bg-gray-50">
                                 Discard Changes
                             </Link>
                         </div>
@@ -136,20 +131,12 @@ export default function EditCustomerPage() {
     );
 }
 
-// Reusable Input Component
-const InputField = ({ label, icon, className = "", ...props }) => (
+const InputField = ({ label, icon, ...props }) => (
     <div className="space-y-2">
         <label className="block text-[10px] font-black uppercase tracking-[2px] text-gray-400">{label}</label>
         <div className="relative">
-            {icon && (
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                    {icon}
-                </div>
-            )}
-            <input
-                {...props}
-                className={`w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none transition-all duration-200 text-sm font-bold shadow-sm h-14 ${className}`}
-            />
+            {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2">{icon}</div>}
+            <input {...props} className="w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-emerald-500 transition-all duration-200 text-sm font-bold shadow-sm h-14" />
         </div>
     </div>
 );

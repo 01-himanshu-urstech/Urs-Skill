@@ -1,83 +1,85 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PageHeader from "../../components/ui/PageHeader";
 import {
     Mail, Phone, User, Calendar,
     Search, Trash2, CheckCircle2,
     Clock, MessageSquare, Loader2, Eye, X, AlertCircle,
-    RefreshCw
+    RefreshCw, ChevronLeft, ChevronRight, ChevronDown, Inbox
 } from "lucide-react";
 import PermissionGuardian from "../../components/auth/PermissionGuardian";
 import {
     useGetAllContactsQuery,
     useUpdateContactStatusMutation,
-    // useDeleteContactMutation
 } from "../../redux/service/adminApi";
 
 export default function ContactQueriesPage() {
+    //    1. Pagination & Filter State
+    const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [selectedQuery, setSelectedQuery] = useState(null);
+    const limit = 10; // Strict limit per page
 
-    // ✅ HOOKS INTEGRATION
+    //    2. API Hooks
     const { data: response, isLoading, isFetching, refetch } = useGetAllContactsQuery();
     const [updateStatus, { isLoading: isUpdating }] = useUpdateContactStatusMutation();
-    // const [deleteContact] = useDeleteContactMutation();
 
-    // Data extraction based on your provided slice logic
     const queries = response?.data || [];
+
+    //    3. STRICT FRONTEND FILTERING & SLICING (Matches your other lists)
+    const { displayQueries, totalRecords } = useMemo(() => {
+        // Step A: Search and Status Filtering
+        let filtered = queries.filter(q => {
+            const matchesSearch = q.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                q.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = statusFilter === "ALL" || q.status === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+
+        const total = filtered.length;
+
+        // Step B: Manual Slice for exact 10 items per page view
+        const startIndex = (page - 1) * limit;
+        const slicedData = filtered.slice(startIndex, startIndex + limit);
+
+        return { displayQueries: slicedData, totalRecords: total };
+    }, [queries, searchTerm, statusFilter, page]);
+
+    const totalPages = Math.ceil(totalRecords / limit) || 1;
+
+    //    4. Auto-reset to page 1 on search or filter change
+    useEffect(() => {
+        setPage(1);
+    }, [searchTerm, statusFilter]);
 
     useEffect(() => {
         if (selectedQuery) {
-            // Disable scroll when modal is open
             document.body.style.overflow = 'hidden';
         } else {
-            // Re-enable scroll when modal is closed
             document.body.style.overflow = 'unset';
         }
-
-        // Cleanup function to ensure scroll is restored if component unmounts
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
+        return () => { document.body.style.overflow = 'unset'; };
     }, [selectedQuery]);
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             await updateStatus({ id, status: newStatus }).unwrap();
-            // Automatically close modal if open
             if (selectedQuery?._id === id) setSelectedQuery(null);
         } catch (err) {
-            alert("Failed to update status: " + (err?.data?.message || "Unknown error"));
+            alert("Failed: " + (err?.data?.message || "Unknown error"));
         }
     };
-
-    const handleDelete = async (id) => {
-        if (window.confirm("Permanent deletion cannot be undone. Proceed?")) {
-            try {
-                await deleteContact(id).unwrap();
-            } catch (err) {
-                console.error("Deletion error:", err);
-            }
-        }
-    };
-
-    // Filter Logic
-    const filteredQueries = queries.filter(q => {
-        const matchesSearch = q.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === "ALL" || q.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
 
     return (
-        <PermissionGuardian permissionId="enquiry">
-            <main className="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-50/30">
+        <PermissionGuardian permissionId="Enquiry">
+            <main className="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-50/30 overflow-x-hidden">
                 <PageHeader
                     title="Customer Queries"
-                    description="Live dashboard for website contact form submissions."
+                    description={`Monitoring ${totalRecords} website contact form submissions.`}
                 />
 
+                {/* Filter Section */}
                 <div className="mt-8 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div className="relative w-full md:max-w-xl flex gap-3">
                         <div className="relative flex-1">
@@ -90,51 +92,76 @@ export default function ContactQueriesPage() {
                                 className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-indigo-500/5 font-bold text-sm transition-all"
                             />
                         </div>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="px-6 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm font-black uppercase text-[10px] tracking-widest text-gray-500 cursor-pointer focus:border-indigo-500 transition-all"
-                        >
-                            <option value="ALL">All Entries</option>
-                            <option value="NEW">New</option>
-                            <option value="CONTACTED">Contacted</option>
-                            <option value="CLOSED">Closed</option>
-                        </select>
+
+                        {/*    CUSTOM DROPDOWN WITH INCREASED ARROW SPACING */}
+                        <div className="relative min-w-[180px]">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="w-full appearance-none pl-6 pr-12 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm font-black uppercase text-[10px] tracking-widest text-gray-500 cursor-pointer focus:border-indigo-500 transition-all"
+                            >
+                                <option value="ALL">All Entries</option>
+                                <option value="NEW">New</option>
+                                <option value="CONTACTED">Contacted</option>
+                                <option value="CLOSED">Closed</option>
+                            </select>
+                            {/* Custom Arrow Icon with precise spacing */}
+                            <ChevronDown
+                                size={14}
+                                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                            />
+                        </div>
                     </div>
-                    <button onClick={() => refetch()} disabled={isFetching} className="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all text-gray-400">
+
+                    <button
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                        className="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 hover:cursor-pointer transition-all text-gray-400 shadow-sm active:scale-95"
+                    >
                         <RefreshCw className={isFetching ? "animate-spin" : ""} size={18} />
                     </button>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-200/20 overflow-hidden">
-                    <div className="overflow-x-auto">
+                {/* Table Container */}
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-200/20 overflow-hidden mb-10">
+                    <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
+                                    <th className="p-6 text-center w-20">S.No</th>
                                     <th className="p-6">Sender Identity</th>
                                     <th className="p-6">Contact Info</th>
                                     <th className="p-6">Message Preview</th>
-                                    <th className="p-6 text-center">Current Status</th>
+                                    <th className="p-6 text-center">Status</th>
                                     <th className="p-6 text-right pr-10">Manage</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {isLoading ? (
-                                    <tr><td colSpan="5" className="p-24 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" size={40} /></td></tr>
-                                ) : filteredQueries.length === 0 ? (
-                                    <tr><td colSpan="5" className="p-24 text-center text-gray-400 font-bold uppercase tracking-widest text-xs italic">No Customer Records Found</td></tr>
+                                    <tr><td colSpan="6" className="p-24 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" size={40} /></td></tr>
+                                ) : displayQueries.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="p-24 text-center">
+                                            <Inbox size={48} className="mx-auto mb-2 text-gray-200 opacity-20" />
+                                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 italic">No records matching your criteria</p>
+                                        </td>
+                                    </tr>
                                 ) : (
-                                    filteredQueries.map((query) => (
+                                    displayQueries.map((query, index) => (
                                         <tr key={query._id} className="hover:bg-gray-50/30 transition-all group">
+                                            {/*    5. Corrected Sequential Indexing */}
+                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                                {String((page - 1) * limit + index + 1).padStart(2, '0')}
+                                            </td>
                                             <td className="p-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
                                                         {query.fullName.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-black text-gray-800 uppercase tracking-tight">{query.fullName}</span>
                                                         <span className="text-[9px] text-gray-400 font-bold mt-1 flex items-center gap-1">
-                                                            <Clock size={10} /> {new Date(query.createdAt).toLocaleDateString()}
+                                                            <Clock size={10} /> {new Date(query.createdAt).toLocaleDateString('en-GB')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -156,11 +183,8 @@ export default function ContactQueriesPage() {
                                             </td>
                                             <td className="p-6 text-right pr-10">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => setSelectedQuery(query)} className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all border border-transparent hover:border-indigo-100">
+                                                    <button onClick={() => setSelectedQuery(query)} className="p-2.5 text-indigo-600 hover:bg-indigo-50 hover:cursor-pointer rounded-xl transition-all border border-transparent hover:border-indigo-100 shadow-sm active:scale-90">
                                                         <Eye size={18} />
-                                                    </button>
-                                                    <button onClick={() => handleDelete(query._id)} className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100">
-                                                        <Trash2 size={18} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -170,12 +194,39 @@ export default function ContactQueriesPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    {/*    6. PAGINATION FOOTER */}
+                    <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[9px] font-bold text-indigo-400 uppercase">
+                                Showing {displayQueries.length} of {totalRecords} Customer Entries
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1 || isFetching}
+                                className="p-2 bg-white border border-gray-200 rounded-xl disabled:opacity-30 hover:bg-gray-50 hover:cursor-pointer shadow-sm transition-all active:scale-90"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page >= totalPages || isFetching}
+                                className="p-2 bg-white border border-gray-200 rounded-xl disabled:opacity-30 hover:bg-gray-50 hover:cursor-pointer shadow-sm transition-all active:scale-90"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                {/* ✅ DETAIL OVERLAY MODAL */}
+                {/* MODAL (Same as your previous version) */}
                 {selectedQuery && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md animate-in fade-in">
                         <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                            {/* ... Modal Header ... */}
                             <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-white rounded-2xl border border-gray-100 flex items-center justify-center text-indigo-600 shadow-sm">
@@ -186,8 +237,9 @@ export default function ContactQueriesPage() {
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">ID: {selectedQuery._id}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setSelectedQuery(null)} className="p-2 hover:bg-white rounded-full transition-all text-gray-400 hover:text-red-500"><X size={20} /></button>
+                                <button onClick={() => setSelectedQuery(null)} className="p-2 hover:bg-white rounded-full hover:cursor-pointer transition-all text-gray-400 hover:text-red-500"><X size={20} /></button>
                             </div>
+
                             <div className="p-10 space-y-8">
                                 <div className="grid grid-cols-2 gap-8 border-b border-gray-50 pb-8">
                                     <div>
@@ -208,18 +260,19 @@ export default function ContactQueriesPage() {
                                     </div>
                                 </div>
                             </div>
+
                             <div className="p-8 bg-gray-50/50 border-t border-gray-100 flex gap-4 justify-end">
                                 <button
                                     onClick={() => handleStatusUpdate(selectedQuery._id, 'CONTACTED')}
                                     disabled={isUpdating}
-                                    className="px-8 py-4 bg-white text-blue-600 border border-blue-100 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-50 transition-all disabled:opacity-50"
+                                    className="px-8 py-4 bg-white text-blue-600 border border-blue-100 rounded-2xl font-black hover:cursor-pointer uppercase text-[10px] tracking-widest hover:bg-blue-50 transition-all disabled:opacity-50"
                                 >
                                     Mark Contacted
                                 </button>
                                 <button
                                     onClick={() => handleStatusUpdate(selectedQuery._id, 'CLOSED')}
                                     disabled={isUpdating}
-                                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50"
+                                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:cursor-pointer uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50"
                                 >
                                     {isUpdating ? "Processing..." : "Close Ticket"}
                                 </button>

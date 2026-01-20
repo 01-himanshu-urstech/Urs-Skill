@@ -13,17 +13,17 @@ export default function MainContentWrapper({ children }) {
     const searchRef = useRef(null);
     const inputRef = useRef(null);
 
-    // ✅ DEFINED SEARCHABLE TABS
+    //    DEFINED SEARCHABLE TABS
     const navigationLinks = [
         { title: "Dashboard Overview", path: "/", icon: <LayoutDashboard size={14} /> },
         { title: "Discount Coupons", path: "/coupon", icon: <Ticket size={14} /> },
         { title: "Manage Blogs", path: "/blog", icon: <FileText size={14} /> },
         { title: "Customer List", path: "/customer/list", icon: <Users size={14} /> },
         { title: "Home Banners", path: "/banners", icon: <ImageIcon size={14} /> },
-        { title: "Contact List", path: "/contact", icon: <Mail size={14} /> },
+        { title: "Enquiry", path: "/contact", icon: <Mail size={14} /> },
     ];
 
-    // ✅ FILTER LOGIC
+    //    FILTER LOGIC
     const suggestions = searchQuery.trim() === ""
         ? []
         : navigationLinks.filter(link =>
@@ -96,7 +96,7 @@ export default function MainContentWrapper({ children }) {
                             <Command size={10} /> K
                         </div>
 
-                        {/* ✅ SEARCH SUGGESTIONS DROPDOWN */}
+                        {/*    SEARCH SUGGESTIONS DROPDOWN */}
                         {isFocused && suggestions.length > 0 && (
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="p-2 border-b border-gray-50 bg-gray-50/50">

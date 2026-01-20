@@ -4,8 +4,8 @@ import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, LogIn, ShieldCheck, AlertCircle } from "lucide-react";
 import { useLoginMutation } from "../../redux/service/adminApi";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux"; // ✅ NEW
-import { setCredentials } from "../../redux/service/authSlice"; // ✅ NEW
+import { useDispatch } from "react-redux"; //    NEW
+import { setCredentials } from "../../redux/service/authSlice"; //    NEW
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +13,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const router = useRouter();
-    const dispatch = useDispatch(); // ✅ Initialize Dispatch
+    const dispatch = useDispatch(); //    Initialize Dispatch
     const [login, { isLoading }] = useLoginMutation();
 
     const handleLogin = async (e) => {

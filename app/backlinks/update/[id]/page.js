@@ -21,7 +21,7 @@ export default function UpdateBacklinkPage() {
         isActive: true
     });
 
-    // ✅ Form mein purana data pre-fill karne ke liye
+    //    Form mein purana data pre-fill karne ke liye
     useEffect(() => {
         if (listData?.data?.backlinks) {
             const currentLink = listData.data.backlinks.find(item => item._id === id);
@@ -45,7 +45,7 @@ export default function UpdateBacklinkPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // ✅ Mutation trigger for PATCH /backlinks/update/:id
+            //    Mutation trigger for PATCH /backlinks/update/:id
             await updateBacklink({ id, ...formData }).unwrap();
             alert("Backlink updated successfully!");
             router.push("/backlinks");
@@ -80,7 +80,7 @@ export default function UpdateBacklinkPage() {
                         </div>
 
                         <div className="flex gap-4">
-                            <button type="submit" disabled={isLoading} className="px-10 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] text-white rounded-xl font-bold flex items-center gap-2 disabled:opacity-70">
+                            <button type="submit" disabled={isLoading} className="px-10 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] hover:cursor-pointer text-white rounded-xl font-bold flex items-center gap-2 disabled:opacity-70">
                                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : <>Update Link <Check size={18} /></>}
                             </button>
                         </div>

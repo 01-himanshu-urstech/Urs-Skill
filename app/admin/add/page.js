@@ -7,15 +7,15 @@ import { useRouter } from "next/navigation";
 import PermissionGuardian from "../../../components/auth/PermissionGuardian";
 import { useAddAdminMutation } from "../../../redux/service/adminApi";
 
-// ✅ Defined consistent module keys matching your Search/Sidebar logic
+//    Defined consistent module keys matching your Search/Sidebar logic
 const PERMISSION_MODULES = [
-    { id: 'admins', label: 'Admin Management' },
+    { id: 'admin', label: 'Admin Management' },
     { id: 'customers', label: 'Customer Records' },
     { id: 'courses', label: 'Course Content' },      // New
     { id: 'transaction', label: 'Transactions' },    // New
     { id: 'General', label: 'General' },
     { id: 'coupons', label: 'Coupon Management' },
-    { id: 'enquiry', label: 'Enquiry' },
+    { id: 'Enquiry', label: 'Enquiry' },
     { id: 'logs', label: 'System Logs' }             // New
 ];
 
@@ -29,7 +29,7 @@ export default function AddAdminPage() {
         password: "",
         confirmPassword: "",
         role: "SUBADMIN",
-        permissions: [] // ✅ Array of strings matching your Mongoose schema
+        permissions: [] //    Array of strings matching your Mongoose schema
     });
 
     const [error, setError] = useState("");
@@ -48,7 +48,7 @@ export default function AddAdminPage() {
         if (error) setError("");
     };
 
-    // ✅ Toggle Permission logic for SUBADMINs
+    //    Toggle Permission logic for SUBADMINs
     const togglePermission = (moduleId) => {
         if (formData.role === "SUPERADMIN") return; // Superadmins stay full-access
         setFormData(prev => ({
@@ -76,7 +76,7 @@ export default function AddAdminPage() {
                 email: formData.email,
                 password: formData.password,
                 role: formData.role,
-                permissions: formData.permissions // ✅ Sent as [String]
+                permissions: formData.permissions //    Sent as [String]
             }).unwrap();
 
             if (result.success) {
@@ -88,8 +88,9 @@ export default function AddAdminPage() {
     };
 
     return (
-        <main className="p-2 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden min-h-screen bg-gray-50/30">
-            <PermissionGuardian permissionId="admins">
+        <PermissionGuardian permissionId="admins">
+            <main className="p-2 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden min-h-screen bg-gray-50/30">
+
                 <PageHeader
                     title="Add New Administrator"
                     description="Assign system roles and access permissions to new staff members."
@@ -147,7 +148,7 @@ export default function AddAdminPage() {
                             </div>
                         </div>
 
-                        {/* ✅ PERMISSIONS GRID SECTION  */}
+                        {/*    PERMISSIONS GRID SECTION  */}
                         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 sm:p-10">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-50 pb-4">
                                 <div className="flex items-center gap-2">
@@ -166,13 +167,13 @@ export default function AddAdminPage() {
                                         type="button"
                                         disabled={formData.role === "SUPERADMIN"}
                                         onClick={() => togglePermission(module.id)}
-                                        className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all group ${formData.permissions.includes(module.id)
+                                        className={`flex items-center justify-between p-5 hover:cursor-pointer rounded-2xl border-2 transition-all group ${formData.permissions.includes(module.id)
                                             ? 'border-[#7C3AED] bg-purple-50/50 text-[#7C3AED]'
                                             : 'border-gray-100 text-gray-400 hover:border-gray-200 bg-white'
                                             }`}
                                     >
                                         <span className="text-[11px] font-black uppercase tracking-tight">{module.label}</span>
-                                        <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${formData.permissions.includes(module.id)
+                                        <div className={`w-6 h-6 rounded-lg border-2 flex items-center hover:cursor-pointer justify-center transition-all ${formData.permissions.includes(module.id)
                                             ? 'bg-[#7C3AED] border-[#7C3AED]'
                                             : 'border-gray-200 bg-gray-50'
                                             }`}>
@@ -221,7 +222,7 @@ export default function AddAdminPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full sm:w-auto px-12 py-5 bg-[#7C3AED] hover:bg-[#5B21B6] text-white rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-purple-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95"
+                                className="w-full sm:w-auto px-12 py-5 bg-[#7C3AED] hover:bg-[#5B21B6] hover:cursor-pointer text-white rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-purple-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95"
                             >
                                 {isLoading ? "Synchronizing..." : "Create Admin Account"}
                                 {!isLoading && <Check size={18} />}
@@ -235,8 +236,8 @@ export default function AddAdminPage() {
                         </div>
                     </form>
                 </div>
-            </PermissionGuardian>
-        </main>
+            </main>
+        </PermissionGuardian>
     );
 }
 

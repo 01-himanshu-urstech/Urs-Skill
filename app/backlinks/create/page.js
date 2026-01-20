@@ -15,7 +15,7 @@ export default function CreateBacklinkPage() {
         name: "",
         url: "",
         type: "DOFOLLOW",
-        position: "FOOTER", // ✅ Default matched with Backend Model
+        position: "FOOTER", //    Default matched with Backend Model
         isActive: true
     });
 
@@ -30,7 +30,7 @@ export default function CreateBacklinkPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // ✅ Values are now validated against Mongoose Enum
+            //    Values are now validated against Mongoose Enum
             await createBacklink(formData).unwrap();
             alert("Backlink created successfully!");
             router.push("/backlinks");
@@ -106,7 +106,7 @@ export default function CreateBacklinkPage() {
                                             onChange={handleChange}
                                             className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-black h-12 shadow-sm font-medium"
                                         >
-                                            {/* ✅ Options strictly matched with Backend Enum */}
+                                            {/*    Options strictly matched with Backend Enum */}
                                             <option value="FOOTER">FOOTER</option>
                                             <option value="BLOG">BLOG</option>
                                             <option value="PARTNER">PARTNER</option>
@@ -134,7 +134,7 @@ export default function CreateBacklinkPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full sm:w-auto px-10 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-70"
+                                className="w-full sm:w-auto px-10 py-3.5 bg-[#7C3AED] hover:bg-[#5B21B6] hover:cursor-pointer text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-100 flex items-center justify-center gap-2 disabled:opacity-70"
                             >
                                 {isLoading ? (
                                     <>

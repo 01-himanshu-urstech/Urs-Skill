@@ -6,15 +6,16 @@ import { Shield, Check, Save, ArrowLeft, Loader2, AlertCircle } from "lucide-rea
 import { useGetAdminByIdQuery, useUpdateAdminByIdMutation } from "../../../../redux/service/adminApi";
 import PermissionGuardian from "../../../../components/auth/PermissionGuardian";
 
-// ✅ IDs match your database permission strings exactly
+//    IDs match your database permission strings exactly
 const MODULES = [
-    { id: 'admins', label: 'Admin Management' },
+    { id: 'dashboard', label: 'Dashboard Overview' },
+    { id: 'admin', label: 'Admin Management' },
     { id: 'customers', label: 'Customer Records' },
     { id: 'courses', label: 'Course Content' },      // New
     { id: 'transaction', label: 'Transactions' },    // New
     { id: 'General', label: 'General' },
     { id: 'coupons', label: 'Coupon Management' },
-    { id: 'enquiry', label: 'Enquiry' },
+    { id: 'Enquiry', label: 'Contact Queries' },
     { id: 'logs', label: 'System Logs' }             // New
 ];
 
@@ -22,14 +23,14 @@ export default function EditAdminPermissions() {
     const { id } = useParams();
     const router = useRouter();
 
-    // ✅ Fetching data from RTK Query
+    //    Fetching data from RTK Query
     const { data: adminData, isLoading, isError } = useGetAdminByIdQuery(id);
     const [updateAdmin, { isLoading: isUpdating }] = useUpdateAdminByIdMutation();
 
     const [role, setRole] = useState("SUBADMIN");
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-    // ✅ FIXED: Extract admin from nested data based on Postman structure
+    //    FIXED: Extract admin from nested data based on Postman structure
     const currentAdmin = adminData?.data?.admin;
 
     useEffect(() => {
@@ -77,21 +78,15 @@ export default function EditAdminPermissions() {
     return (
         <main className="p-4 sm:p-8 bg-gray-50/30 min-h-screen">
             <PermissionGuardian permissionId="admins">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-gray-400 hover:text-black mb-6 transition-all font-black text-[10px] uppercase tracking-widest"
-                >
-                    <ArrowLeft size={14} /> Back to Administration
-                </button>
 
-                {/* ✅ FIXED: Name and Role extraction from currentAdmin */}
+                {/*    FIXED: Name and Role extraction from currentAdmin */}
                 <PageHeader
                     title={`Permissions: ${currentAdmin?.name}`}
                     description={`Current Role: ${currentAdmin?.role} | Update access levels for this staff member.`}
                 />
 
                 <div className="max-w-4xl mt-10 space-y-6 pb-20">
-                    {/* ✅ ROLE SELECTION CARD */}
+                    {/*    ROLE SELECTION CARD */}
                     <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4 ml-1">Account Authority</label>
                         <div className="flex flex-col sm:flex-row gap-4">
@@ -99,7 +94,7 @@ export default function EditAdminPermissions() {
                                 <button
                                     key={r}
                                     onClick={() => setRole(r)}
-                                    className={`flex-1 py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] transition-all border-2 ${role === r
+                                    className={`flex-1 py-4 rounded-2xl font-black hover:cursor-pointer text-[10px] tracking-[0.2em] transition-all border-2 ${role === r
                                         ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl shadow-indigo-100'
                                         : 'bg-gray-50/50 border-gray-100 text-gray-400 hover:border-gray-200'
                                         }`}
@@ -110,7 +105,7 @@ export default function EditAdminPermissions() {
                         </div>
                     </div>
 
-                    {/* ✅ PERMISSION GRID CARD */}
+                    {/*    PERMISSION GRID CARD */}
                     <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50">
                         <div className="flex items-center justify-between mb-8 border-b border-gray-50 pb-4">
                             <h3 className="text-xs font-black text-gray-800 uppercase tracking-widest flex items-center gap-2">
@@ -130,13 +125,13 @@ export default function EditAdminPermissions() {
                                         key={mod.id}
                                         disabled={role === "SUPERADMIN"}
                                         onClick={() => togglePermission(mod.id)}
-                                        className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all group ${isActive
+                                        className={`flex items-center justify-between hover:cursor-pointer p-5 rounded-2xl border-2 transition-all group ${isActive
                                             ? 'border-indigo-600 bg-indigo-50/30 text-indigo-700'
                                             : 'border-gray-50 text-gray-300 hover:border-gray-200 bg-gray-50/30'
                                             }`}
                                     >
                                         <span className="text-[11px] font-black uppercase tracking-tight">{mod.label}</span>
-                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${isActive ? 'bg-indigo-600 border-indigo-600' : 'border-gray-200 bg-white'
+                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 hover:cursor-pointer transition-all ${isActive ? 'bg-indigo-600 border-indigo-600' : 'border-gray-200 bg-white'
                                             }`}>
                                             {isActive && <Check size={14} className="text-white" strokeWidth={4} />}
                                         </div>
@@ -146,12 +141,12 @@ export default function EditAdminPermissions() {
                         </div>
                     </div>
 
-                    {/* ✅ SAVE ACTION */}
+                    {/*    SAVE ACTION */}
                     <div className="pt-4">
                         <button
                             onClick={handleSave}
                             disabled={isUpdating}
-                            className="w-full py-5 bg-black text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl hover:bg-indigo-600 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                            className="w-full py-5 bg-black text-white rounded-[1.5rem] hover:cursor-pointer font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl hover:bg-indigo-600 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                         >
                             {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                             Save System Permissions

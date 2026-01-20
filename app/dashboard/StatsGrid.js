@@ -9,7 +9,7 @@ import {
 import PermissionGuardian from "../../components/auth/PermissionGuardian";
 
 export default function StatsGrid() {
-    // ✅ Fetching multiple APIs to derive stats
+    //    Fetching multiple APIs to derive stats
     const { data: customers, isLoading: loadCust } = useGetCustomersQuery();
     const { data: courses, isLoading: loadCour } = useGetCoursesQuery();
     const { data: blogs, isLoading: loadBlog } = useGetAllBlogsQuery();
@@ -55,39 +55,37 @@ export default function StatsGrid() {
     if (isLoading) return <LoadingSkeleton />;
 
     return (
-        <PermissionGuardian permissionId="dashboard">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                {stats.map((stat, idx) => (
-                    <div key={idx} className="group relative bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-500/5 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden">
-                        {/* Glassmorphism Effect */}
-                        <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color} opacity-[0.05] group-hover:scale-150 transition-transform duration-700`} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {stats.map((stat, idx) => (
+                <div key={idx} className="group relative bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-500/5 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden">
+                    {/* Glassmorphism Effect */}
+                    <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color} opacity-[0.05] group-hover:scale-150 transition-transform duration-700`} />
 
-                        <div className="flex justify-between items-start mb-6">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br shadow-xl transform group-hover:rotate-6 transition-transform ${stat.color}`}>
-                                {stat.icon}
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span className="flex items-center gap-1 text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                    <TrendingUp size={12} /> {stat.trend}
-                                </span>
-                            </div>
+                    <div className="flex justify-between items-start mb-6">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br shadow-xl transform group-hover:rotate-6 transition-transform ${stat.color}`}>
+                            {stat.icon}
                         </div>
-
-                        <div className="relative z-10">
-                            <h3 className="text-3xl font-black text-gray-800 tracking-tighter mb-1">
-                                {stat.value.toString().padStart(2, '0')}
-                            </h3>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
-                                {stat.title}
-                            </p>
-                            <p className="text-[9px] text-gray-300 font-bold uppercase mt-2 group-hover:text-gray-400 transition-colors">
-                                {stat.label}
-                            </p>
+                        <div className="flex flex-col items-end">
+                            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                <TrendingUp size={12} /> {stat.trend}
+                            </span>
                         </div>
                     </div>
-                ))}
-            </div>
-        </PermissionGuardian>
+
+                    <div className="relative z-10">
+                        <h3 className="text-3xl font-black text-gray-800 tracking-tighter mb-1">
+                            {stat.value.toString().padStart(2, '0')}
+                        </h3>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
+                            {stat.title}
+                        </p>
+                        <p className="text-[9px] text-gray-300 font-bold uppercase mt-2 group-hover:text-gray-400 transition-colors">
+                            {stat.label}
+                        </p>
+                    </div>
+                </div>
+            ))}
+        </div>
     );
 }
 

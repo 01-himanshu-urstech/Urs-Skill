@@ -12,7 +12,7 @@ const getInitialUser = () => {
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        user: getInitialUser(), // ✅ Load from localStorage on startup
+        user: getInitialUser(), //    Load from localStorage on startup
         token: null,
     },
     reducers: {
@@ -20,7 +20,7 @@ const authSlice = createSlice({
             const { user, token } = action.payload;
             state.user = user;
             state.token = token;
-            // ✅ Save to localStorage so it survives refresh
+            //    Save to localStorage so it survives refresh
             if (typeof window !== 'undefined') {
                 localStorage.setItem('user', JSON.stringify(user));
             }

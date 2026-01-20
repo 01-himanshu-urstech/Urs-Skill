@@ -1,7 +1,11 @@
 "use client";
+import { useState, useMemo, useEffect } from "react";
 import PageHeader from "../../components/ui/PageHeader";
 import { StatusBadge } from "../../components/ui/StatusBadge";
-import { Eye, Edit2, Trash2, Loader2, BookOpen, AlertCircle, Inbox } from "lucide-react";
+import {
+    Edit2, Trash2, Loader2, BookOpen,
+    AlertCircle, Inbox, ChevronLeft, ChevronRight, Search
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import PermissionGuardian from "../../components/auth/PermissionGuardian";
 import { useGetAllBlogsQuery, useDeleteBlogMutation } from "../../redux/service/adminApi";
@@ -9,151 +13,152 @@ import { useGetAllBlogsQuery, useDeleteBlogMutation } from "../../redux/service/
 export default function BlogListPage() {
     const router = useRouter();
 
-    // ✅ Redux Query with extra states for better UX
-    const { data, isLoading, isError, refetch } = useGetAllBlogsQuery();
+    //    1. Pagination & Filter State
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const limit = 10; // Strict limit per page
+
+    const { data, isLoading, isError, isFetching, refetch } = useGetAllBlogsQuery();
     const [deleteBlog, { isLoading: isDeleting }] = useDeleteBlogMutation();
 
-    // ✅ FIX: Extracting blogs array correctly based on your API response
-    const blogs = data?.data?.blogs || [];
+    const allBlogs = data?.data?.blogs || [];
+
+    //    2. Strict Frontend Filtering & Slicing (Same as Coupons)
+    const { displayBlogs, totalRecords } = useMemo(() => {
+        let filtered = allBlogs.filter(blog =>
+            blog.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        const total = filtered.length;
+        const startIndex = (page - 1) * limit;
+        const sliced = filtered.slice(startIndex, startIndex + limit);
+
+        return { displayBlogs: sliced, totalRecords: total };
+    }, [allBlogs, searchTerm, page]);
+
+    const totalPages = Math.ceil(totalRecords / limit) || 1;
+
+    //    3. Auto-reset to page 1 on search
+    useEffect(() => {
+        setPage(1);
+    }, [searchTerm]);
 
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this blog?")) {
             try {
-                // ✅ Mutation trigger based on your adminApi definition
                 await deleteBlog(id).unwrap();
             } catch (err) {
-                alert(err?.data?.message || "Failed to delete blog. Please try again.");
+                alert(err?.data?.message || "Failed to delete blog.");
             }
         }
     };
 
     return (
         <PermissionGuardian permissionId="General">
-            <main className="p-2 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden min-h-screen bg-gray-50/30">
-                {/* Header Section */}
+            <main className="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-50/30 overflow-x-hidden">
                 <PageHeader
                     title="Blogs & Articles"
-                    description="Manage your website's content and SEO articles"
-                    showExport={false}
+                    description={`Monitoring ${totalRecords} published articles.`}
                     addButtonLabel="Create Blog"
                     onAddClick={() => router.push("/blog/create")}
                 />
 
-                <div className="mt-4 sm:mt-6">
-                    <div className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto no-scrollbar">
-                            <div className="min-w-[900px]">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                                        <tr>
-                                            <th className="p-4 font-semibold w-16 text-center">S.No</th>
-                                            <th className="p-4 font-semibold">Title & Category</th>
-                                            <th className="p-4 font-semibold">Author</th>
-                                            <th className="p-4 font-semibold">Date</th>
-                                            <th className="p-4 font-semibold">Status</th>
-                                            <th className="p-4 font-semibold text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {/* 1. LOADING STATE */}
-                                        {isLoading ? (
-                                            <tr>
-                                                <td colSpan="6" className="p-20 text-center">
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        <Loader2 className="animate-spin text-[#7C3AED]" size={40} />
-                                                        <p className="text-sm text-gray-400 font-medium tracking-wide">Syncing with server...</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ) : isError ? (
-                                            /* 2. ERROR STATE */
-                                            <tr>
-                                                <td colSpan="6" className="p-20 text-center">
-                                                    <div className="flex flex-col items-center gap-3 text-red-500">
-                                                        <AlertCircle size={40} />
-                                                        <p className="font-bold">Could not load blogs</p>
-                                                        <button onClick={() => refetch()} className="text-xs bg-gray-100 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-all">Try Again</button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ) : blogs.length === 0 ? (
-                                            /* 3. EMPTY STATE */
-                                            <tr>
-                                                <td colSpan="6" className="p-20 text-center">
-                                                    <div className="flex flex-col items-center gap-3 text-gray-400">
-                                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
-                                                            <Inbox size={32} />
-                                                        </div>
-                                                        <p className="text-sm font-medium italic">No blogs found. Start by creating your first post!</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            /* 4. DATA RENDER */
-                                            blogs.map((blog, index) => (
-                                                <tr key={blog._id} className="hover:bg-gray-50/50 transition-colors group">
-                                                    <td className="p-4 text-xs text-gray-400 font-medium text-center">
-                                                        {String(index + 1).padStart(2, '0')}
-                                                    </td>
-                                                    <td className="p-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
-                                                                <BookOpen size={20} />
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <span className="text-sm font-semibold text-gray-800 block truncate max-w-[300px]" title={blog.title}>
-                                                                    {blog.title}
-                                                                </span>
-                                                                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                                                                    {blog.category || 'General Content'}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="p-4">
-                                                        <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                                            {blog.createdBy?.role || 'SUPERADMIN'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="p-4 text-sm text-gray-600">
-                                                        {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
-                                                    </td>
-                                                    <td className="p-4">
-                                                        <StatusBadge status={blog.status || "PUBLISHED"} />
-                                                    </td>
-                                                    <td className="p-4 text-right">
-                                                        <div className="flex items-center justify-end gap-1">
+                {/*    4. Search Bar Integration */}
+                <div className="mt-6 mb-6 max-w-md relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                        type="text"
+                        placeholder="Search articles by title..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-purple-500/5 transition-all text-sm font-medium"
+                    />
+                </div>
 
-                                                            <button
-                                                                onClick={() => router.push(`/blog/edit/${blog._id}`)}
-                                                                className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                                                                title="Edit"
-                                                            >
-                                                                <Edit2 size={18} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDelete(blog._id)}
-                                                                disabled={isDeleting}
-                                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-30"
-                                                                title="Delete"
-                                                            >
-                                                                <Trash2 size={18} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
+                    <div className="overflow-x-auto no-scrollbar">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                                <tr>
+                                    <th className="p-6 text-center w-20">Index</th>
+                                    <th className="p-6">Article Identity</th>
+                                    <th className="p-6">Created By</th>
+                                    <th className="p-6 text-center">Status</th>
+                                    <th className="p-6 text-right pr-10">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {isLoading ? (
+                                    <tr><td colSpan="5" className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-purple-600" size={40} /></td></tr>
+                                ) : displayBlogs.length === 0 ? (
+                                    <tr><td colSpan="5" className="p-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs"><Inbox className="mx-auto mb-2 opacity-20" size={48} /> No Articles Found</td></tr>
+                                ) : (
+                                    displayBlogs.map((blog, index) => (
+                                        <tr key={blog._id} className="hover:bg-gray-50/50 transition-colors group">
+                                            {/*    5. Corrected Indexing: Page 2 starts at 11 */}
+                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                                {String((page - 1) * limit + index + 1).padStart(2, '0')}
+                                            </td>
+                                            <td className="p-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 border border-purple-100">
+                                                        <BookOpen size={18} />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-black text-gray-800 tracking-tight">{blog.title}</span>
+                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{new Date(blog.createdAt).toLocaleDateString('en-GB')}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-6">
+                                                <span className="text-[10px] font-black uppercase px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">
+                                                    {blog.createdBy?.role || 'ADMIN'}
+                                                </span>
+                                            </td>
+                                            <td className="p-6 text-center">
+                                                <StatusBadge status={blog.status || "PUBLISHED"} />
+                                            </td>
+                                            <td className="p-6 text-right pr-10">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button onClick={() => router.push(`/blog/edit/${blog._id}`)} className="p-2 text-emerald-600 hover:bg-emerald-50 hover:cursor-pointer rounded-xl transition-all">
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(blog._id)} disabled={isDeleting} className="p-2 text-red-500 hover:bg-red-50 hover:cursor-pointer rounded-xl transition-all disabled:opacity-30">
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/*    6. PAGINATION FOOTER - Exact Coupon Design */}
+                    <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[9px] font-bold text-purple-400 uppercase">Showing {displayBlogs.length} of {totalRecords} Records</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1 || isFetching}
+                                className="p-2 bg-white border border-gray-200 hover:cursor-pointer rounded-xl disabled:opacity-30 hover:bg-gray-50 shadow-sm transition-all active:scale-90"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page >= totalPages || isFetching}
+                                className="p-2 bg-white border border-gray-200 hover:cursor-pointer rounded-xl disabled:opacity-30 hover:bg-gray-50 shadow-sm transition-all active:scale-90"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
                         </div>
                     </div>
                 </div>
-                {/* Footer Note */}
-                <p className="mt-6 text-center text-[10px] text-gray-400 font-medium uppercase tracking-[2px]">
-                    Powered by UrsSkill Internal CMS System
-                </p>
             </main>
         </PermissionGuardian>
     );

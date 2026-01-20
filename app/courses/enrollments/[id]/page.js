@@ -152,7 +152,7 @@ export default function CourseEnrollmentsPage({ params }) {
                         </div>
                     </div>
 
-                    {/* ✅ SAME TABLE EVERYWHERE - HORIZONTAL SCROLL ONLY */}
+                    {/*    SAME TABLE EVERYWHERE - HORIZONTAL SCROLL ONLY */}
                     <div className="w-full">
                         <div className="overflow-x-auto bg-white rounded-2xl border border-gray-100 shadow-sm">
                             <div className="min-w-[1400px]">

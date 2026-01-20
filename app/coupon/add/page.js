@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import PageHeader from "../../../components/ui/PageHeader";
 import {
     Info, ShieldCheck, Zap,
-    ArrowLeft, RefreshCw, Check, Calendar, ArrowRight, Mail
+    ArrowLeft, RefreshCw, Check, Calendar, ArrowRight, Mail, AlertCircle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PermissionGuardian from "../../../components/auth/PermissionGuardian";
@@ -15,7 +15,6 @@ export default function AddCouponPage() {
     const [activeTab, setActiveTab] = useState("information");
     const [error, setError] = useState("");
 
-    // ✅ Precision Helper: Ensures time is always current and formatted for HTML5
     const getLiveDateTime = () => {
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -24,7 +23,6 @@ export default function AddCouponPage() {
 
     const [minDateTime, setMinDateTime] = useState(getLiveDateTime());
 
-    // Sync min time every minute
     useEffect(() => {
         const timer = setInterval(() => setMinDateTime(getLiveDateTime()), 60000);
         return () => clearInterval(timer);
@@ -39,16 +37,47 @@ export default function AddCouponPage() {
         discountType: "1", discountValue: 0
     });
 
-    // ✅ FORCE TIME VALIDATION: Prevents selecting past time on current date
+    //    Validation Helper: Runs specific checks based on the tab
+    const validateStep = (tab) => {
+        if (tab === "information") {
+            if (!formData.name.trim()) return "Promotional Rule Name is required.";
+            if (!formData.code.trim()) return "Coupon Code is required.";
+            if (formData.code.length < 3) return "Code must be at least 3 characters.";
+        }
+
+        if (tab === "conditions") {
+            if (!formData.validTill) return "Expiry Date (Valid Till) is required.";
+            if (new Date(formData.validTill) <= new Date(formData.validFrom)) {
+                return "Expiry time must be after the start time.";
+            }
+            if (formData.totalUsageLimit < 1) return "Global Quota must be at least 1.";
+
+            // Validate Emails if provided
+            if (formData.allowedCustomers.trim()) {
+                const emails = formData.allowedCustomers.split(",").map(e => e.trim());
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const invalidEmail = emails.find(email => !emailRegex.test(email));
+                if (invalidEmail) return `Invalid email detected: ${invalidEmail}`;
+            }
+        }
+
+        if (tab === "actions") {
+            if (formData.discountValue <= 0) return "Discount value must be greater than 0.";
+            if (formData.discountType === "1" && formData.discountValue > 100) {
+                return "Percentage discount cannot exceed 100%.";
+            }
+        }
+
+        return null;
+    };
+
     const handleDateChange = (field, value) => {
         const selectedTime = new Date(value).getTime();
         const currentTime = new Date().getTime();
 
-        if (selectedTime < currentTime) {
-            // If user selects past time, force it to the current live time
-            const now = getLiveDateTime();
-            setFormData(prev => ({ ...prev, [field]: now }));
-            setError("Past time is not allowed. Resetting to current time.");
+        if (selectedTime < currentTime && field === 'validFrom') {
+            setFormData(prev => ({ ...prev, [field]: getLiveDateTime() }));
+            setError("Start time cannot be in the past.");
         } else {
             setFormData(prev => ({ ...prev, [field]: value }));
             setError("");
@@ -61,8 +90,9 @@ export default function AddCouponPage() {
     };
 
     const handleNext = (nextTab) => {
-        if (activeTab === "information" && (!formData.name.trim() || !formData.code.trim())) {
-            setError("Please fill Name and Code before proceeding.");
+        const validationError = validateStep(activeTab);
+        if (validationError) {
+            setError(validationError);
             return;
         }
         setActiveTab(nextTab);
@@ -71,23 +101,25 @@ export default function AddCouponPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.discountValue <= 0) {
-            setError("Please set a discount value before publishing.");
+
+        const finalError = validateStep("actions");
+        if (finalError) {
+            setError(finalError);
             return;
         }
 
         const submissionData = {
             ...formData,
             allowedCustomers: formData.allowedCustomers
-                ? formData.allowedCustomers.split(",").map(email => email.trim())
+                ? formData.allowedCustomers.split(",").map(email => email.trim()).filter(e => e !== "")
                 : []
         };
 
         try {
             await createCoupon(submissionData).unwrap();
-            router.push("/admin/coupons");
+            router.push("/coupon/list");
         } catch (err) {
-            setError(err?.data?.message || "Creation failed");
+            setError(err?.data?.message || "Internal Server Error: Could not save coupon.");
         }
     };
 
@@ -97,7 +129,7 @@ export default function AddCouponPage() {
             return;
         }
         const prefix = formData.name.split(" ")[0].toUpperCase().replace(/[^A-Z0-9]/g, "");
-        const randomStr = Math.random().toString(36).substring(2, 4).toUpperCase();
+        const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
         handleUpdate('code', `${prefix}${randomStr}`);
     };
 
@@ -106,118 +138,111 @@ export default function AddCouponPage() {
             <main className="min-h-screen bg-gray-50/50 p-3 sm:p-6 md:p-8 lg:p-10 overflow-x-hidden">
                 <div className="w-full mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-gray-100 pb-8">
                     <div className="text-center sm:text-left">
-                        <PageHeader title="Publish New Discount Rule" description="Configure campaign validity and target specific audiences." />
+                        <PageHeader title="Publish Discount Rule" description="Configure campaign validity and reward logic." />
                         <div className="w-24 h-1.5 bg-indigo-600 rounded-full mt-4 mx-auto sm:mx-0" />
                     </div>
-                    <button onClick={() => router.back()} className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-200 rounded-2xl text-gray-500 hover:text-indigo-600 transition-all font-black uppercase text-[10px] tracking-widest shadow-sm">
-                        <ArrowLeft size={16} /> Cancel Draft
-                    </button>
                 </div>
 
                 <div className="w-full space-y-6">
-                    {error && <div className="p-4 bg-red-50 border-2 border-red-100 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest animate-in fade-in slide-in-from-top-2">{error}</div>}
+                    {error && (
+                        <div className="p-4 bg-red-50 border-2 border-red-100 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                            <AlertCircle size={18} /> {error}
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
                         <div className="inline-flex gap-2 p-1.5 bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-500/5 min-w-full sm:min-w-max lg:w-fit">
                             <TabButton active={activeTab === "information"} onClick={() => setActiveTab("information")} icon={<Info size={18} />} label="1. Information" />
-                            <TabButton active={activeTab === "conditions"} onClick={() => setActiveTab("conditions")} icon={<ShieldCheck size={18} />} label="2. Conditions" />
-                            <TabButton active={activeTab === "actions"} onClick={() => setActiveTab("actions")} icon={<Zap size={18} />} label="3. Actions" />
+                            <TabButton active={activeTab === "conditions"} onClick={() => {
+                                const err = validateStep("information");
+                                if (!err) setActiveTab("conditions"); else setError(err);
+                            }} icon={<ShieldCheck size={18} />} label="2. Conditions" />
+                            <TabButton active={activeTab === "actions"} onClick={() => {
+                                const err = validateStep("information") || validateStep("conditions");
+                                if (!err) setActiveTab("actions"); else setError(err);
+                            }} icon={<Zap size={18} />} label="3. Actions" />
                         </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden">
                         <div className="p-5 sm:p-10 lg:p-16">
-                            <div className="w-full">
-                                {activeTab === "information" && (
-                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in duration-300">
-                                        <div className="space-y-6 sm:space-y-8">
-                                            <InputField label="Promotional Rule Name *" value={formData.name} onChange={(e) => handleUpdate('name', e.target.value)} required />
-                                            <div className="flex flex-col sm:flex-row items-end gap-4">
-                                                <div className="w-full"><InputField label="Public Coupon Code *" value={formData.code} onChange={(e) => handleUpdate('code', e.target.value.toUpperCase())} required /></div>
-                                                <button type="button" onClick={generateCode} className="w-full sm:w-auto h-14 sm:h-16 px-10 bg-indigo-50 text-indigo-600 border-2 border-indigo-100 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-indigo-600 hover:text-white transition-all">Generate</button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description ({formData.description.length}/120)</label>
-                                            <textarea maxLength={120} rows={5} className="w-full p-6 sm:p-8 bg-gray-50/50 border-2 border-gray-100 rounded-[2rem] focus:outline-none focus:border-indigo-500 transition-all font-medium text-base leading-relaxed" value={formData.description} onChange={(e) => handleUpdate('description', e.target.value)} />
+                            {activeTab === "information" && (
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in duration-300">
+                                    <div className="space-y-6 sm:space-y-8">
+                                        <InputField label="Promotional Rule Name *" placeholder="e.g. Winter Sale 2026" value={formData.name} onChange={(e) => handleUpdate('name', e.target.value)} />
+                                        <div className="flex flex-col sm:flex-row items-end gap-4">
+                                            <div className="w-full"><InputField label="Public Coupon Code *" placeholder="WINTER50" value={formData.code} onChange={(e) => handleUpdate('code', e.target.value.toUpperCase().replace(/\s/g, ""))} /></div>
+                                            <button type="button" onClick={generateCode} className="w-full sm:w-auto h-14 sm:h-16 px-10 bg-indigo-50 text-indigo-600 border-2 border-indigo-100 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-indigo-600 hover:text-white transition-all">Auto-Gen</button>
                                         </div>
                                     </div>
-                                )}
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Internal Description ({formData.description.length}/120)</label>
+                                        <textarea maxLength={120} rows={5} className="w-full p-6 sm:p-8 bg-gray-50/50 border-2 border-gray-100 rounded-[2rem] focus:outline-none focus:border-indigo-500 transition-all font-medium text-base leading-relaxed" placeholder="Briefly describe the purpose of this discount..." value={formData.description} onChange={(e) => handleUpdate('description', e.target.value)} />
+                                    </div>
+                                </div>
+                            )}
 
-                                {activeTab === "conditions" && (
-                                    <div className="space-y-10 lg:space-y-12 animate-in fade-in duration-300">
-                                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">
-                                            <div className="space-y-4">
-                                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Validity Window</label>
-                                                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3">
-                                                    <div className="relative w-full">
-                                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={18} />
-                                                        <input
-                                                            min={minDateTime}
-                                                            type="datetime-local"
-                                                            className="w-full pl-12 pr-3 h-14 sm:h-16 bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-xs sm:text-sm focus:border-indigo-500 outline-none transition-all"
-                                                            value={formData.validFrom}
-                                                            onChange={(e) => handleDateChange('validFrom', e.target.value)}
-                                                        />
-                                                    </div>
-                                                    <span className="text-[10px] font-black text-gray-300 uppercase text-center">To</span>
-                                                    <div className="relative w-full">
-                                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={18} />
-                                                        <input
-                                                            min={formData.validFrom || minDateTime}
-                                                            type="datetime-local"
-                                                            className="w-full pl-12 pr-3 h-14 sm:h-16 bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-xs sm:text-sm focus:border-indigo-500 outline-none transition-all"
-                                                            value={formData.validTill}
-                                                            onChange={(e) => handleDateChange('validTill', e.target.value)}
-                                                        />
-                                                    </div>
+                            {activeTab === "conditions" && (
+                                <div className="space-y-10 lg:space-y-12 animate-in fade-in duration-300">
+                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">
+                                        <div className="space-y-4">
+                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Validity Window *</label>
+                                            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3">
+                                                <div className="relative w-full">
+                                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={18} />
+                                                    <input min={minDateTime} type="datetime-local" className="w-full pl-12 pr-3 h-14 sm:h-16 bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-xs sm:text-sm focus:border-indigo-500 outline-none transition-all" value={formData.validFrom} onChange={(e) => handleDateChange('validFrom', e.target.value)} />
                                                 </div>
-                                            </div>
-                                            <InputField label="Minimum Order Valuation (₹)" type="number" value={formData.minCartAmount} onChange={(e) => handleUpdate('minCartAmount', e.target.value)} />
-                                        </div>
-
-                                        <div className="pt-10 border-t border-gray-50">
-                                            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 lg:gap-12 items-start">
-                                                <div className="xl:col-span-2">
-                                                    <InputField label="Allowed Customers (Optional)" placeholder="Enter emails separated by commas..." value={formData.allowedCustomers} onChange={(e) => handleUpdate('allowedCustomers', e.target.value)} />
-                                                    <p className="text-[9px] font-bold text-gray-400 uppercase mt-3 ml-1 flex items-center gap-1.5"><Mail size={10} /> Leave blank to allow all registered customers.</p>
-                                                </div>
-                                                <div className="grid grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-6">
-                                                    <InputField label="Global Quota" type="number" value={formData.totalUsageLimit} onChange={(e) => handleUpdate('totalUsageLimit', e.target.value)} />
-                                                    <InputField label="User Limit" type="number" value={formData.perUserUsageLimit} onChange={(e) => handleUpdate('perUserUsageLimit', e.target.value)} />
+                                                <span className="text-[10px] font-black text-gray-300 uppercase text-center">To</span>
+                                                <div className="relative w-full">
+                                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={18} />
+                                                    <input min={formData.validFrom || minDateTime} type="datetime-local" className="w-full pl-12 pr-3 h-14 sm:h-16 bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-xs sm:text-sm focus:border-indigo-500 outline-none transition-all" value={formData.validTill} onChange={(e) => handleDateChange('validTill', e.target.value)} />
                                                 </div>
                                             </div>
                                         </div>
+                                        <InputField label="Minimum Cart Value (₹)" type="number" min="0" value={formData.minCartAmount} onChange={(e) => handleUpdate('minCartAmount', e.target.value)} />
                                     </div>
-                                )}
 
-                                {activeTab === "actions" && (
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 animate-in fade-in duration-300">
-                                        <div className="lg:col-span-2 space-y-6">
-                                            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest block ml-1">Calculation Methodology</label>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                                <RadioOption label="Percentage (%)" active={formData.discountType === "1"} onClick={() => handleUpdate('discountType', "1")} />
-                                                <RadioOption label="Fixed Amount (₹)" active={formData.discountType === "2"} onClick={() => handleUpdate('discountType', "2")} />
+                                    <div className="pt-10 border-t border-gray-50">
+                                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 lg:gap-12 items-start">
+                                            <div className="xl:col-span-2">
+                                                <InputField label="Target Customers (Comma separated emails)" placeholder="user1@gmail.com, user2@gmail.com" value={formData.allowedCustomers} onChange={(e) => handleUpdate('allowedCustomers', e.target.value)} />
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase mt-3 ml-1 flex items-center gap-1.5"><Mail size={10} /> Leave empty to make this coupon public for everyone.</p>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <InputField label="Total Uses" type="number" min="1" value={formData.totalUsageLimit} onChange={(e) => handleUpdate('totalUsageLimit', e.target.value)} />
+                                                <InputField label="Per User" type="number" min="1" value={formData.perUserUsageLimit} onChange={(e) => handleUpdate('perUserUsageLimit', e.target.value)} />
                                             </div>
                                         </div>
-                                        <InputField label={`Reward Value ${formData.discountType === "1" ? "(%)" : "(₹)"}`} type="number" value={formData.discountValue} onChange={(e) => handleUpdate('discountValue', e.target.value)} />
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
+
+                            {activeTab === "actions" && (
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 animate-in fade-in duration-300">
+                                    <div className="lg:col-span-2 space-y-6">
+                                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest block ml-1">Discount Calculation</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <RadioOption label="Percentage (%)" active={formData.discountType === "1"} onClick={() => handleUpdate('discountType', "1")} />
+                                            <RadioOption label="Fixed Amount (₹)" active={formData.discountType === "2"} onClick={() => handleUpdate('discountType', "2")} />
+                                        </div>
+                                    </div>
+                                    <InputField label={`Discount Value ${formData.discountType === "1" ? "(Max 100%)" : "(Flat ₹)"}`} type="number" min="1" value={formData.discountValue} onChange={(e) => handleUpdate('discountValue', e.target.value)} />
+                                </div>
+                            )}
                         </div>
 
                         <div className="p-6 sm:p-8 lg:p-12 bg-gray-50/50 border-t border-gray-100 flex justify-end">
                             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                                 {activeTab !== "information" && (
-                                    <button type="button" onClick={() => setActiveTab(activeTab === "actions" ? "conditions" : "information")} className="w-full sm:w-auto px-10 py-4 sm:py-5 text-gray-400 font-black uppercase text-[10px] tracking-widest hover:text-indigo-600 transition-all text-center">Back</button>
+                                    <button type="button" onClick={() => setActiveTab(activeTab === "actions" ? "conditions" : "information")} className="w-full sm:w-auto hover:cursor-pointer px-10 py-4 sm:py-5 text-gray-400 font-black uppercase text-[10px] tracking-widest hover:text-indigo-600 transition-all text-center">Back</button>
                                 )}
                                 {activeTab === "actions" ? (
-                                    <button type="submit" disabled={isLoading} className="w-full sm:w-auto px-12 py-4 sm:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.2rem] sm:rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95">
-                                        {isLoading ? <RefreshCw className="animate-spin" size={16} /> : <Check size={18} />} Securely Publish
+                                    <button type="submit" disabled={isLoading} className="w-full sm:w-auto hover:cursor-pointer px-12 py-4 sm:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50">
+                                        {isLoading ? <RefreshCw className="animate-spin" size={16} /> : <Check size={18} />} Publish Rule
                                     </button>
                                 ) : (
-                                    <button type="button" onClick={() => handleNext(activeTab === "information" ? "conditions" : "actions")} className="w-full sm:w-auto px-12 py-4 sm:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.2rem] sm:rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95">
-                                        Continue <ArrowRight size={18} />
+                                    <button type="button" onClick={() => handleNext(activeTab === "information" ? "conditions" : "actions")} className="w-full sm:w-auto hover:cursor-pointer px-12 py-4 sm:py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95">
+                                        Save & Continue <ArrowRight size={18} />
                                     </button>
                                 )}
                             </div>
@@ -229,9 +254,9 @@ export default function AddCouponPage() {
     );
 }
 
-/* Internal Components (Design maintained) */
+/* Internal Components (Maintaining Original Premium Design) */
 const TabButton = ({ active, onClick, icon, label }) => (
-    <button onClick={onClick} type="button" className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-5 rounded-[1.2rem] transition-all whitespace-nowrap ${active ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'text-gray-400 hover:bg-gray-50'}`}>
+    <button onClick={onClick} type="button" className={`flex-1 flex items-center justify-center hover:cursor-pointer gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-5 rounded-[1.2rem] transition-all whitespace-nowrap ${active ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'text-gray-400 hover:bg-gray-50'}`}>
         <span className="opacity-70">{icon}</span>
         <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest">{label}</span>
     </button>
@@ -245,7 +270,7 @@ const InputField = ({ label, onChange, ...props }) => (
 );
 
 const RadioOption = ({ label, active, onClick }) => (
-    <button onClick={onClick} type="button" className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-[1.2rem] sm:rounded-[1.5rem] border-2 transition-all w-full ${active ? 'border-indigo-600 bg-indigo-50 shadow-md' : 'border-gray-100 bg-white'}`}>
+    <button onClick={onClick} type="button" className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-[1.5rem] border-2 transition-all w-full ${active ? 'border-indigo-600 bg-indigo-50 shadow-md' : 'border-gray-100 bg-white'}`}>
         <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 flex items-center justify-center ${active ? 'border-indigo-600 bg-indigo-600 shadow-sm' : 'border-gray-200 bg-white'}`}>
             {active && <div className="w-2 h-2 rounded-full bg-white" />}
         </div>
