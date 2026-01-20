@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast'; // Switched import
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -21,6 +21,7 @@ export default function LoginPage() {
   const submit = async (e) => {
     e.preventDefault();
 
+    // Validations
     if (!form.email || !form.password) {
       toast.error('All fields are required');
       return;
@@ -36,25 +37,28 @@ export default function LoginPage() {
       return;
     }
 
+    // Using toast.promise or manual loading toast for better UX
+    const loginToast = toast.loading('Authenticating...');
+
     const res = await dispatch(customerLogin(form));
 
     if (res.meta.requestStatus === 'fulfilled') {
-      toast.success('Login successful');
+      toast.success('Login successful', { id: loginToast });
       router.push('/profile');
     } else {
-      toast.error(res.payload || 'Login failed');
+      toast.error(res.payload || 'Login failed', { id: loginToast });
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border rounded-lg mb-4">
-      <h2 className="text-2xl font-semibold mb-4">Customer Login</h2>
+    <div className="max-w-md mx-auto mt-20 p-6 border rounded-lg mb-4 shadow-sm">
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Customer Login</h2>
 
       <form onSubmit={submit} className="space-y-4">
         <input
           type="email"
           placeholder="Email"
-          className="w-full border p-2 rounded"
+          className="w-full border p-2 rounded focus:ring-2 focus:ring-purple-200 focus:outline-none"
           value={form.email}
           onChange={(e) =>
             setForm({ ...form, email: e.target.value })
@@ -65,7 +69,7 @@ export default function LoginPage() {
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Password"
-            className="w-full border p-2 rounded pr-10"
+            className="w-full border p-2 rounded pr-10 focus:ring-2 focus:ring-purple-200 focus:outline-none"
             value={form.password}
             onChange={(e) =>
               setForm({ ...form, password: e.target.value })
@@ -74,23 +78,25 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700 transition-colors"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
 
         <button
-          className="w-full bg-purple-700 text-white py-2 rounded"
+          className={`w-full bg-purple-700 text-white py-2 rounded transition-all ${
+            loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-purple-800'
+          }`}
           disabled={loading}
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
-      <p className="mt-4 text-sm">
+      <p className="mt-4 text-sm text-gray-600">
         New here?{' '}
-        <Link href="/signup" className="text-purple-700">
+        <Link href="/signup" className="text-purple-700 font-semibold hover:underline">
           Create account
         </Link>
       </p>
