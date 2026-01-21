@@ -19,10 +19,22 @@ export const transactionApi = createApi({
         method: 'POST',
         body
       })
-    })
+    }),
+    applyCoupon: builder.mutation({
+      query: (body) => ({
+        url: '/api/v1/coupons/apply',
+        method: 'POST',
+        body // expects { code, courseId }
+      })
+    }),
+    getMyTransactions: builder.query({
+      query: () => '/api/v1/transactions/my',
+    }),
   })
 });
 
 export const {
-  useCreateTransactionMutation
+  useCreateTransactionMutation,
+  useApplyCouponMutation,
+  useGetMyTransactionsQuery,
 } = transactionApi;

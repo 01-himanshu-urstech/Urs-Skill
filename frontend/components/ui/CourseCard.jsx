@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function CourseCard({ course }) {
+  const safeHref = course.link || "#";
   return (
-    <Link href={course.link} className="block">
+    <Link href={safeHref} className="block">
       {/* OUTER CARD */}
       <div className=" group
   bg-[#12064C] rounded-[18px] p-[10px] h-[480px]
