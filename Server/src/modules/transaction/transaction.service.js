@@ -144,12 +144,27 @@ class TransactionService {
     };
   }
 
-  async getCustomerTransactions(customerId) {
-    const transactions = await Transaction.find({ customerId })
-      .sort({ createdAt: -1 });
+async getCustomerTransactions(customerId) {
+  const transactions = await Transaction.find({ 
+    customerId, 
+    status: 'SUCCESS' // Only fetch successful purchases for "My Courses"
+  }).sort({ createdAt: -1 });
 
-    return { transactions };
-  }
+  // Enrich the data with STATIC_COURSES info
+  const enrichedTransactions = transactions.map(txn => {
+    const courseInfo = STATIC_COURSES[txn.courseId] || {};
+    return {
+      ...txn._doc,
+      courseDetails: {
+        name: courseInfo.name,
+        // thumbnail: courseInfo.thumbnail,
+        // duration: courseInfo.duration
+      }
+    };
+  });
+
+  return { transactions: enrichedTransactions };
+}
 
   async getAllTransactions({ page = 1, limit = 20 }) {
     const transactions = await Transaction.find()
