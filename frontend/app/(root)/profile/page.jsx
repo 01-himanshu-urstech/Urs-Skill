@@ -40,9 +40,10 @@ export default function ProfilePage() {
     if (!txnData?.data?.transactions) return [];
 
     return txnData.data.transactions
-      .filter(txn => txn.status === 'SUCCESS')
+      .filter(txn => txn.status === 'SUCCESS') // Note: Latest course won't show if status is PENDING
       .map(txn => {
-        // Accessing STATIC_COURSES by ID (e.g., STATIC_COURSES[1])
+        // Since STATIC_COURSES is an Object, access it directly by key
+        // Example: STATIC_COURSES["1"]
         const courseStaticInfo = STATIC_COURSES[txn.courseId];
 
         return {
@@ -51,7 +52,7 @@ export default function ProfilePage() {
           amount: txn.finalAmount,
           status: txn.status,
           coupon: txn.couponCode,
-          instructor: "Expert Instructor", // Fallback if not in static data
+          instructor: courseStaticInfo?.instructor || "Expert Instructor",
           date: new Date(txn.createdAt).toLocaleDateString('en-IN')
         };
       });

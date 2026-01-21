@@ -1,14 +1,22 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { CheckCircle2, ArrowRight, LayoutDashboard, Mail } from "lucide-react";
+import { useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import { CheckCircle2, ArrowRight, LayoutDashboard, Mail, IndianRupee } from "lucide-react";
+import { useGetMyTransactionsQuery } from "@/store/api/transactionApi"; // Import your API hook
 import Link from "next/link";
 import gsap from "gsap";
 
 export default function PaymentSuccessPage() {
   const params = useSearchParams();
-  const router = useRouter();
   const orderId = params.get("orderId");
+
+  // Fetch transactions to find the amount for this specific order
+  const { data: txnData } = useGetMyTransactionsQuery();
+
+  // Find the current transaction from the list
+  const currentTxn = useMemo(() => {
+    return txnData?.data?.transactions?.find(t => t.transactionId === orderId);
+  }, [txnData, orderId]);
 
   const containerRef = useRef(null);
   const cardRef = useRef(null);
@@ -17,7 +25,6 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
-
       tl.fromTo(containerRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 })
         .fromTo(cardRef.current,
           { y: 40, opacity: 0, scale: 0.95 },
@@ -38,14 +45,12 @@ export default function PaymentSuccessPage() {
         ref={cardRef}
         className="max-w-md w-full bg-white rounded-[24px] p-8 shadow-[0_20px_50px_rgba(109,74,255,0.1)] border border-purple-50 text-center"
       >
-        {/* Success Icon */}
         <div ref={checkRef} className="flex justify-center mb-6">
           <div className="bg-purple-100 p-4 rounded-full">
             <CheckCircle2 className="text-purple-600 w-12 h-12" strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Text Content */}
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
           Enrollment Successful
         </h1>
@@ -53,14 +58,25 @@ export default function PaymentSuccessPage() {
           Your payment was processed successfully. You now have full access to your course materials.
         </p>
 
+        {/* --- NEW AMOUNT SECTION --- */}
+        {currentTxn && (
+          <div className="mt-6 py-4 border-y border-gray-100 flex flex-col items-center">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Amount Paid</span>
+            <div className="flex items-center text-3xl font-black text-gray-900 mt-1">
+              <IndianRupee size={24} className="text-purple-600" />
+              <span>{currentTxn.finalAmount}</span>
+            </div>
+          </div>
+        )}
+
         {/* Order Details */}
-        <div className="mt-8 bg-purple-50/50 rounded-2xl p-4 border border-purple-100/50">
+        <div className="mt-6 bg-purple-50/50 rounded-2xl p-4 border border-purple-100/50">
           <div className="flex justify-between items-center text-[12px] uppercase tracking-wider font-bold text-purple-400 mb-1">
             <span>Transaction ID</span>
             <span className="text-purple-600">Verified</span>
           </div>
           <p className="text-sm font-mono font-medium text-gray-700 break-all">
-            {orderId || "CF_ORD_9283741"}
+            {orderId}
           </p>
         </div>
 
@@ -68,7 +84,7 @@ export default function PaymentSuccessPage() {
         <div className="mt-8 space-y-3">
           <Link
             href="/profile"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 group"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 group "
           >
             <LayoutDashboard size={18} />
             Go to My Profile
@@ -77,13 +93,12 @@ export default function PaymentSuccessPage() {
 
           <button
             onClick={() => window.print()}
-            className="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all"
+            className="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all hover:cursor-pointer"
           >
             Download Invoice
           </button>
         </div>
 
-        {/* Footer Support */}
         <div className="mt-8 pt-6 border-t border-gray-100">
           <p className="text-[11px] text-gray-400 flex items-center justify-center gap-2">
             <Mail size={12} />

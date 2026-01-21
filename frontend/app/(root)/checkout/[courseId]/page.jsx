@@ -47,14 +47,14 @@ export default function CheckoutPage() {
         try {
             const res = await applyCoupon({
                 code: couponCode.toUpperCase(),
-                courseId: parseInt(courseId)
+                cartAmount: course.price // FIX: Pass the price so backend can calculate %
             }).unwrap();
 
+            // res.data now contains { discount, finalAmount, couponCode } from your updated backend
             setAppliedCoupon(res.data);
 
-            // Calculate Discount based on your backend response structure
-            const discountValue = res.data.discountAmount || 0;
-            setFinalAmount(Math.max(0, course.price - discountValue));
+            // Use the exact finalAmount calculated by your backend service
+            setFinalAmount(res.data.finalAmount);
 
             toast.success("Coupon applied!");
         } catch (err) {
@@ -64,40 +64,39 @@ export default function CheckoutPage() {
         }
     };
 
-const handlePayment = async () => {
-    try {
-        const payload = {
-            courseId: parseInt(courseId),
-            couponCode: appliedCoupon?.code || null,
-        };
+    const handlePayment = async () => {
+        try {
+            const payload = {
+                courseId: parseInt(courseId),
+                // Ensure we send the string code 'SAVE10', not the whole object
+                couponCode: appliedCoupon?.couponCode || null,
+            };
 
-        const res = await createTransaction(payload).unwrap();
+            const res = await createTransaction(payload).unwrap();
 
-        // FIX: Match the backend key "paymentSessionId" from your screenshot
-        const sessionId = res.data?.paymentSessionId; 
+            // Your backend returns: { transactionId, paymentSessionId }
+            const sessionId = res.data?.paymentSessionId;
 
-        if (!sessionId) {
-            console.error("Session ID missing in response:", res.data);
-            toast.error("Could not initialize payment session. Please try again.");
-            return;
+            if (!sessionId) {
+                toast.error("Payment session failed. Please try again.");
+                return;
+            }
+
+            const cashfree = new window.Cashfree({
+                mode: "sandbox", // Change to "production" when going live
+            });
+
+            const checkoutOptions = {
+                paymentSessionId: sessionId,
+                redirectTarget: "_self", // This will trigger the backend /return route
+            };
+
+            cashfree.checkout(checkoutOptions);
+
+        } catch (err) {
+            toast.error(err?.data?.message || "Transaction failed");
         }
-
-        // Initialize Cashfree
-        const cashfree = new window.Cashfree({
-            mode: "sandbox", 
-        });
-
-        const checkoutOptions = {
-            paymentSessionId: sessionId, // This is the SDK's required key name
-            redirectTarget: "_self",
-        };
-
-        cashfree.checkout(checkoutOptions);
-
-    } catch (err) {
-        toast.error(err?.data?.message || "Transaction failed");
-    }
-};
+    };
     if (!course) return null;
 
     return (
@@ -156,7 +155,7 @@ const handlePayment = async () => {
                                 <button
                                     onClick={handleApplyCoupon}
                                     disabled={applyingCoupon}
-                                    className="bg-gray-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-50"
+                                    className="bg-gray-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-50 hover:cursor-pointer"
                                 >
                                     {applyingCoupon ? <Loader2 className="animate-spin" size={20} /> : 'Apply'}
                                 </button>
@@ -196,7 +195,7 @@ const handlePayment = async () => {
                             <button
                                 onClick={handlePayment}
                                 disabled={creatingTx}
-                                className="w-full bg-gradient-to-br from-purple-600 to-purple-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 flex items-center justify-center gap-2 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-70"
+                                className="w-full bg-gradient-to-br from-purple-600 to-purple-800 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 flex items-center justify-center gap-2 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-70 hover:cursor-pointer"
                             >
                                 {creatingTx ? (
                                     <Loader2 className="animate-spin" size={20} />
