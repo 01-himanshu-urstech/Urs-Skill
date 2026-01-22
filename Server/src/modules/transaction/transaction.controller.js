@@ -1,4 +1,5 @@
 import { transactionService } from './transaction.service.js';
+import {config} from '../../config/config.js';
 
 /* CREATE TRANSACTION */
 export const createTransactionController = async (req, res, next) => {
@@ -19,17 +20,19 @@ export const createTransactionController = async (req, res, next) => {
 };
 
 /* CASHFREE RETURN URL */
+/* backend/transaction.controller.js */
 export const transactionReturnController = async (req, res, next) => {
   try {
     const { order_id } = req.query;
+    console.log("Confirming payment for:", order_id); // LOG THIS
 
     const result = await transactionService.confirmPayment(order_id);
 
-    // 🔁 Redirect to frontend success page
     return res.redirect(
-      `${process.env.FRONTEND_URL}/payment/success?orderId=${order_id}`
+      `${config.FRONTEND_URL}/payment/success?orderId=${order_id}`
     );
   } catch (err) {
+    console.error("Payment Confirmation Error:", err.message); // LOG THE ERROR
     return res.redirect(
       `${process.env.FRONTEND_URL}/payment/failed`
     );

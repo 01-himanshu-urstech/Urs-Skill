@@ -57,11 +57,33 @@ export const updateCouponController = async (req, res, next) => {
   }
 };
 
+/* ---------------- DELETE COUPON ---------------- */
+export const deleteCouponController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const admin = req.user;
 
+    const result = await couponService.deleteCouponById(
+      id,
+      {
+        userId: admin.adminId,
+        role: admin.role
+      }
+    );
+
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/* ---------------- LIST COUPONS ---------------- */
 /* ---------------- LIST COUPONS ---------------- */
 export const getCouponsController = async (req, res, next) => {
   try {
-    const result = await couponService.getCoupons();
+    // Pass req.user (which contains adminId and role from your authMiddleware)
+    const result = await couponService.getCoupons(req.user); 
     res.status(result.statusCode).json(result);
   } catch (error) {
     next(error);

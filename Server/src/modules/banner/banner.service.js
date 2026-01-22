@@ -15,6 +15,16 @@ class BannerService {
       throw APIError.validation('Banner image is required');
     }
 
+    // NEW: Check if a banner with the same order exists in this position
+    const existingOrder = await Banner.findOne({ 
+        order: data.order, 
+        position: data.position 
+    });
+    
+    if (existingOrder) {
+        throw APIError.validation(`Order number ${data.order} is already taken for the ${data.position} position.`);
+    }
+
     const uploaded = await uploadToCloudinary(file.buffer, 'banners');
 
     const banner = await Banner.create({
@@ -66,6 +76,21 @@ class BannerService {
     const banner = await Banner.findById(id);
     if (!banner) throw APIError.notFound('Banner not found');
 
+    // NEW: Check if the new order is taken by ANOTHER banner
+    if (data.order || data.position) {
+        const orderToCheck = data.order || banner.order;
+        const positionToCheck = data.position || banner.position;
+
+        const existingOrder = await Banner.findOne({
+            _id: { $ne: id }, // Exclude current banner
+            order: orderToCheck,
+            position: positionToCheck
+        });
+
+        if (existingOrder) {
+            throw APIError.validation(`Cannot update: Order ${orderToCheck} is already assigned to another banner in ${positionToCheck}.`);
+        }
+    }
     if (file) {
       await deleteFromCloudinary(banner.image.publicId);
 

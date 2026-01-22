@@ -63,6 +63,14 @@ const couponSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    
+    assignedSubAdmins: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Admin',
+          default: []
+        }
+      ],
 
     /* -------- ACTIONS TAB -------- */
     discountType: {

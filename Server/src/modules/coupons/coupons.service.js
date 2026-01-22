@@ -9,7 +9,7 @@ import { DISCOUNT_TYPES } from '../../constants/discountTypes.js';
 class CouponService {
 
   /* ---------------- CREATE COUPON ---------------- */
-  async createCoupon(data, admin) {
+async createCoupon(data, admin) {
     console.log(' Creating coupon:', data.code);
 
     const existing = await Coupon.findOne({ code: data.code });
@@ -17,12 +17,17 @@ class CouponService {
       throw APIError.conflict('Coupon code already exists');
     }
 
-    const coupon = await Coupon.create({
+    // 1. Create the coupon
+    let coupon = await Coupon.create({
       ...data,
-    validFrom: convertISTToUTC(data.validFrom),
-    validTill: convertISTToUTC(data.validTill),
+      validFrom: convertISTToUTC(data.validFrom),
+      validTill: convertISTToUTC(data.validTill),
       createdBy: admin.adminId
     });
+
+    // 2. IMPORTANT: Populate the sub-admin details so the frontend receives the Name and Email
+    // Replace 'assignedSubAdmins' with the exact field name in your Mongoose Schema
+    coupon = await coupon.populate('assignedSubAdmins', 'name email');
 
     // Activity log
     await ActivityLog.create({
@@ -40,15 +45,15 @@ class CouponService {
       }
     });
 
-    console.log('✅ Coupon created:', coupon.code);
+    console.log('✅ Coupon created and populated:', coupon.code);
 
     return {
       success: true,
       statusCode: 201,
       message: 'Coupon created successfully',
-      data: { coupon }
+      data: { coupon } // Now 'coupon' includes full sub-admin objects
     };
-  }
+}
 
   /* ---------------- GET COUPON BY ID ---------------- */
 async getCouponById(couponId) {
@@ -113,17 +118,58 @@ async updateCouponById(couponId, updateData, performedBy) {
 }
 
   /* ---------------- LIST COUPONS ---------------- */
-  async getCoupons() {
-    console.log(' Fetching coupons');
+async getCoupons(admin) {
+    let query = {};
+    
+    // If the person asking is a SUBADMIN, only show coupons assigned to them
+    if (admin.role === 'SUBADMIN') {
+        query = { assignedSubAdmins: admin.adminId };
+    }
 
-    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    const coupons = await Coupon.find(query)
+        .populate('assignedSubAdmins', 'name email')
+        .sort({ createdAt: -1 });
 
     return {
-      success: true,
-      statusCode: 200,
-      data: { coupons }
+        success: true,
+        statusCode: 200,
+        data: { coupons }
     };
+}
+
+
+/* ---------------- DELETE COUPON BY ID ---------------- */
+async deleteCouponById(couponId, performedBy) {
+  // Use 'couponId' (the argument name), not 'id'
+  const coupon = await Coupon.findById(couponId);
+  
+  if (!coupon) {
+    throw APIError.notFound('Coupon not found');
   }
+
+  // Delete the coupon
+  await Coupon.findByIdAndDelete(couponId);
+
+  // 🧾 Activity Log
+  await ActivityLog.create({
+    action: 'DELETE_COUPON',
+    performedBy,
+    target: {
+      entity: 'COUPON',
+      entityId: couponId
+    },
+    metadata: {
+      code: coupon.code,
+      deletedAt: new Date()
+    }
+  });
+
+  return {
+    success: true,
+    statusCode: 200,
+    message: `Coupon '${coupon.code}' deleted successfully`
+  };
+}
 
   /* ---------------- APPLY COUPON ---------------- */
   async applyCoupon({ code, customer, cartAmount, subAdminId = null }) {
@@ -156,20 +202,25 @@ async updateCouponById(couponId, updateData, performedBy) {
       throw APIError.forbidden('Coupon not allowed for this customer');
     }
 
-    // 💰 Discount calculation
-    let discount = 0;
-    if (coupon.discountType === '2') {
-      // PERCENT
-      discount = (cartAmount * coupon.discountValue) / 100;
-      if (coupon.maxDiscountAmount) {
-        discount = Math.min(discount, coupon.maxDiscountAmount);
-      }
-    } else {
-      // FLAT
-      discount = coupon.discountValue;
-    }
+   // 💰 Corrected Discount calculation
+let discount = 0;
 
-    const finalAmount = Math.max(cartAmount - discount, 0);
+if (coupon.discountType === '1' || coupon.discountType === 'PERCENTAGE') {
+    // PERCENTAGE Logic
+    discount = (Number(cartAmount) * Number(coupon.discountValue)) / 100;
+    if (coupon.maxDiscountAmount && coupon.maxDiscountAmount > 0) {
+        discount = Math.min(discount, coupon.maxDiscountAmount);
+    }
+} else if (coupon.discountType === '2' || coupon.discountType === 'FLAT') {
+    // FLAT Logic (This matches your DB where discountType is "2")
+    discount = Number(coupon.discountValue);
+}
+
+// Ensure discount doesn't exceed the cart amount
+discount = Math.min(discount, Number(cartAmount));
+discount = Math.round(discount);
+
+const finalAmount = Math.max(cartAmount - discount, 0);
 
     // ✅ SAVE COUPON USAGE (THIS FIXES YOUR ERROR)
     // await CouponUsage.create({
@@ -187,17 +238,18 @@ async updateCouponById(couponId, updateData, performedBy) {
     // coupon.usedCount += 1;
     // await coupon.save();
     
-
     return {
       success: true,
-      statusCode: 200,
-      message: 'Coupon applied successfully',
+    statusCode: 200,
       data: {
-        discount,
-        finalAmount,
-        couponCode: coupon.code
+          discount,
+          finalAmount,
+          couponCode: coupon.code,
+          discountType: coupon.discountType // Send this back for UI
       }
     };
+
+
   }
 
 }

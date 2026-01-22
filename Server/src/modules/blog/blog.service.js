@@ -92,17 +92,18 @@ async getBlogById(id) {
 
 
   /* ================= UPDATE ================= */
-  async updateBlog(id, data, performedBy, file) {
+async updateBlog(id, data, performedBy, file) {
     const blog = await Blog.findById(id);
     if (!blog) {
       throw APIError.notFound('Blog not found');
     }
 
+    // 1. Handle Slug Generation if title changes
     if (data.title && data.title !== blog.title) {
       blog.slug = await generateUniqueSlug(data.title, blog._id);
     }
 
-    // Replace cover image if new file uploaded
+    // 2. Replace cover image if new file uploaded
     if (file) {
       if (blog.coverImage?.publicId) {
         await deleteFromCloudinary(blog.coverImage.publicId);
@@ -119,9 +120,30 @@ async getBlogById(id) {
       };
     }
 
+    // ✅ FIX 1: Explicitly handle the 'status' field
+    // Mongoose enums are case-sensitive. Ensure 'data.status' is exactly 'DRAFT' or 'PUBLISHED'
+    if (data.status) {
+      blog.status = data.status;
+    }
+
+    // ✅ FIX 2: Handle nested SEO data from FormData
+    // Since FormData sends objects as [object Object] or stringified JSON, 
+    // we need to parse it if it arrives as a string.
+    if (data.seo && typeof data.seo === 'string') {
+      try {
+        data.seo = JSON.parse(data.seo);
+      } catch (error) {
+        console.error("SEO parsing error:", error);
+      }
+    }
+
+    // 3. Merge remaining standard fields
     Object.assign(blog, data);
+
+    // Save the changes
     await blog.save();
 
+    // 4. Activity Logging
     await activityLogService.log({
       action: 'UPDATE_BLOG',
       performedBy,

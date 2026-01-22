@@ -56,6 +56,13 @@ const transactionSchema = new mongoose.Schema(
     transactionValidity: {
       type: Date
     }
+    ,
+    // Add this inside transactionSchema
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Admin',
+      default: null
+    }
   },
   { timestamps: true }
 );

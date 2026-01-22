@@ -4,7 +4,8 @@ import {
   getCouponsController,
   applyCouponController,
   getCouponByIdController,
-  updateCouponController
+  updateCouponController,
+  deleteCouponController 
 } from './coupons.controller.js';
 
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
@@ -58,6 +59,17 @@ router.patch(
   authMiddleware,
   roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
   updateCouponController
+);
+
+/**
+ * DELETE COUPON BY ID
+ * SUPERADMIN / SUBADMIN
+ */
+router.delete(
+  '/delete/:id',
+  authMiddleware,
+  roleMiddleware(['SUPERADMIN', 'SUBADMIN']),
+  deleteCouponController
 );
 
 
