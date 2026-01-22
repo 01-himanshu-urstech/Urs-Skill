@@ -73,7 +73,7 @@ export default function LoginPage() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#7C3AED]/5 focus:border-[#7C3AED] transition-all text-sm font-bold"
+                                    className="text-black w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#7C3AED]/5 focus:border-[#7C3AED] transition-all text-sm font-bold text-black"
                                 />
                             </div>
                         </div>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-12 pr-12 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#7C3AED]/5 focus:border-[#7C3AED] transition-all text-sm font-bold"
+                                    className="text-black w-full pl-12 pr-12 py-4 bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#7C3AED]/5 focus:border-[#7C3AED] transition-all text-sm font-bold text-black" 
                                 />
                                 <button
                                     type="button"

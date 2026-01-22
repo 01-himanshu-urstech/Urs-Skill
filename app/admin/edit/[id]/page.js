@@ -8,14 +8,13 @@ import PermissionGuardian from "../../../../components/auth/PermissionGuardian";
 
 //    IDs match your database permission strings exactly
 const MODULES = [
-    { id: 'dashboard', label: 'Dashboard Overview' },
     { id: 'admin', label: 'Admin Management' },
     { id: 'customers', label: 'Customer Records' },
     { id: 'courses', label: 'Course Content' },      // New
     { id: 'transaction', label: 'Transactions' },    // New
     { id: 'General', label: 'General' },
     { id: 'coupons', label: 'Coupon Management' },
-    { id: 'Enquiry', label: 'Contact Queries' },
+    { id: 'Enquiry', label: 'Enquiry' },
     { id: 'logs', label: 'System Logs' }             // New
 ];
 

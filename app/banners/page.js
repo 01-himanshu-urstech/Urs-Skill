@@ -77,7 +77,7 @@ export default function BannerPage() {
                             placeholder="Filter by title or position..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium text-sm"
+                            className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium text-sm text-black"
                         />
                     </div>
                     <button

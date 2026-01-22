@@ -59,7 +59,7 @@ export default function CreateBacklinkPage() {
                                 <h3 className="font-bold text-gray-800">Link Details</h3>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
                                 <InputField
                                     label="Partner Name"
                                     name="name"
@@ -178,7 +178,7 @@ const InputField = ({ label, icon, ...props }) => (
             )}
             <input
                 {...props}
-                className={`w-full ${icon ? 'pl-11' : 'px-4'} py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-black placeholder-gray-600 h-12 shadow-sm font-medium`}
+                className={`w-full ${icon ? 'pl-11' : 'px-4'} py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-black placeholder-gray-600 h-12 shadow-sm font-medium text-black`}
             />
         </div>
     </div>

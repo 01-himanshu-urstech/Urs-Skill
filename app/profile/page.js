@@ -168,7 +168,7 @@ const InputField = ({ label, ...props }) => (
         <label className="text-sm font-semibold text-gray-900">{label}</label>
         <input
             {...props}
-            className="w-full px-3 sm:px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-black placeholder-gray-600 h-12 shadow-sm font-medium"
+            className="text-black w-full px-3 sm:px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-black placeholder-gray-600 h-12 shadow-sm font-medium"
         />
     </div>
 );

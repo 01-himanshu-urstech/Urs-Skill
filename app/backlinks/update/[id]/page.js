@@ -65,7 +65,7 @@ export default function UpdateBacklinkPage() {
                 <div className="max-w-4xl mt-6">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
                                 <InputField label="Partner Name" name="name" value={formData.name} onChange={handleChange} icon={<Globe size={18} />} required />
                                 <InputField label="Target URL" name="url" type="url" value={formData.url} onChange={handleChange} icon={<Link2 size={18} />} required />
 
@@ -97,7 +97,7 @@ const InputField = ({ label, icon, ...props }) => (
         <label className="text-sm font-semibold text-gray-900">{label}</label>
         <div className="relative group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
-            <input {...props} className="w-full pl-11 py-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-[#7C3AED] text-sm h-12 shadow-sm font-medium" />
+            <input {...props} className="text-black w-full pl-11 py-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-[#7C3AED] text-sm h-12 shadow-sm font-medium" />
         </div>
     </div>
 );

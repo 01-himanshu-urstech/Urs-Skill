@@ -30,8 +30,13 @@ export const adminApi = createApi({
         // ==========================================
         // 2. ADMIN MANAGEMENT (6 Routes)
         // ==========================================
+// ==========================================
+        // 2. ADMIN MANAGEMENT (Optimized for Sub-Admin Selection)
+        // ==========================================
         getAdmins: builder.query({
             query: () => '/admins/getall-admins',
+            // Suggestion: Ensure the backend returns role info so 
+            // the frontend can filter for 'sub-admin' specifically.
             providesTags: ['Admins'],
         }),
         getAdminById: builder.query({
@@ -130,16 +135,30 @@ export const adminApi = createApi({
                 } catch { }
             },
         }),
-        updateBlog: builder.mutation({
-            query: ({ id, ...data }) => ({ url: `/blogs/update/${id}`, method: 'PATCH', body: data }),
-            async onQueryStarted({ id, ...data }, { dispatch, queryFulfilled }) {
-                const patchResult = dispatch(adminApi.util.updateQueryData('getAllBlogs', undefined, (draft) => {
-                    const blog = draft.data.blogs.find(b => b._id === id);
-                    if (blog) Object.assign(blog, data);
-                }));
-                try { await queryFulfilled; } catch { patchResult.undo(); }
-            },
-        }),
+            updateBlog: builder.mutation({
+                    // We expect { id, formData, patch } where 'patch' is a plain object { title, status, etc. }
+                    query: ({ id, formData }) => ({ 
+                        url: `/blogs/update/${id}`, 
+                        method: 'PATCH', 
+                        body: formData // This goes to the server
+                    }),
+                    async onQueryStarted({ id, patch }, { dispatch, queryFulfilled }) {
+                        // We only use the plain 'patch' object to update the local Redux state
+                        const patchResult = dispatch(
+                            adminApi.util.updateQueryData('getAllBlogs', undefined, (draft) => {
+                                const blog = draft.data.blogs.find(b => b._id === id);
+                                // ✅ We spread 'patch' (plain object), NOT 'formData'
+                                if (blog && patch) Object.assign(blog, patch);
+                            })
+                        );
+                        try {
+                            await queryFulfilled;
+                        } catch {
+                            patchResult.undo();
+                        }
+                    },
+                    invalidatesTags: ['Blogs'],
+                }),
         deleteBlog: builder.mutation({
             query: (id) => ({ url: `/blogs/delete/${id}`, method: 'DELETE' }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
@@ -173,8 +192,8 @@ export const adminApi = createApi({
             },
         }),
 
-        // ==========================================
-        // 6. COUPON MANAGEMENT (4 Routes)
+       // ==========================================
+        // 6. COUPON MANAGEMENT (Enhanced for Assignments)
         // ==========================================
         getCoupons: builder.query({
             query: (params) => ({
@@ -186,29 +205,67 @@ export const adminApi = createApi({
                     search: params?.search || undefined
                 }
             }),
+            // IMPORTANT: If your backend returns sub-admin data inside coupons, 
+            // ensure the backend is using .populate('assignedSubAdmin')
             providesTags: ['Coupons'],
         }),
+        
         createCoupon: builder.mutation({
-            query: (newCoupon) => ({ url: '/coupons/create-coupons', method: 'POST', body: newCoupon }),
+            query: (newCoupon) => ({ 
+                url: '/coupons/create-coupons', 
+                method: 'POST', 
+                body: newCoupon // This body should now include assignedSubAdmin ID
+            }),
             async onQueryStarted(args, { dispatch, queryFulfilled }) {
                 try {
                     const { data: response } = await queryFulfilled;
+                    // Optimistic update for the coupon list
                     dispatch(adminApi.util.updateQueryData('getCoupons', undefined, (draft) => {
-                        draft.data.coupons.unshift(response.data.coupon);
+                        if (draft?.data?.coupons) {
+                            draft.data.coupons.unshift(response.data.coupon);
+                        }
                     }));
                 } catch { }
             },
+            invalidatesTags: ['Coupons'], 
         }),
-        updateCouponStatus: builder.mutation({
-            query: ({ id, status }) => ({ url: `/coupons/update-status/${id}`, method: 'PATCH', body: { status } }),
-            async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
-                const patchResult = dispatch(adminApi.util.updateQueryData('getCoupons', undefined, (draft) => {
-                    const coupon = draft.data.coupons.find(c => c._id === id);
-                    if (coupon) coupon.status = status;
-                }));
-                try { await queryFulfilled; } catch { patchResult.undo(); }
-            },
+        getCouponById: builder.query({
+            query: (id) => `/coupons/${id}`,
+            // Provides 'Coupons' tag so it refetches if the coupon is updated/deleted
+            providesTags: (result, error, id) => [{ type: 'Coupons', id }],
         }),
+
+        // ADDED: Mutation to re-assign or update coupon details
+        // Mutation to update coupon details with Optimistic Updates for status changes
+        updateCoupon: builder.mutation({
+                query: ({ id, ...data }) => ({
+                    url: `/coupons/editcoupon/${id}`,
+                    method: 'PATCH',
+                    body: data
+                }),
+                // This part handles the immediate UI update before the server responds
+                async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
+                    // Only attempt optimistic update if 'status' is being changed
+                    if (status) {
+                        const patchResult = dispatch(
+                            adminApi.util.updateQueryData('getCoupons', undefined, (draft) => {
+                                const coupon = draft.data.coupons.find(c => c._id === id);
+                                if (coupon) {
+                                    coupon.status = status;
+                                }
+                            })
+                        );
+                        try {
+                            await queryFulfilled;
+                        } catch {
+                            // If the API call fails, roll back the UI to the previous state
+                            patchResult.undo();
+                        }
+                    }
+                },
+                // Standard cache invalidation to ensure data consistency
+                invalidatesTags: ['Coupons'],
+            }),
         deleteCoupon: builder.mutation({
             query: (id) => ({ url: `/coupons/delete/${id}`, method: 'DELETE' }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
@@ -266,7 +323,7 @@ export const {
     useGetBlogsQuery, useGetAllBlogsQuery, useGetWebBlogsQuery, useGetBlogBySlugQuery, useCreateBlogMutation, useUpdateBlogMutation, useDeleteBlogMutation,
     useGetBacklinksQuery, useCreateBacklinkMutation, useUpdateBacklinkMutation, useDeleteBacklinkByIdMutation,
     useGetBannersQuery, useGetBannerByIdQuery, useCreateBannerMutation, useUpdateBannerMutation, useDeleteBannerMutation,
-    useGetCouponsQuery, useCreateCouponMutation, useUpdateCouponStatusMutation, useDeleteCouponMutation,
+    useGetCouponsQuery, useCreateCouponMutation,useGetCouponByIdQuery, useUpdateCouponMutation, useDeleteCouponMutation,
     useGetContactsQuery, useGetAllContactsQuery, useUpdateContactStatusMutation,
     useGetTransactionsQuery, useGetCoursesQuery, useGetSettingsQuery
 } = adminApi;

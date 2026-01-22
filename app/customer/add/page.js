@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAddCustomerMutation } from "../../../redux/service/adminApi";
 import PermissionGuardian from "../../../components/auth/PermissionGuardian";
+
 export default function AddCustomerPage() {
     const router = useRouter();
     const [addCustomer, { isLoading }] = useAddCustomerMutation();
@@ -22,7 +23,6 @@ export default function AddCustomerPage() {
         e.preventDefault();
         setError("");
 
-        // 🔥 Backend expects EXACTLY these 4 fields
         const payload = {
             name: formData.name,
             email: formData.email,
@@ -49,7 +49,6 @@ export default function AddCustomerPage() {
         <PermissionGuardian permissionId="customers">
             <main className="p-2 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden">
                 <div className="flex items-center gap-4 mb-2">
-
                     <PageHeader
                         title="Add New Customer"
                         description="Register a new student or client"
@@ -69,13 +68,14 @@ export default function AddCustomerPage() {
                             <h3 className="font-bold text-gray-800 text-lg">Customer Details</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
                             <InputField
                                 label="Full Name *"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
+                                minLength={3}
                                 placeholder="Anish Kumar Mishra"
                                 icon={<User size={18} />}
                             />
@@ -98,6 +98,9 @@ export default function AddCustomerPage() {
                                 onChange={handleChange}
                                 type="tel"
                                 required
+                                pattern="[0-9]{10}"
+                                title="Please enter a valid 10-digit phone number"
+                                maxLength={10}
                                 placeholder="9806527800"
                                 icon={<Phone size={18} />}
                             />
@@ -109,6 +112,7 @@ export default function AddCustomerPage() {
                                 onChange={handleChange}
                                 type="password"
                                 required
+                                minLength={6}
                                 placeholder="••••••••"
                                 icon={<Shield size={18} />}
                             />
@@ -161,7 +165,7 @@ const InputField = ({ label, icon, name, value, onChange, ...props }) => (
                 value={value}
                 onChange={onChange}
                 {...props}
-                className={`w-full ${icon ? 'pl-12' : 'px-4'} py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED] transition-all text-sm font-medium h-12 shadow-sm`}
+                className={`w-full ${icon ? 'pl-12' : 'px-4'} py-3.5 text-black bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED] transition-all text-sm font-medium h-12 shadow-sm`}
             />
         </div>
     </div>

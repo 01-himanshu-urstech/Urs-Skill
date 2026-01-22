@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import PageHeader from "../../../components/ui/PageHeader";
 import {
     Download, Eye, CheckCircle2, XCircle, Clock,
-    Loader2, Copy, Wallet, ChevronLeft, ChevronRight, Search, Inbox, Filter, Ticket
+    Loader2, Copy, Wallet, ChevronLeft, ChevronRight, Search, Inbox, Filter, Ticket, UserCheck
 } from "lucide-react";
 import PermissionGuardian from "../../../components/auth/PermissionGuardian";
 import { useGetTransactionsQuery } from "../../../redux/service/adminApi";
@@ -18,33 +18,30 @@ export default function TransactionListPage() {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [courseFilter, setCourseFilter] = useState("ALL");
-    const [couponFilter, setCouponFilter] = useState("ALL"); //    1. Coupon Filter State
+    const [couponFilter, setCouponFilter] = useState("ALL");
     const limit = 10;
 
     const { data: response, isLoading, isFetching } = useGetTransactionsQuery();
     const allTransactions = response?.data?.transactions || [];
 
-    //    2. Extract Unique Coupons for the dropdown
+    // 1. Extract Unique Coupons for dropdown
     const availableCoupons = useMemo(() => {
         const coupons = allTransactions
             .map(txn => txn.couponCode)
             .filter(code => code && code !== "");
-        return [...new Set(coupons)]; // Get unique values
+        return [...new Set(coupons)];
     }, [allTransactions]);
 
-    //    3. Enhanced Filtering Logic (Search + Course + Coupon)
+    // 2. Enhanced Filtering Logic
     const { displayTransactions, totalRecords, filteredAll } = useMemo(() => {
         let filtered = allTransactions.filter(txn => {
-            // Search logic
             const matchesSearch =
                 txn.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                txn.paymentGateway?.toLowerCase().includes(searchTerm.toLowerCase());
+                txn.paymentGateway?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                txn.referredBy?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // Course logic
             const courseName = courseMapping[txn.courseId] || "Unknown Course";
             const matchesCourse = courseFilter === "ALL" || courseName === courseFilter;
-
-            // Coupon logic
             const matchesCoupon = couponFilter === "ALL" || txn.couponCode === couponFilter;
 
             return matchesSearch && matchesCourse && matchesCoupon;
@@ -57,25 +54,27 @@ export default function TransactionListPage() {
         return { displayTransactions: sliced, totalRecords: total, filteredAll: filtered };
     }, [allTransactions, searchTerm, courseFilter, couponFilter, page]);
 
+    // 3. Updated CSV Data to include Referral Info
     const csvData = useMemo(() => {
         return filteredAll.map((txn, index) => ({
             "S.No": index + 1,
+            "Date": new Date(txn.createdAt).toLocaleString('en-IN'),
             "Transaction ID": txn.transactionId,
-            "Payment Gateway": txn.paymentGateway,
-            "Customer ID": txn.customerId,
+            "Customer Name": txn.customerId?.name || "N/A",
+            "Customer Email": txn.customerId?.email || "N/A",
+            "Referred By (Admin)": txn.referredBy ? txn.referredBy.name : "Direct/Organic",
+            "Referrer Email": txn.referredBy ? txn.referredBy.email : "N/A",
             "Course Name": courseMapping[txn.courseId] || `ID: ${txn.courseId}`,
-            "Coupon Used": txn.couponCode || "None",
-            "Amount": txn.amount,
+            "Coupon Code": txn.couponCode || "None",
+            "Base Amount": txn.amount,
             "Discount": txn.discountAmount,
             "Final Amount": txn.finalAmount,
-            "Status": txn.status,
-            "Date": new Date(txn.createdAt).toLocaleString('en-IN')
+            "Status": txn.status
         }));
     }, [filteredAll]);
 
     const totalPages = Math.ceil(totalRecords / limit) || 1;
 
-    //    4. Auto-reset to page 1 on any filter change
     useEffect(() => {
         setPage(1);
     }, [searchTerm, courseFilter, couponFilter]);
@@ -110,21 +109,19 @@ export default function TransactionListPage() {
                     </div>
                 </div>
 
-                {/*    5. EXPANDED FILTER TOOLBAR */}
+                {/* FILTER TOOLBAR */}
                 <div className="mt-6 mb-6 flex flex-wrap gap-4 items-center">
-                    {/* Search */}
                     <div className="relative flex-1 min-w-[300px]">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
                             type="text"
-                            placeholder="Search Transaction ID..."
+                            placeholder="Search ID, Gateway or Admin Name..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-medium"
+                            className="text-black w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-medium"
                         />
                     </div>
 
-                    {/* Course Filter */}
                     <div className="relative min-w-[200px]">
                         <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <select
@@ -139,7 +136,6 @@ export default function TransactionListPage() {
                         </select>
                     </div>
 
-                    {/*    6. NEW COUPON FILTER */}
                     <div className="relative min-w-[180px]">
                         <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
                         <select
@@ -155,7 +151,7 @@ export default function TransactionListPage() {
                     </div>
                 </div>
 
-                {/* Table Logic remains same... */}
+                {/* TABLE SECTION */}
                 <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <div className="min-w-[1200px]">
@@ -165,6 +161,7 @@ export default function TransactionListPage() {
                                         <th className="p-5 text-center w-16">S.No</th>
                                         <th className="p-5">Transaction & Gateway</th>
                                         <th className="p-5">Entity Links (IDs)</th>
+                                        <th className="p-5">Referral Source</th>
                                         <th className="p-5">Pricing Audit</th>
                                         <th className="p-5 text-center">Status & Timeline</th>
                                     </tr>
@@ -172,7 +169,7 @@ export default function TransactionListPage() {
                                 <tbody className="divide-y divide-gray-50">
                                     {displayTransactions.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="p-20 text-center">
+                                            <td colSpan="6" className="p-20 text-center">
                                                 <div className="flex flex-col items-center gap-3 text-gray-400">
                                                     <Inbox size={48} className="opacity-20" />
                                                     <p className="text-xs font-black uppercase tracking-widest">No matching results found</p>
@@ -195,12 +192,28 @@ export default function TransactionListPage() {
                                                 </td>
                                                 <td className="p-5">
                                                     <div className="flex flex-col gap-1">
-                                                        <button onClick={() => handleCopy(txn.customerId)} className="text-[10px] text-gray-400 hover:cursor-pointer hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase font-bold">
-                                                            User: {txn.customerId.slice(-6)}... <Copy size={10} />
+                                                        <button onClick={() => handleCopy(txn.customerId?._id || txn.customerId)} className="text-[10px] text-gray-400 hover:cursor-pointer hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase font-bold">
+                                                           {txn.customerId?.name || 'User'}: {String(txn.customerId?._id || txn.customerId || "").slice(-6)}... <Copy size={10} />
                                                         </button>
                                                         <span className="text-[10px] text-indigo-600 font-black uppercase tracking-tight">
                                                             {courseMapping[txn.courseId] || `ID: ${txn.courseId}`}
                                                         </span>
+                                                    </div>
+                                                </td>
+                                                {/* NEW REFERRAL SOURCE COLUMN */}
+                                                <td className="p-5">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        {txn.referredBy ? (
+                                                            <>
+                                                                <div className="flex items-center gap-1 text-[9px] font-black text-amber-500 uppercase tracking-tighter">
+                                                                    <UserCheck size={12} /> Referral
+                                                                </div>
+                                                                <span className="text-xs font-bold text-gray-700">{txn.referredBy.name}</span>
+                                                                <span className="text-[9px] text-gray-400 font-medium">{txn.referredBy.email}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-[10px] text-gray-300 font-bold uppercase italic tracking-widest">Organic</span>
+                                                        )}
                                                     </div>
                                                 </td>
                                                 <td className="p-5">
@@ -238,10 +251,10 @@ export default function TransactionListPage() {
                             <p className="text-[9px] font-bold text-indigo-400 uppercase">Showing {displayTransactions.length} of {totalRecords} Records</p>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1 || isFetching} className="p-2 bg-white border hover:cursor-pointer border-gray-200 rounded-xl disabled:opacity-30 hover:bg-gray-50 shadow-sm transition-all active:scale-90">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1 || isFetching} className="p-2 bg-white border hover:cursor-pointer border-gray-300 rounded-xl disabled:opacity-30 hover:bg-gray-150 shadow-sm transition-all active:scale-90">
                                 <ChevronLeft size={18} />
                             </button>
-                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages || isFetching} className="p-2 bg-white border hover:cursor-pointer border-gray-200 rounded-xl disabled:opacity-30 hover:bg-gray-50 shadow-sm transition-all active:scale-90">
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages || isFetching} className="p-2 bg-white border hover:cursor-pointer border-gray-300 rounded-xl disabled:opacity-30 hover:bg-gray-150 shadow-sm transition-all active:scale-90">
                                 <ChevronRight size={18} />
                             </button>
                         </div>
@@ -252,7 +265,6 @@ export default function TransactionListPage() {
     );
 }
 
-// StatusBadge component remains same...
 const StatusBadge = ({ status }) => {
     const config = {
         SUCCESS: { color: "text-emerald-600 bg-emerald-50 border-emerald-100", icon: CheckCircle2 },

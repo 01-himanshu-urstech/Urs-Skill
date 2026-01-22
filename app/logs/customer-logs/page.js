@@ -60,7 +60,7 @@ export default function CustomerLogsPage() {
                             placeholder="Search by email or action..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium text-sm"
+                            className="text-black w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium text-sm"
                         />
                     </div>
                     <button

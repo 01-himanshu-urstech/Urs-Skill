@@ -116,7 +116,7 @@ export default function AddBannerPage() {
                                 {errors.image && <p className="text-[10px] text-red-500 font-bold uppercase ml-2">{errors.image}</p>}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black">
                                 <InputField
                                     label="Primary Title *"
                                     placeholder="Learn Spoken Communication"
@@ -189,7 +189,7 @@ const InputField = ({ label, icon, error, ...props }) => (
             {icon && <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">{icon}</div>}
             <input
                 {...props}
-                className={`w-full h-16 ${icon ? 'pl-14' : 'px-6'} bg-gray-50/50 border-2 rounded-2xl font-bold text-sm focus:outline-none transition-all ${error ? 'border-red-200 focus:border-red-400' : 'border-gray-100 focus:border-emerald-500'}`}
+                className={`w-full h-16 ${icon ? 'pl-14' : 'px-6'} bg-gray-50/50 border-2 rounded-2xl font-bold text-sm focus:outline-none transition-all text-black ${error ? 'border-red-200 focus:border-red-400' : 'border-gray-100 focus:border-emerald-500'}`}
             />
         </div>
         {error && <p className="text-[9px] text-red-500 font-bold uppercase ml-2">{error}</p>}

@@ -90,7 +90,7 @@ export default function MainContentWrapper({ children }) {
                             value={searchQuery}
                             onFocus={() => setIsFocused(true)}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent outline-none text-sm w-full text-gray-700"
+                            className="text-black bg-transparent outline-none text-sm w-full text-gray-700"
                         />
                         <div className={`flex items-center gap-1 bg-white border border-gray-200 px-1.5 py-0.5 rounded text-[10px] text-gray-400 transition-all duration-300 ${isFocused ? "opacity-0 translate-x-2" : "opacity-100"}`}>
                             <Command size={10} /> K
@@ -139,7 +139,7 @@ export default function MainContentWrapper({ children }) {
                                         placeholder="Search..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="flex-1 outline-none text-sm"
+                                        className="text-black flex-1 outline-none text-sm"
                                     />
                                     <button onClick={() => setSearchOpen(false)} className="text-gray-400"><X size={16} /></button>
                                 </div>

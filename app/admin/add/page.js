@@ -112,7 +112,7 @@ export default function AddAdminPage() {
                                 <h3 className="font-bold text-gray-800 uppercase tracking-tight text-sm">Account Credentials</h3>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black">
                                 <InputField
                                     label="Admin Name"
                                     name="name"

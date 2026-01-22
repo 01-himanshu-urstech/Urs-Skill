@@ -53,7 +53,7 @@ export default function EditBannerPage() {
                 <div className="max-w-4xl">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 sm:p-10 space-y-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black">
                                 <InputField label="Heading *" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
                                 <InputField label="Subtitle" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} />
 
@@ -103,6 +103,6 @@ export default function EditBannerPage() {
 const InputField = ({ label, ...props }) => (
     <div className="flex flex-col gap-2 w-full">
         <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">{label}</label>
-        <input {...props} className="w-full h-14 px-5 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none transition-all" />
+        <input {...props} className="text-black w-full h-14 px-5 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none transition-all" />
     </div>
 );

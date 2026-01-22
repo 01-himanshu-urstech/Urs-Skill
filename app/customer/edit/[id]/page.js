@@ -136,7 +136,7 @@ const InputField = ({ label, icon, ...props }) => (
         <label className="block text-[10px] font-black uppercase tracking-[2px] text-gray-400">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2">{icon}</div>}
-            <input {...props} className="w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-emerald-500 transition-all duration-200 text-sm font-bold shadow-sm h-14" />
+            <input {...props} className="text-black w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-emerald-500 transition-all duration-200 text-sm font-bold shadow-sm h-14" />
         </div>
     </div>
 );

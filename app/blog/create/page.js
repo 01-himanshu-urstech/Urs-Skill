@@ -93,7 +93,7 @@ export default function CreateBlogPage() {
                             </div>
                         )}
 
-                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl p-6 sm:p-10 lg:p-12 space-y-10">
+                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl p-6 sm:p-10 lg:p-12 space-y-10 text-black">
                             <InputField label="Article Title *" placeholder="Enter catchy title..." value={formData.title} onChange={(e) => handleUpdate('title', e.target.value)} icon={<Type size={20} />} required />
 
                             <div className="flex flex-col gap-3">
@@ -128,7 +128,7 @@ export default function CreateBlogPage() {
                             </button>
                         </div>
 
-                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-4">
+                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-4 text-black">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Cover Graphic</label>
                             <label className="relative flex flex-col items-center justify-center w-full h-56 border-2 border-dashed border-gray-100 rounded-[2rem] hover:bg-gray-50 cursor-pointer overflow-hidden group transition-all">
                                 {selectedImage ? (
@@ -143,7 +143,7 @@ export default function CreateBlogPage() {
                             </label>
                         </div>
 
-                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-6">
+                        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-6 text-black">
                             <div className="flex items-center gap-2 text-indigo-600 pb-3 border-b border-gray-50">
                                 <Globe size={18} />
                                 <h3 className="font-black text-[10px] uppercase tracking-widest">SEO Meta Configuration</h3>
@@ -167,7 +167,7 @@ const InputField = ({ label, icon, ...props }) => (
         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>}
-            <input {...props} className={`w-full h-16 ${icon ? 'pl-14' : 'px-6'} bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-indigo-500 focus:bg-white outline-none transition-all shadow-sm`} />
+            <input {...props} className={`w-full h-16 ${icon ? 'pl-14' : 'px-6'} text-black bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-indigo-500 focus:bg-white outline-none transition-all shadow-sm`} />
         </div>
     </div>
 );

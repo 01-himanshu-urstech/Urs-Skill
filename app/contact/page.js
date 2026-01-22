@@ -89,7 +89,7 @@ export default function ContactQueriesPage() {
                                 placeholder="Filter by name or email..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-indigo-500/5 font-bold text-sm transition-all"
+                                className="text-black w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-indigo-500/5 font-bold text-sm transition-all"
                             />
                         </div>
 

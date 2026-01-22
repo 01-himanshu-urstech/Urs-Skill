@@ -29,7 +29,7 @@ export default function PageHeader({
                 {showExport && (
                     <button
                         onClick={onExportClick}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 border border-gray-200 bg-white rounded-lg text-xs md:text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 border border-gray-200 bg-white rounded-lg text-xs md:text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm hover:cursor-pointer"
                     >
                         <FileOutput size={16} className="text-gray-400" />
                         <span className="whitespace-nowrap">Export</span>
@@ -39,7 +39,7 @@ export default function PageHeader({
                 {addButtonLabel && (
                     <button
                         onClick={onAddClick}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 bg-[#7C3AED] text-white rounded-lg text-xs md:text-sm font-semibold hover:bg-[#5B21B6] transition-all shadow-sm shadow-purple-200"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 md:px-4 py-2 bg-[#7C3AED] text-white rounded-lg text-xs md:text-sm font-semibold hover:bg-[#5B21B6] transition-all shadow-sm shadow-purple-200 hover:cursor-pointer"
                     >
                         <Plus size={16} />
                         <span className="whitespace-nowrap">{addButtonLabel}</span>

@@ -68,7 +68,7 @@ export default function BacklinkListPage() {
                 />
 
                 {/* Search Bar Integration */}
-                <div className="mt-8 mb-6 max-w-md relative">
+                <div className="mt-8 mb-6 max-w-md relative text-black">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                         type="text"
