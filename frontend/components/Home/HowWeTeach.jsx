@@ -1,61 +1,117 @@
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ArrowUpRight, GraduationCap, Briefcase, Rocket } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
+
 export default function HowWeTeach() {
+    const sectionRef = useRef(null);
+    const cardRefs = useRef([]);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Section Title Animation
+            gsap.from(".section-title-reveal", {
+                y: 20,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 85%",
+                }
+            });
+
+            // Progressive "Staircase" Reveal
+            gsap.from(cardRefs.current, {
+                y: 60,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1.2,
+                ease: "expo.out",
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 75%",
+                }
+            });
+        }, sectionRef);
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <section className="bg-gradient-to-br from-purple-50 to-purple-100 py-20">
-            <div className="max-w-[1400px] mx-auto px-6 sm:px-8 md:px-12 lg:px-24">
+        <section ref={sectionRef} className="py-16 md:py-24 bg-white overflow-hidden">
+            {/* 1440px Alignment - Fixed for Website Consistency */}
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* HEADER */}
-                <div className="max-w-4xl mb-8">
-                    <h1 className="text-purple-900 text-2xl sm:text-3xl md:text-3xl font-playfair italic font-extrabold leading-tight">
-                        How We Teach
-                    </h1>
-
-                    <h2 className="text-purple-800 text-xl sm:text-2xl md:text-2xl font-light mt-[-4px]">
-                        in Urs Skill Program
-                    </h2>
-
-                    <p className="text-[rgba(44,44,44,0.6)] text-sm sm:text-lg md:text-md mt-3 font-nunito">
-                        A unique 3 phase program to launch your career
-                    </p>
+                {/* HEADER: Defined Self-Explanation */}
+                <div className="section-title-reveal mb-16 md:mb-24">
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="inline-block px-3 py-1 bg-purple-50 text-[#8B19E6] text-[10px] font-bold uppercase tracking-[0.3em] rounded-full border border-purple-100">
+                            • Our Methodology
+                        </span>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div className="flex-1">
+                            {/* UNIVERSAL TITLE SIZE: 3xl to 5xl sync */}
+                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+                                How we <span className="text-[#8B19E6]">Teach</span>
+                            </h2>
+                        </div>
+                        
+                        <div className="max-w-xs md:border-l border-gray-100 md:pl-6">
+                            <p className="text-gray-500 text-sm font-medium leading-relaxed">
+                                Our curriculum is structured as an upward journey, where each phase builds the foundation for your ultimate industry launch.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* PHASES GRID */}
-                <div className="grid grid-cols-1 md:grid-cols-3 border-t border-purple-300 ">
+                {/* THE GROWTH LADDER GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16 items-start">
+                    
+                    {/* PHASE 01: Foundation (Low position) */}
+                    <div ref={(el) => (cardRefs.current[0] = el)} className="relative md:mt-20">
+                        <GrowthCard
+                            phase="01"
+                            icon={<GraduationCap size={24} />}
+                            title="The Foundation"
+                            subtitle="Learn & Master"
+                            description="Master industry-critical skills from elite professionals who bring real-world AI strategies to the classroom."
+                            image="https://assets.digiaccel.in/website/images/bootcamp/learn-phase.webp"
+                        />
+                        {/* Connecting Visual Line for Growth */}
+                        <div className="hidden md:block absolute -right-8 top-1/2 w-16 h-[2px] bg-gradient-to-r from-[#8B19E6]/20 to-transparent z-0" />
+                    </div>
 
-                    {/* PHASE 1 */}
-                    <PhaseCard
-                        number="1"
-                        title="Learn"
-                        points={[
-                            "Skills that are valued by the industry",
-                            "from expert mentors who have excelled in that field",
-                        ]}
-                        image="https://assets.digiaccel.in/website/images/bootcamp/learn-phase.webp"
-                        bordered="right"
-                    />
+                    {/* PHASE 02: Application (Mid position) */}
+                    <div ref={(el) => (cardRefs.current[1] = el)} className="relative md:mt-10">
+                        <GrowthCard
+                            phase="02"
+                            icon={<Briefcase size={24} />}
+                            title="The Application"
+                            subtitle="Intern & Apply"
+                            description="Translate theory into execution by working directly with our partner eCommerce and Media giants."
+                            image="https://assets.digiaccel.in/website/images/bootcamp/intern-phase.webp"
+                        />
+                        <div className="hidden md:block absolute -right-8 top-1/2 w-16 h-[2px] bg-gradient-to-r from-[#8B19E6]/20 to-transparent z-0" />
+                    </div>
 
-                    {/* PHASE 2 */}
-                    <PhaseCard
-                        number="2"
-                        title="Intern"
-                        points={[
-                            "With partner companies in sectors like eCommerce,",
-                            "Brands, Media and Analytics",
-                        ]}
-                        image="https://assets.digiaccel.in/website/images/bootcamp/intern-phase.webp"
-                        bordered="both"
-                    />
-
-                    {/* PHASE 3 */}
-                    <PhaseCard
-                        number="3"
-                        title="Get Placed"
-                        points={[
-                            "In Analyst (or equivalent) roles",
-                            "(Expected Average CTC between 6 LPA to 7 LPA)",
-                        ]}
-                        image="https://assets.digiaccel.in/website/images/bootcamp/get-placed-phase.webp"
-                        bordered="left"
-                    />
+                    {/* PHASE 03: Elevation (High position) */}
+                    <div ref={(el) => (cardRefs.current[2] = el)} className="relative">
+                        <GrowthCard
+                            phase="03"
+                            icon={<Rocket size={24} />}
+                            title="The Launch"
+                            subtitle="Placement & Impact"
+                            description="Step into high-impact Analyst roles with lifetime access to our mentor network and alumni community."
+                            image="https://assets.digiaccel.in/website/images/bootcamp/get-placed-phase.webp"
+                            isHighImpact
+                        />
+                    </div>
 
                 </div>
             </div>
@@ -63,44 +119,51 @@ export default function HowWeTeach() {
     );
 }
 
-/* ---------------- PHASE CARD ---------------- */
+/* ---------------- PREMIUM GROWTH CARD COMPONENT ---------------- */
 
-function PhaseCard({ number, title, points, image, bordered }) {
+const GrowthCard = ({ phase, title, subtitle, description, image, icon, isHighImpact }) => {
     return (
-        <div
-            className={`flex flex-col justify-between border-purple-300 border-t bg-white/50 backdrop-blur-sm ${bordered === "right"
-                ? "md:border-r"
-                : bordered === "left"
-                    ? "md:border-l"
-                    : bordered === "both"
-                        ? "md:border-x"
-                        : ""
-                }`}
-        >
-            {/* TEXT */}
-            <div className="relative px-8 pt-16 pb-10">
-                {/* BIG NUMBER */}
-                <span className="absolute top-6 left-6 text-[72px] font-jakarta font-bold text-[rgba(98,105,86,0.2)]">
-                    {number}
-                </span>
+        <div className="group relative z-10">
+            {/* Visual Header with Floating Glass Phase Number */}
+            <div className="relative aspect-[16/10] mb-8 rounded-3xl overflow-hidden shadow-sm">
+                <img 
+                    src={image} 
+                    alt={title} 
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-60" />
+                
+                {/* Glass Phase Badge */}
+                <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white">
+                    <span className="text-xs font-black tracking-tighter">{phase}</span>
+                    <div className="w-[1px] h-3 bg-white/30" />
+                    <span className="text-[9px] font-bold uppercase tracking-widest">{subtitle}</span>
+                </div>
 
-                <h3 className="text-[#3B432C] font-poppins text-[24px] font-semibold relative z-10 left-12">
-                    {title}
-                </h3>
-
-                <ul className="mt-3 space-y-2 text-[rgba(59,67,44,0.8)] text-sm font-nunito leading-relaxed">
-                    {points.map((point, idx) => (
-                        <li key={idx}>{point}</li>
-                    ))}
-                </ul>
+                {/* Phase Icon */}
+                <div className="absolute bottom-4 right-4 p-3 bg-white rounded-2xl text-[#8B19E6] shadow-xl transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                    {icon}
+                </div>
             </div>
 
-            {/* IMAGE */}
-            <img
-                src={image}
-                alt={title}
-                className="w-full object-cover border-t border-purple-300"
-            />
+            {/* Content synced with Universal Typography */}
+            <div className="px-2">
+                <div className="flex items-center gap-3 mb-3">
+                    <h3 className={`text-xl font-bold transition-colors duration-300 ${isHighImpact ? 'text-[#8B19E6]' : 'text-gray-900'}`}>
+                        {title}
+                    </h3>
+                    <ArrowUpRight size={18} className="text-gray-300 group-hover:text-[#8B19E6] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                </div>
+                
+                <p className="text-gray-500 text-sm leading-relaxed font-medium">
+                    {description}
+                </p>
+
+                {/* Progress Bar (Interactive Growth indicator) */}
+                <div className="mt-6 w-12 h-[2px] bg-gray-100 overflow-hidden">
+                    <div className="h-full bg-[#8B19E6] transition-all duration-700 w-0 group-hover:w-full" />
+                </div>
+            </div>
         </div>
     );
-}
+};

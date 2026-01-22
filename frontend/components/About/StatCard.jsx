@@ -25,15 +25,22 @@ export default function StatCard({ target, suffix, label, isVisible }) {
   }, [isVisible, target]);
 
   return (
-    <div className="text-center group">
-      <div className="mb-6">
-        <span className="text-7xl lg:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-600 inline-block group-hover:scale-110 transition-transform duration-300">
-          {count}{suffix}
+    <div className="text-center group p-8 rounded-[2.5rem] transition-all duration-500 hover:bg-[#FAFAFB]">
+      {/* BRAND-ALIGNED STAT: Transitioned from blue to Brand Purple */}
+      <div className="mb-4">
+        <span className="text-5xl lg:text-7xl font-black text-gray-900 tracking-tighter inline-block group-hover:text-[#8B19E6] transition-colors duration-500">
+          {count}
+          <span className="text-[#8B19E6] ml-1">{suffix}</span>
         </span>
       </div>
-      <h3 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
-        {label}
-      </h3>
+
+      {/* UNIFIED LABEL: Using font-black and tracking-widest for premium feel */}
+      <div className="space-y-2">
+        <div className="h-[2px] w-8 bg-purple-100 mx-auto transition-all duration-500 group-hover:w-16 group-hover:bg-[#8B19E6]" />
+        <h3 className="text-[10px] lg:text-[12px] font-black text-gray-400 uppercase tracking-[0.3em] leading-tight transition-colors duration-500 group-hover:text-gray-900">
+          {label}
+        </h3>
+      </div>
     </div>
   );
 }

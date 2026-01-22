@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 const sections = [
-  { id: 'month-1-2', label: 'Month 1 & 2', title: 'Build Foundational Skills' },
+  { id: 'month-1-2', label: 'Month 1 & 2', title: 'Foundational Skills' },
   { id: 'month-3-4', label: 'Month 3 & 4', title: 'Functional Skills' },
-  { id: 'month-5-6', label: 'Month 5 & 6', title: 'Functional Skills Mastery' },
+  { id: 'month-5-6', label: 'Month 5 & 6', title: 'Skills Mastery' },
   { id: 'month-7-9', label: 'Month 7 to 9', title: 'Internship' },
   { id: 'month-9-plus', label: 'Month 9+', title: 'Get Placed' },
 ];
@@ -13,108 +13,124 @@ const sections = [
 export default function CourseCurriculum() {
   const [active, setActive] = useState(0);
   const sectionRefs = useRef([]);
+  const navRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const index = sectionRefs.current.findIndex(
-              (el) => el === entry.target
-            );
+            const index = sectionRefs.current.findIndex((el) => el === entry.target);
             if (index !== -1) setActive(index);
           }
         });
       },
-      {
-        root: null,
-        rootMargin: '-40% 0px -40% 0px',
-        threshold: 0,
-      }
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
     );
 
     sectionRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
+  const scrollToSection = (i) => {
+    sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   return (
-    <section className="bg-[#2D1B47]">
-      {/* HEADER */}
-      <div className="py-24 text-center px-6">
-        <h2 className="text-white text-[2em] md:text-[2.25em] font-light leading-[135%]">
-          <span className="font-semibold">
-            New-Age Curriculum to Level you Up
-          </span>
-          <br />
-          <span className="text-white/80">
-            on Key eCommerce & Marketing Skills
-          </span>
+    <section className="bg-[#2D1B47] py-16 md:py-24">
+      {/* HEADER: Unified Typography */}
+      <div className="max-w-[1440px] mx-auto px-6 mb-12 md:mb-20 text-center md:text-left">
+        <div className="flex items-center justify-center md:justify-start gap-2 mb-6">
+           <span className="inline-block px-3 py-1 bg-purple-500/10 text-purple-300 text-[10px] font-bold uppercase tracking-[0.3em] rounded-full border border-purple-500/20">
+             • Curriculum
+           </span>
+        </div>
+        <h2 className="text-white text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+          New-Age Curriculum <br className="hidden md:block" />
+          <span className="text-white/60">to Level you Up</span>
         </h2>
       </div>
 
-      {/* BODY */}
-      <div className="max-w-[1400px] mx-auto flex relative">
-        {/* LEFT SIDEBAR */}
-        <aside className="w-[280px] shrink-0 hidden md:block ml-16">
-          <div className="sticky top-40 pl-10">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex flex-col md:flex-row relative gap-8 lg:gap-16">
+        
+        {/* MOBILE STICKY NAV: Minimal change to design logic */}
+        <div className="md:hidden sticky top-0 z-40 bg-[#2D1B47]/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-white/5 overflow-x-auto no-scrollbar">
+          <div className="flex gap-6 min-w-max">
             {sections.map((s, i) => (
-              <div key={s.id}>
+              <button 
+                key={s.id} 
+                onClick={() => scrollToSection(i)}
+                className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${active === i ? 'text-[#FF6F2C]' : 'text-white/40'}`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* LEFT SIDEBAR: Kept original design with slight spacing fix */}
+        <aside className="w-[260px] shrink-0 hidden md:block">
+          <div className="sticky top-32 space-y-0">
+            {sections.map((s, i) => (
+              <div key={s.id} className="relative">
                 <button
-                  onClick={() =>
-                    sectionRefs.current[i]?.scrollIntoView({
-                      behavior: 'smooth',
-                    })
-                  }
-                  className="flex items-start gap-3 text-left mb-6"
+                  onClick={() => scrollToSection(i)}
+                  className="flex items-start gap-4 text-left group py-4"
                 >
-                  {/* CIRCLE (ORANGE KEPT) */}
-                  <span
-                    className={`mt-1 h-3 w-3 rounded-full border transition-all ${
-                      active === i
-                        ? 'bg-[#FF6F2C] border-[#FF6F2C]'
-                        : 'border-purple-300/40'
+                  <span className={`mt-1.5 h-2.5 w-2.5 rounded-full border-2 transition-all duration-500 shrink-0 ${
+                      active === i ? 'bg-[#FF6F2C] border-[#FF6F2C] scale-125 shadow-[0_0_15px_rgba(255,111,44,0.5)]' : 'border-purple-300/20'
                     }`}
                   />
-
-                  {/* TEXT */}
                   <div>
-                    <p className="text-white/70 text-sm">{s.label}</p>
-                    <p
-                      className={`text-sm font-semibold transition-all ${
-                        active === i
-                          ? 'text-[#FF6F2C]'
-                          : 'text-white/60'
-                      }`}
-                    >
+                    <p className={`text-[10px] uppercase font-black tracking-widest transition-opacity ${active === i ? 'text-white opacity-100' : 'text-white/30'}`}>
+                      {s.label}
+                    </p>
+                    <p className={`text-sm font-bold transition-all mt-1 ${active === i ? 'text-[#FF6F2C]' : 'text-white/20 group-hover:text-white/40'}`}>
                       {s.title}
                     </p>
                   </div>
                 </button>
-
                 {i < sections.length - 1 && (
-                  <div className="h-6 w-px bg-purple-300/30 ml-[6px]" />
+                  <div className="absolute left-[4.5px] top-10 bottom-0 w-[1px] bg-white/5" />
                 )}
               </div>
             ))}
           </div>
         </aside>
 
-        {/* RIGHT CONTENT */}
-        <div className="flex-1 px-6 md:px-16 pb-32 space-y-10">
+        {/* RIGHT CONTENT: Synced with CourseCard alignment */}
+        <div className="flex-1 space-y-8 md:space-y-12">
           {sections.map((s, i) => (
             <div
               key={s.id}
-              id={s.id}
               ref={(el) => (sectionRefs.current[i] = el)}
-              className="bg-[#F6F1FF] rounded-xl p-8 min-h-[420px]"
+              className={`bg-white rounded-[2rem] p-8 md:p-12 min-h-[400px] transition-all duration-700 ${active === i ? 'opacity-100 translate-x-0' : 'opacity-40 scale-[0.98]'}`}
             >
-              <h3 className="text-[1.6em] font-bold mb-6 text-[#2D1B47]">
+              <div className="flex items-center gap-3 mb-8">
+                <span className="text-[#FF6F2C] font-black text-xs uppercase tracking-widest">Phase 0{i+1}</span>
+                <div className="h-px flex-1 bg-gray-100" />
+              </div>
+
+              <h3 className="text-2xl md:text-4xl font-black text-[#2D1B47] mb-8 tracking-tight">
                 {s.title}
               </h3>
 
-              <div className="h-[220px] flex items-center justify-center text-purple-900/50 text-sm border border-dashed border-purple-300 rounded-lg">
-                Replace this block with actual cards/content for <br />
-                <strong>{s.title}</strong>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                 <div className="space-y-4">
+                    <p className="text-gray-500 font-medium leading-relaxed">
+                      Deep dive into industry-ready skills with master-led sessions and hands-on case studies designed for the modern AI economy.
+                    </p>
+                    <ul className="space-y-3">
+                       {['Advanced Excel', 'Growth Frameworks', 'Market Analysis'].map((item) => (
+                         <li key={item} className="flex items-center gap-3 text-sm font-bold text-gray-700">
+                           <div className="h-1.5 w-1.5 rounded-full bg-[#FF6F2C]" /> {item}
+                         </li>
+                       ))}
+                    </ul>
+                 </div>
+                 <div className="h-[200px] bg-purple-50 rounded-2xl flex items-center justify-center border border-dashed border-purple-200">
+                    <span className="text-[10px] font-black uppercase text-purple-300 tracking-widest">Module Visualization</span>
+                 </div>
               </div>
             </div>
           ))}

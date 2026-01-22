@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-export default function NeedhelpCourses() {
+export default function NeedHelpForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     background: "",
@@ -15,7 +15,7 @@ export default function NeedhelpCourses() {
   const steps = [
     { number: 1, title: "About You" },
     { number: 2, title: "Preferences" },
-    { number: 3, title: "Details" },
+    { number: 3, title: "Finalize" },
   ];
 
   const handleNext = () => {
@@ -27,150 +27,115 @@ export default function NeedhelpCourses() {
   };
 
   return (
-    <section
-      id="need-help-course"
-      className="bg-gradient-to-br from-purple-200 via-purple-50 to-purple-100 relative overflow-hidden px-4 sm:px-6 py-12"
-    >
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-10 items-start lg:items-center">
+    <section id="need-help" className="bg-white pt-8 md:pt-12 pb-0 overflow-hidden">
+      {/* ALIGNMENT: Perfectly synced with 1440px master-grid */}
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Adjusted items-end to snap the image to the section floor */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-end">
 
-          {/* LEFT SIDE */}
-          <div className="w-full lg:w-1/3 flex-shrink-0">
-            <div className="backdrop-blur-sm rounded-3xl p-6">
-              <div className="flex gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
+          {/* LEFT SIDE: Content & Bottom-Aligned Image */}
+          <div className="w-full lg:w-2/5 flex flex-col self-stretch">
+            <div className="mb-6 lg:mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="inline-block px-3 py-1 bg-purple-50 text-[#8B19E6] text-[10px] font-bold uppercase tracking-[0.3em] rounded-full border border-purple-100">
+                  • Support
+                </span>
               </div>
-
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                Need Help?
-              </h1>
-              <p className="text-gray-600 text-sm mb-6">
-                Connect with us & know what&apos;s best for you.
+              
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
+                Need Help? <br />
+                <span className="text-[#8B19E6]">We&apos;re Here.</span>
+              </h2>
+              
+              <p className="text-gray-500 text-sm md:text-base font-medium leading-relaxed max-w-sm">
+                Connect with our experts and discover the perfect career path tailored specifically for you.
               </p>
+            </div>
 
-              {/* IMAGE */}
-              <div className="relative mt-6 flex justify-center">
+            {/* IMAGE: Tightened padding to reduce unnecessary white space */}
+            <div className="relative mt-auto flex justify-center lg:justify-start items-end">
+              <div className="relative translate-y-1"> {/* Nudges image to touch the bottom line */}
                 <Image
                   src="/man.webp"
-                  alt="Need Help"
-                  width={260}
-                  height={260}
-                  className="w-full max-w-[220px] sm:max-w-[260px]"
+                  alt="Support Specialist"
+                  width={380}
+                  height={380}
+                  className="w-full max-w-[260px] md:max-w-[320px] lg:max-w-[360px] h-auto block grayscale hover:grayscale-0 transition-all duration-700"
                 />
-                <div className="absolute -top-3 right-6 rotate-12">
-                  <span className="text-5xl animate-bounce text-[#D4A574]">
-                    ?
-                  </span>
-                </div>
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-50 rounded-full blur-3xl -z-10" />
               </div>
             </div>
           </div>
 
-          {/* RIGHT SIDE FORM */}
-          <div className="w-full lg:flex-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 sm:p-8 max-w-2xl mx-auto">
-
-              {/* PROGRESS */}
-              <div className="mb-8">
-                <div className="flex justify-center gap-4 flex-wrap">
-                  {steps.map((step, index) => (
-                    <div key={step.number} className="flex items-center">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${currentStep > step.number
-                            ? "bg-green-500 text-white"
-                            : currentStep === step.number
-                              ? "bg-[#5b1e8b] text-white"
-                              : "bg-gray-300 text-gray-500"
-                            }`}
-                        >
-                          {currentStep > step.number ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            step.number
-                          )}
-                        </div>
-                        <span className="text-sm font-medium text-gray-700">
-                          {step.title}
-                        </span>
+          {/* RIGHT SIDE: Floating Form Card with reduced padding */}
+          <div className="w-full lg:flex-1 pb-10 md:pb-16">
+            <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-6 md:p-10 relative">
+              
+              {/* PROGRESS BAR: Reduced margin */}
+              <div className="flex items-center justify-between mb-8 max-w-xs mx-auto md:mx-0">
+                {steps.map((step, index) => (
+                  <div key={step.number} className="flex items-center flex-1 last:flex-none">
+                    <div className="flex flex-col items-center gap-2">
+                      <div
+                        className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${
+                          currentStep >= step.number
+                            ? "bg-[#8B19E6] text-white"
+                            : "bg-gray-100 text-gray-400"
+                        }`}
+                      >
+                        {currentStep > step.number ? <Check className="w-3 h-3" /> : step.number}
                       </div>
-
-                      {index < steps.length - 1 && (
-                        <div className="hidden sm:block w-12 h-[2px] mx-3 bg-gray-300" />
-                      )}
                     </div>
-                  ))}
-                </div>
+                    {index < steps.length - 1 && (
+                      <div className={`flex-1 h-[1.5px] mx-2 md:mx-3 transition-colors duration-500 ${
+                        currentStep > step.number ? "bg-[#8B19E6]" : "bg-gray-100"
+                      }`} />
+                    )}
+                  </div>
+                ))}
               </div>
 
-              {/* FORM STEPS */}
-              <div className="space-y-6">
-
-                {/* STEP 1 */}
+              {/* FORM CONTENT: Reduced min-height for tighter vertical flow */}
+              <div className="min-h-[240px] md:min-h-[280px] flex flex-col justify-center">
                 {currentStep === 1 && (
                   <div className="space-y-5">
                     <Select
-                      label="Tell us about your background?"
+                      label="Professional Background"
                       value={formData.background}
                       onChange={(v) => handleSelectChange("background", v)}
-                      options={[
-                        "College Student",
-                        "Working Professional",
-                        "Freelancer",
-                        "Business Owner",
-                      ]}
+                      options={["College Student", "Working Professional", "Freelancer", "Business Owner"]}
                     />
-
                     <Select
-                      label="What type of course are you interested in?"
+                      label="Program Preference"
                       value={formData.courseType}
                       onChange={(v) => handleSelectChange("courseType", v)}
-                      options={[
-                        "Upskilling Course",
-                        "Certification Program",
-                        "Degree Program",
-                        "Bootcamp",
-                      ]}
+                      options={["Upskilling Course", "Certification", "Degree Program", "Bootcamp"]}
                     />
-
-                    <ActionButton onClick={handleNext} />
+                    <ActionButton onClick={handleNext} text="Continue" />
                   </div>
                 )}
 
-                {/* STEP 2 */}
                 {currentStep === 2 && (
                   <div className="space-y-5">
                     <Select
-                      label="Which domain interests you the most?"
+                      label="Primary Domain of Interest"
                       value={formData.domain}
                       onChange={(v) => handleSelectChange("domain", v)}
-                      options={[
-                        "Web Development",
-                        "Data Science",
-                        "UI/UX Design",
-                        "Digital Marketing",
-                        "Business Analytics",
-                      ]}
+                      options={["Web Development", "Data Science", "UI/UX Design", "Digital Marketing"]}
                     />
-
-                    <ActionButton onClick={handleNext} />
+                    <ActionButton onClick={handleNext} text="Get Recommendations" />
                   </div>
                 )}
 
-                {/* STEP 3 */}
                 {currentStep === 3 && (
-                  <div className="text-center py-8">
-                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Check className="w-10 h-10 text-green-600" />
+                  <div className="text-center py-6">
+                    <div className="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Check className="w-6 h-6 text-[#8B19E6]" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                      Thank You!
-                    </h3>
-                    <p className="text-gray-600">
-                      We&apos;ll get back to you soon with personalized
-                      recommendations.
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Thank You</h3>
+                    <p className="text-gray-500 text-sm font-medium">
+                      Our mentors will reach out with your roadmap.
                     </p>
                   </div>
                 )}
@@ -183,41 +148,43 @@ export default function NeedhelpCourses() {
   );
 }
 
-/* REUSABLE COMPONENTS */
+/* ---------------- COMPONENTS ---------------- */
 
 function Select({ label, value, onChange, options }) {
   return (
     <div>
-      <label className="block text-gray-700 text-base font-medium mb-3">
+      <label className="block text-gray-900 text-[9px] font-black uppercase tracking-[0.2em] mb-2.5 opacity-40">
         {label}
       </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                   focus:outline-none focus:ring-2 focus:ring-[#E57373]
-                   bg-white text-gray-700 cursor-pointer"
-      >
-        <option value="">Select</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-[#8B19E6]/30 outline-none transition-all duration-300 text-sm text-gray-700 font-bold appearance-none cursor-pointer"
+        >
+          <option value="">Select Option</option>
+          {options.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+      </div>
     </div>
   );
 }
 
-function ActionButton({ onClick }) {
+function ActionButton({ onClick, text }) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full sm:w-auto px-12 py-3 bg-purple-700
-                 hover:bg-[#5b1e8b] text-white font-semibold
-                 rounded-xl transition-all hover:shadow-lg ml-auto block hover:cursor-pointer"
-    >
-      Next
-    </button>
+    <div className="flex pt-2">
+      <button
+        onClick={onClick}
+        className="w-full md:w-auto px-10 py-4 bg-[#8B19E6] text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#7014ba] transition-all duration-500 flex items-center justify-center gap-3 group md:ml-auto"
+      >
+        {text}
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </button>
+    </div>
   );
 }

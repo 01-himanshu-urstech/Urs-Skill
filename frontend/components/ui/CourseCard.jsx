@@ -1,90 +1,82 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, Clock, MapPin, Monitor, Calendar } from "lucide-react";
 
 export default function CourseCard({ course }) {
   const safeHref = course.link || "#";
+
   return (
-    <Link href={safeHref} className="block">
-      {/* OUTER CARD */}
-      <div className=" group
-  bg-[#12064C] rounded-[18px] p-[10px] h-[480px]
-  transition-all duration-500 ease-out
-  hover:-translate-y-2 hover:scale-[1.03]
-  hover:shadow-[0_30px_80px_rgba(109,74,255,0.35)]">
+    <Link href={safeHref} className="block group">
+      {/* OUTER CARD: Clean white with premium shadow lift */}
+      <div className="bg-white rounded-[24px] p-3 h-[520px] 
+        border border-gray-100 transition-all duration-700 ease-out 
+        hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(139,25,230,0.15)]">
 
-        {/* INNER CARD */}
-        <div className="flex flex-col h-full rounded-[18px] overflow-hidden">
-
-          {/* TOP IMAGE */}
-          <div className="relative w-full h-[180px] flex-shrink-0">
+        <div className="flex flex-col h-full rounded-[20px] overflow-hidden">
+          
+          {/* 1. SECTION DEFINITION: The Visual Hook */}
+          <div className="relative w-full h-[200px] flex-shrink-0 rounded-[18px] overflow-hidden">
             <Image
               src={course.image}
               alt={course.title}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-1000 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#12064C]/70 via-transparent to-transparent" />
+            {/* Soft brand overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 via-transparent to-transparent" />
+            
+          
           </div>
 
-          {/* CONTENT AREA */}
-          <div className="flex flex-col px-[10px] h-[260px]">
-
-            {/* CATEGORY */}
-            <div className="mt-[12px] text-[#D6C9FF] font-semibold text-[13px] tracking-wide line-clamp-1">
+          {/* 2. CONTENT AREA: Clean Hierarchy */}
+          <div className="flex flex-col px-3 flex-1 mt-6">
+            
+            {/* CATEGORY & PROGRAM DEFINITION */}
+            <div className="text-[#8B19E6] font-bold text-[14px] uppercase tracking-[0.3em] mb-2">
               {course.category}
             </div>
 
-            {/* ELIGIBILITY */}
-            <div className="text-[#FE9900] font-bold text-[13px] mt-[6px]">
-              UG / PG | 0–5 YRS WORK EX
+            <h3 className="text-xl font-bold text-gray-900 leading-tight mb-2 line-clamp-2">
+              {course.title}
+            </h3>
+
+            {/* ELIGIBILITY: Clear and Classic */}
+            <div className="text-gray-400 font-bold text-[11px] uppercase tracking-wider mb-6">
+              UG / PG | 0–5 Yrs Work Ex
             </div>
 
-            {/* INFO GRID */}
-            <div className="mt-[14px] grid grid-cols-2 gap-y-[16px] text-white">
+            {/* INFO GRID: Replaced icons with Lucide for a "Premium Tech" look */}
+            <div className="grid grid-cols-2 gap-y-6 text-gray-600 mb-8">
               <InfoItem
                 title={course.duration}
-                subtitle="incl. internship"
-                icon="/icons/clock.svg"
+                subtitle="Incl. Internship"
+                icon={<Clock size={18} className="text-[#8B19E6]" />}
               />
               <InfoItem
                 title="Hybrid"
-                subtitle="Weekend / Weekdays"
-                icon="/icons/immersion.svg"
+                subtitle="Flexible Mode"
+                icon={<Monitor size={18} className="text-[#8B19E6]" />}
               />
               <InfoItem
-                title="Campus"
-                subtitle="Gurugram"
-                icon="/icons/location.webp"
+                title="Gurugram"
+                subtitle="On-Campus"
+                icon={<MapPin size={18} className="text-[#8B19E6]" />}
               />
               <InfoItem
                 title="Starts"
                 subtitle="Feb ’26"
-                icon="/icons/calender.svg"
+                icon={<Calendar size={18} className="text-[#8B19E6]" />}
               />
             </div>
 
-            {/* CTA */}
-            <div className="mt-auto pt-[6px]">
-              <div className="h-[46px] rounded-[999px] bg-[#FE9900] hover:bg-[#FFAA2B] flex items-center justify-center gap-[10px] transition-all duration-300">
-                <span className="text-white font-semibold text-[15px]">
-                  Learn More
+            {/* 3. CTA: Integrated Growth Action */}
+            <div className="mt-auto pb-2">
+              <div className="h-[52px] rounded-2xl bg-[#8B19E6] hover:bg-[#7014ba] flex items-center justify-between px-6 transition-all duration-500 shadow-lg shadow-purple-100 group-hover:shadow-purple-200">
+                <span className="text-white font-bold text-[14px] uppercase tracking-widest">
+                  View Program
                 </span>
-
-                <div className=" w-[28px] h-[28px]
-  bg-white rounded-full
-  flex items-center justify-center
-  transition-transform duration-300
-  group-hover:translate-x-1">
-                  <svg
-                    className="w-[14px]"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#2C2C2C"
-                    strokeWidth="2"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="M13 5l7 7-7 7" />
-                  </svg>
+                <div className="transition-transform duration-500 group-hover:translate-x-1">
+                   <ArrowRight className="text-white" size={20} />
                 </div>
               </div>
             </div>
@@ -96,16 +88,20 @@ export default function CourseCard({ course }) {
   );
 }
 
-/* INFO ITEM */
+/* REUSABLE INFO ITEM - Premium Layout */
 function InfoItem({ title, subtitle, icon }) {
   return (
-    <div className="flex gap-[10px] items-start">
-      <div className="w-[28px] h-[28px] relative flex-shrink-0">
-        <Image src={icon} alt="" fill />
+    <div className="flex gap-3 items-start">
+      <div className="mt-0.5">
+        {icon}
       </div>
-      <div className="text-[12px] leading-[14px] h-[28px]">
-        <div className="font-semibold whitespace-nowrap">{title}</div>
-        <div className="opacity-70 whitespace-nowrap">{subtitle}</div>
+      <div className="flex flex-col">
+        <span className="text-[13px] font-bold text-gray-900 leading-none mb-1">
+          {title}
+        </span>
+        <span className="text-[11px] font-medium text-gray-400 leading-none">
+          {subtitle}
+        </span>
       </div>
     </div>
   );
