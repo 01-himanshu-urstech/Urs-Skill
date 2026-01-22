@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { ArrowUpRight, Headphones } from "lucide-react";
 import { STATIC_COURSES } from "@/app/(root)/constants/constant";
+import { useGetMyTransactionsQuery } from "@/store/api/transactionApi"; // Import your API
+import toast from "react-hot-toast"; // Assuming you use react-hot-toast
 import gsap from "gsap";
 
-// We map our Hero UI data to the IDs in your STATIC_COURSES
 const HERO_UI_CONFIG = {
   fullstack: {
     courseId: 1,
@@ -31,8 +32,10 @@ const CourseHero = ({ course = "fullstack" }) => {
   const courseData = STATIC_COURSES[ui.courseId];
 
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
+  
+  // 1. Fetch user transactions (skipped if not logged in)
+  const { data: txnData } = useGetMyTransactionsQuery(undefined, { skip: !isLoggedIn });
 
-  // Refs for GSAP animations
   const textRef = useRef(null);
   const buttonRef = useRef(null);
   const imageRef = useRef(null);
@@ -55,24 +58,38 @@ const CourseHero = ({ course = "fullstack" }) => {
       router.push("/login");
       return;
     }
-    // Redirect to the professional checkout page we created earlier
+
+    // 2. CHECK IF ALREADY ENROLLED
+    const isAlreadyEnrolled = txnData?.data?.transactions?.some(
+      (txn) => String(txn.courseId) === String(ui.courseId) && txn.status === "SUCCESS"
+    );
+
+    if (isAlreadyEnrolled) {
+      // 3. SHOW POPUP / TOAST
+      toast.error("You are already enrolled in this course! please check profile", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+            background: "#7C3AED",
+            color: "#fff",
+            fontWeight: "bold"
+        }
+      });
+      return; // Stop the function here
+    }
+
     router.push(`/checkout/${ui.courseId}`);
   };
 
   const handleCounsellorClick = () => {
     const section = document.getElementById("need-help-course");
     if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
-
   return (
     <section className="relative h-[300px] sm:h-[380px] md:h-[400px] w-full overflow-hidden bg-gray-900">
-      {/* Background Image with GSAP Ref */}
       <img
         ref={imageRef}
         src={ui.image}
@@ -80,10 +97,8 @@ const CourseHero = ({ course = "fullstack" }) => {
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      {/* Modern Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
 
-      {/* Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20">
         <div ref={textRef}>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-widest mb-4">
@@ -106,7 +121,6 @@ const CourseHero = ({ course = "fullstack" }) => {
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div ref={buttonRef} className="mt-8 flex flex-wrap gap-4">
           <button
             onClick={handleApplyNow}
@@ -116,25 +130,19 @@ const CourseHero = ({ course = "fullstack" }) => {
               Apply Now
               <ArrowUpRight size={20} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
             </span>
-            {/* Glossy Button Shine Effect */}
             <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-40 group-hover:animate-shine" />
           </button>
 
           <button
             onClick={handleCounsellorClick}
-            className="flex items-center gap-2 bg-white/10 backdrop-blur-md
-                      border border-white/20 text-white px-8 py-4 rounded-2xl
-                      font-bold hover:bg-white hover:text-purple-900
-                      transition-all duration-300 hover:cursor-pointer"
+            className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-2xl font-bold hover:bg-white hover:text-purple-900 transition-all duration-300 hover:cursor-pointer"
           >
             <Headphones size={20} />
             {ui.ctaSecondary}
           </button>
-
         </div>
       </div>
 
-      {/* Course Badge for desktop */}
       <div className="hidden lg:block absolute bottom-10 right-20 bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl animate-bounce-slow">
         <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Starting from</p>
         <p className="text-white text-2xl font-black">₹{courseData.price}</p>
