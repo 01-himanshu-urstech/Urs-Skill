@@ -8,9 +8,12 @@ import { useGetMyTransactionsQuery } from '@/store/api/transactionApi';
 import { STATIC_COURSES } from '@/app/(root)/constants/constant';
 import { logout } from '@/store/slices/authSlice';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   User, Mail, Phone, Calendar, LogOut,
-  ShieldCheck, Settings, Lock, BookOpen, Save, X, Eye, EyeOff, CheckCircle, Tag, ArrowUpRight
+  ShieldCheck, Settings, Lock, BookOpen, Save, X, Eye, EyeOff, CheckCircle, Tag, ArrowUpRight,
+  FileText, Download
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -40,12 +43,62 @@ export default function ProfilePage() {
   const [updateProfile, { isLoading: isUpdating }] = useUpdateMyProfileMutation();
 
   const customer = profileData?.data?.customer;
+const generatePDF = (course) => {
+  const doc = new jsPDF();
+  
+  // Brand Header
+  doc.setFontSize(20);
+  doc.setTextColor(124, 58, 237);
+  doc.text("Urs Skill", 14, 22);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text("Official Course Invoice", 14, 30);
+  doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 14, 35);
 
+  // Customer Details
+  doc.setFontSize(12);
+  doc.setTextColor(0);
+  doc.text("Billed To:", 14, 50);
+  doc.setFontSize(10);
+  doc.text(`Name: ${customer?.name}`, 14, 56);
+  doc.text(`Email: ${customer?.email}`, 14, 61);
+  doc.text(`Phone: ${customer?.phone || 'N/A'}`, 14, 66);
+
+  // 2. Use the imported autoTable function directly
+  autoTable(doc, {
+    startY: 75,
+    head: [['Description', 'Transaction ID', 'Date', 'Amount']],
+    body: [
+      [
+        course.title, 
+        course.id.toUpperCase(), 
+        course.date, 
+        `INR ${course.amount}`
+      ],
+    ],
+    headStyles: { fillColor: [124, 58, 237] }, // Purple Header
+    theme: 'striped'
+  });
+
+  // Footer - doc.lastAutoTable still works to find the end of the table
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(10);
+  doc.text("Thank you for choosing Urs Skill for your learning journey!", 14, finalY);
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text("This is a computer-generated document and does not require a signature.", 14, finalY + 10);
+
+  // Save the PDF
+  doc.save(`Invoice_${course.title.replace(/\s+/g, '_')}.pdf`);
+  toast.success("Invoice downloaded!");
+};
   const enrolledCourses = useMemo(() => {
     if (!txnData?.data?.transactions) return [];
     return txnData.data.transactions
-      .filter(txn => txn.status === 'SUCCESS')
+      .filter(txn => txn.status === 'SUCCESS') // Note: Latest course won't show if status is PENDING
       .map(txn => {
+        // Accessing STATIC_COURSES by ID (e.g., STATIC_COURSES[1])
         const courseStaticInfo = STATIC_COURSES[txn.courseId];
         return {
           id: txn._id,
@@ -53,8 +106,8 @@ export default function ProfilePage() {
           amount: txn.finalAmount,
           status: txn.status,
           coupon: txn.couponCode,
-          // Hydration safe date handling
-          dateRaw: txn.createdAt 
+          instructor: courseStaticInfo?.instructor || "Expert Instructor",
+          date: new Date(txn.createdAt).toLocaleDateString('en-IN')
         };
       });
   }, [txnData]);
@@ -281,6 +334,58 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Billing & Invoices Section */}
+          <div className="lg:col-span-3 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <FileText size={20} className="text-purple-700" />
+              Billing History & Invoices
+            </h3>
+
+            {enrolledCourses.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="py-4 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Course Details</th>
+                      <th className="py-4 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Date</th>
+                      <th className="py-4 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</th>
+                      <th className="py-4 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {enrolledCourses.map((course) => (
+                      <tr key={`inv-${course.id}`} className="group hover:bg-gray-50/50 transition-colors">
+                        <td className="py-4 px-2">
+                          <div className="font-bold text-gray-900 text-sm sm:text-base">{course.title}</div>
+                          <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase">ID: {course.id.slice(-8)}</div>
+                        </td>
+                        <td className="py-4 px-2 hidden sm:table-cell">
+                          <span className="text-sm text-gray-600">{course.date}</span>
+                        </td>
+                        <td className="py-4 px-2">
+                          <span className="text-sm font-bold text-gray-900">₹{course.amount}</span>
+                        </td>
+                      <td className="py-4 px-2 text-right">
+                        <button 
+                          onClick={() => generatePDF(course)} // Updated function call
+                          className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-50 text-purple-700 rounded-lg text-xs font-bold hover:bg-purple-700 hover:text-white transition-all active:scale-95 hover:cursor-pointer"
+                        >
+                          <Download size={14} />
+                          <span className="hidden xs:inline">Invoice</span>
+                        </button>
+                      </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <p className="text-gray-500 font-medium text-sm">No transactions found.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
