@@ -6,6 +6,8 @@ import {
   logoutController,
   resendEmailOTPController,
   verifyEmailOTPController,
+  forgotPasswordRequestController,
+  resetPasswordController
 } from './auth.controller.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 
@@ -18,6 +20,9 @@ export default (app) => {
   router.post('/customer/login', customerLoginController);
   router.post('/verify-email-otp', verifyEmailOTPController);
   router.post('/resend-email-otp', resendEmailOTPController);
+
+  router.post('/forgot-password-request', forgotPasswordRequestController);
+  router.post('/reset-password', resetPasswordController);
     
   router.post(
     '/logout',

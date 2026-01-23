@@ -26,6 +26,13 @@ const customerSchema = new mongoose.Schema(
     emailOTP: String,
     emailOTPExpires: Date,
 
+    forgotPasswordOTP: {
+      type: String,
+    },
+    forgotPasswordOTPExpires: {
+      type: Date,
+    },
+
     // 🧠 IMPORTANT
     createdBy: {
       type: String,

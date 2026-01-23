@@ -214,6 +214,69 @@ await sendEmail({
   };
 }
 
+/* ================= FORGOT PASSWORD ================= */
+
+async forgotPasswordRequest({ email }) {
+  if (!email) throw APIError.validation('Email is required');
+
+  const customer = await Customer.findOne({ email });
+  // For security, don't confirm if user exists, but here we'll assume standard flow
+  if (!customer) throw APIError.notFound('Customer not found');
+
+  const { otp, expires } = generateOTP();
+  
+  customer.forgotPasswordOTP = otp;
+  customer.forgotPasswordOTPExpires = expires;
+  await customer.save();
+
+  await sendEmail({
+    to: email,
+    subject: 'Password Reset OTP - Urs Skill',
+    html: `
+      <div style="font-family: Arial; padding: 20px; border: 1px solid #eee;">
+        <h2>Password Reset Request</h2>
+        <p>Use the OTP below to reset your password. This is valid for 5 minutes.</p>
+        <h1 style="color: #6d28d9;">${otp}</h1>
+      </div>
+    `
+  });
+
+  return {
+    success: true,
+    statusCode: 200,
+    message: 'Password reset OTP sent to email'
+  };
+}
+
+async resetPassword({ email, otp, newPassword }) {
+  if (!email || !otp || !newPassword) {
+    throw APIError.validation('Email, OTP, and new password are required');
+  }
+
+  const customer = await Customer.findOne({
+    email,
+    forgotPasswordOTP: otp,
+    forgotPasswordOTPExpires: { $gt: Date.now() }
+  });
+
+  if (!customer) {
+    throw APIError.badRequest('Invalid or expired OTP');
+  }
+
+  // Hash new password and clear OTP fields
+  customer.password = await hashPassword(newPassword);
+  customer.forgotPasswordOTP = undefined;
+  customer.forgotPasswordOTPExpires = undefined;
+  
+  await customer.save();
+
+  return {
+    success: true,
+    statusCode: 200,
+    message: 'Password has been reset successfully'
+  };
+}
+
 
   /* ================= CUSTOMER LOGIN ================= */
 

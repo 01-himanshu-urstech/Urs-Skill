@@ -46,6 +46,24 @@ export const customerLoginController = async (req, res, next) => {
   }
 };
 
+export const forgotPasswordRequestController = async (req, res, next) => {
+  try {
+    const result = await authService.forgotPasswordRequest(req.body);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPasswordController = async (req, res, next) => {
+  try {
+    const result = await authService.resetPassword(req.body);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const logoutController = async (req, res) => {
   return res.status(200).json({
     success: true,
