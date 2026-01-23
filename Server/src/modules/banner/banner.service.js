@@ -26,6 +26,14 @@ class BannerService {
     }
 
     const uploaded = await uploadToCloudinary(file.buffer, 'banners');
+    if (data.title && data.title.length > 18) {
+      throw APIError.validation('Title must be at most 18 characters');
+    }
+
+    if (data.subtitle && data.subtitle.length > 26) {
+      throw APIError.validation('Subtitle must be at most 26 characters');
+    }
+
 
     const banner = await Banner.create({
       ...data,
@@ -91,6 +99,15 @@ class BannerService {
             throw APIError.validation(`Cannot update: Order ${orderToCheck} is already assigned to another banner in ${positionToCheck}.`);
         }
     }
+
+    if (data.title && data.title.length > 18) {
+      throw APIError.validation('Title must be at most 18 characters');
+    }
+
+    if (data.subtitle && data.subtitle.length > 26) {
+      throw APIError.validation('Subtitle must be at most 26 characters');
+    }
+
     if (file) {
       await deleteFromCloudinary(banner.image.publicId);
 

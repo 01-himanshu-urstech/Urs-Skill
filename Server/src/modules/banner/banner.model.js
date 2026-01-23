@@ -2,8 +2,17 @@ import mongoose from 'mongoose';
 
 const bannerSchema = new mongoose.Schema(
   {
-    title: String,
-    subtitle: String,
+    title: {
+      type: String,
+      trim: true,
+      maxlength: [18, 'Title cannot exceed 18 characters']
+    },
+
+    subtitle: {
+      type: String,
+      trim: true,
+      maxlength: [26, 'Subtitle cannot exceed 26 characters']
+    },
 
     image: {
       url: {
@@ -15,6 +24,7 @@ const bannerSchema = new mongoose.Schema(
         required: true
       }
     },
+
     link: String,
 
     position: {
