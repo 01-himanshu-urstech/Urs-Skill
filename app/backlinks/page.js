@@ -82,7 +82,7 @@ export default function BacklinkListPage() {
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-200/10 overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-6 text-center w-20">S.No</th>
                                     <th className="p-6">Partner & URL</th>
@@ -99,20 +99,20 @@ export default function BacklinkListPage() {
                                     <tr>
                                         <td colSpan="6" className="p-24 text-center">
                                             <Inbox size={48} className="mx-auto mb-2 text-gray-200 opacity-20" />
-                                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 italic">No Backlinks Found</p>
+                                            <p className="text-xs   uppercase tracking-widest text-gray-400 italic">No Backlinks Found</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     displayBacklinks.map((link, index) => (
                                         <tr key={link._id} className="hover:bg-gray-50/30 transition-all group">
                                             {/*    5. Corrected Sequential Indexing */}
-                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                            <td className="p-6 text-center text-xs   text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
 
                                             <td className="p-6">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-gray-800 flex items-center gap-2 uppercase tracking-tight">
+                                                    <span className="text-sm   text-gray-800 flex items-center gap-2 uppercase tracking-tight">
                                                         <Globe size={14} className="text-indigo-400" />
                                                         {link.name}
                                                     </span>
@@ -126,7 +126,7 @@ export default function BacklinkListPage() {
                                             </td>
 
                                             <td className="p-6">
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-wider border border-gray-200/50">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 text-[10px]   text-gray-500 uppercase tracking-wider border border-gray-200/50">
                                                     <Tag size={10} />
                                                     {link.type}
                                                 </span>
@@ -140,7 +140,7 @@ export default function BacklinkListPage() {
                                             </td>
 
                                             <td className="p-6 text-center">
-                                                <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${link.isActive ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
+                                                <span className={`px-3 py-1.5 rounded-full text-[9px]   uppercase tracking-widest border transition-all ${link.isActive ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
                                                     {link.isActive ? 'Active' : 'Inactive'}
                                                 </span>
                                             </td>
@@ -171,7 +171,7 @@ export default function BacklinkListPage() {
                     {/*    6. PAGINATION FOOTER */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-indigo-500 uppercase">
                                 Showing {displayBacklinks.length} of {totalRecords} Backlink Records
                             </p>

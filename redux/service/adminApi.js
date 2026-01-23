@@ -16,7 +16,7 @@ export const adminApi = createApi({
         },
     }),
     keepUnusedDataFor: 90,
-    tagTypes: ['Settings', 'Admins', 'Customers', 'Courses', 'Logs', 'Blogs', 'Backlinks', 'Banners', 'Coupons', 'Contacts', 'Transactions'],
+    tagTypes: ['Settings', 'Admins', 'Customers', 'Courses', 'Logs', 'Blogs', 'Backlinks', 'Banners', 'Coupons', 'Contacts', 'Transactions','Enquiries'],
 
     endpoints: (builder) => ({
         // ==========================================
@@ -304,6 +304,43 @@ export const adminApi = createApi({
         }),
 
         // ==========================================
+// 8.5 ENQUIRIES (ADMIN PANEL)
+// ==========================================
+
+getAllEnquiries: builder.query({
+  query: () => '/enquiries/admin',
+  providesTags: ['Enquiries'],
+}),
+
+updateEnquiryStatus: builder.mutation({
+  query: ({ id, status }) => ({
+    url: `/enquiries/status/${id}`,
+    method: 'PATCH',
+    body: { status },
+  }),
+  async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
+    const patchResult = dispatch(
+      adminApi.util.updateQueryData(
+        'getAllEnquiries',
+        undefined,
+        (draft) => {
+          const enquiry = draft.data.enquiries.find(e => e._id === id);
+          if (enquiry) enquiry.status = status;
+        }
+      )
+    );
+
+    try {
+      await queryFulfilled;
+    } catch {
+      patchResult.undo();
+    }
+  },
+  invalidatesTags: ['Enquiries'],
+}),
+
+
+        // ==========================================
         // 9. LOGS & TRANSACTIONS (6 Routes)
         // ==========================================
         getAdminLogs: builder.query({ query: () => '/logs/admin', providesTags: ['Logs'] }),
@@ -325,5 +362,6 @@ export const {
     useGetBannersQuery, useGetBannerByIdQuery, useCreateBannerMutation, useUpdateBannerMutation, useDeleteBannerMutation,
     useGetCouponsQuery, useCreateCouponMutation,useGetCouponByIdQuery, useUpdateCouponMutation, useDeleteCouponMutation,
     useGetContactsQuery, useGetAllContactsQuery, useUpdateContactStatusMutation,
-    useGetTransactionsQuery, useGetCoursesQuery, useGetSettingsQuery
+    useGetTransactionsQuery, useGetCoursesQuery, useGetSettingsQuery,
+    useGetAllEnquiriesQuery,useUpdateEnquiryStatusMutation,
 } = adminApi;

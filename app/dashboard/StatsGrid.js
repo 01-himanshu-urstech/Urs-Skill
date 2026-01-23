@@ -66,17 +66,17 @@ export default function StatsGrid() {
                             {stat.icon}
                         </div>
                         <div className="flex flex-col items-end">
-                            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            <span className="flex items-center gap-1 text-[10px]   text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
                                 <TrendingUp size={12} /> {stat.trend}
                             </span>
                         </div>
                     </div>
 
                     <div className="relative z-10">
-                        <h3 className="text-3xl font-black text-gray-800 tracking-tighter mb-1">
+                        <h3 className="text-3xl   text-gray-800 tracking-tighter mb-1">
                             {stat.value.toString().padStart(2, '0')}
                         </h3>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
+                        <p className="text-[10px]   text-gray-400 uppercase tracking-[2px]">
                             {stat.title}
                         </p>
                         <p className="text-[9px] text-gray-300 font-bold uppercase mt-2 group-hover:text-gray-400 transition-colors">

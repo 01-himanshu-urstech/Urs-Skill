@@ -25,24 +25,56 @@ export default function AddBannerPage() {
     //    Validation State
     const [errors, setErrors] = useState({});
 
+    // const validateForm = () => {
+    //     let newErrors = {};
+
+    //     if (!selectedImage) newErrors.image = "Banner graphic is required";
+    //     if (selectedImage && selectedImage.size > 2 * 1024 * 1024) newErrors.image = "Image size must be less than 2MB";
+
+    //     if (!formData.title.trim()) newErrors.title = "Primary title is required";
+    //     else if (formData.title.length < 3) newErrors.title = "Title must be at least 3 characters";
+
+    //     if (formData.link && !formData.link.startsWith('/') && !formData.link.startsWith('http')) {
+    //         newErrors.link = "Link must be a relative path (/) or absolute URL (http)";
+    //     }
+
+    //     if (formData.order < 1) newErrors.order = "Order must be a positive number";
+
+    //     setErrors(newErrors);
+    //     return Object.keys(newErrors).length === 0;
+    // };
+
     const validateForm = () => {
         let newErrors = {};
 
         if (!selectedImage) newErrors.image = "Banner graphic is required";
-        if (selectedImage && selectedImage.size > 2 * 1024 * 1024) newErrors.image = "Image size must be less than 2MB";
+        if (selectedImage && selectedImage.size > 2 * 1024 * 1024)
+            newErrors.image = "Image size must be less than 2MB";
 
-        if (!formData.title.trim()) newErrors.title = "Primary title is required";
-        else if (formData.title.length < 3) newErrors.title = "Title must be at least 3 characters";
+        if (!formData.title.trim())
+            newErrors.title = "Primary title is required";
+        else if (formData.title.length < 3)
+            newErrors.title = "Title must be at least 3 characters";
+        else if (formData.title.length > 18)
+            newErrors.title = "Title must not exceed 18 characters";
 
-        if (formData.link && !formData.link.startsWith('/') && !formData.link.startsWith('http')) {
+        if (formData.subtitle && formData.subtitle.length > 26)
+            newErrors.subtitle = "Subtitle must not exceed 26 characters";
+
+        if (formData.link &&
+            !formData.link.startsWith("/") &&
+            !formData.link.startsWith("http")
+        ) {
             newErrors.link = "Link must be a relative path (/) or absolute URL (http)";
         }
 
-        if (formData.order < 1) newErrors.order = "Order must be a positive number";
+        if (formData.order < 1)
+            newErrors.order = "Order must be a positive number";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -77,7 +109,7 @@ export default function AddBannerPage() {
                                 <CheckCircle size={24} strokeWidth={3} />
                             </div>
                             <div>
-                                <p className="text-sm font-black uppercase tracking-widest">Banner Published!</p>
+                                <p className="text-sm   uppercase tracking-widest">Banner Published!</p>
                                 <p className="text-[10px] font-bold opacity-80 uppercase">Synchronizing with live platform...</p>
                             </div>
                             <button onClick={() => setShowToast(false)} className="ml-4 hover:cursor-pointer hover:rotate-90 transition-transform">
@@ -101,14 +133,14 @@ export default function AddBannerPage() {
 
                             {/* Image Upload Area */}
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Banner Graphic *</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">Banner Graphic *</label>
                                 <label className={`relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-[2rem] cursor-pointer overflow-hidden transition-all ${errors.image ? 'border-red-300 bg-red-50/30' : 'border-gray-100 hover:bg-gray-50/50'}`}>
                                     {selectedImage ? (
                                         <img src={URL.createObjectURL(selectedImage)} className="w-full h-full object-cover" alt="Preview" />
                                     ) : (
                                         <div className="flex flex-col items-center gap-3 text-gray-300">
                                             <Camera size={40} />
-                                            <p className="text-xs font-black uppercase tracking-widest">Click to upload media</p>
+                                            <p className="text-xs   uppercase tracking-widest">Click to upload media</p>
                                         </div>
                                     )}
                                     <input type="file" className="hidden" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" />
@@ -122,14 +154,28 @@ export default function AddBannerPage() {
                                     placeholder="Learn Spoken Communication"
                                     value={formData.title}
                                     error={errors.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    maxLength={18}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, title: e.target.value })
+                                    }
                                 />
+                                <p className="text-[9px] text-gray-400 font-bold text-right">
+                                    {formData.title.length}/18
+                                </p>
                                 <InputField
                                     label="Secondary Subtitle"
                                     placeholder="Become Job Ready"
                                     value={formData.subtitle}
-                                    onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                                    error={errors.subtitle}
+                                    maxLength={26}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, subtitle: e.target.value })
+                                    }
                                 />
+                                <p className="text-[9px] text-gray-400 font-bold text-right">
+                                    {formData.subtitle.length}/26
+                                </p>
+
                                 <InputField
                                     label="Redirect URL (Link)"
                                     placeholder="/courses/fullstack"
@@ -140,7 +186,7 @@ export default function AddBannerPage() {
                                 />
 
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Target Position</label>
+                                    <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">Target Position</label>
                                     <select
                                         value={formData.position}
                                         onChange={(e) => setFormData({ ...formData, position: e.target.value })}
@@ -166,12 +212,12 @@ export default function AddBannerPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="flex-1 h-16 bg-emerald-500 hover:cursor-pointer hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 transition-all disabled:opacity-50"
+                                className="flex-1 h-16 bg-emerald-500 hover:cursor-pointer hover:bg-emerald-600 text-white rounded-2xl   uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 transition-all disabled:opacity-50"
                             >
                                 {isLoading ? <Loader2 className="animate-spin" /> : <Check size={18} />}
                                 Upload and Publish
                             </button>
-                            <Link href="/banners" className="px-10 h-16 bg-white border-2 border-gray-100 text-gray-400 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center">
+                            <Link href="/banners" className="px-10 h-16 bg-white border-2 border-gray-100 text-gray-400 rounded-2xl   uppercase tracking-widest text-[10px] flex items-center justify-center">
                                 Discard
                             </Link>
                         </div>
@@ -184,7 +230,7 @@ export default function AddBannerPage() {
 
 const InputField = ({ label, icon, error, ...props }) => (
     <div className="flex flex-col gap-2 w-full">
-        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">{label}</label>
+        <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300">{icon}</div>}
             <input

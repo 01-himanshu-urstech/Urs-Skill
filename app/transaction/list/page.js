@@ -156,7 +156,7 @@ export default function TransactionListPage() {
                     <div className="overflow-x-auto no-scrollbar">
                         <div className="min-w-[1200px]">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest border-b border-gray-100">
+                                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase   tracking-widest border-b border-gray-100">
                                     <tr>
                                         <th className="p-5 text-center w-16">S.No</th>
                                         <th className="p-5">Transaction & Gateway</th>
@@ -172,19 +172,19 @@ export default function TransactionListPage() {
                                             <td colSpan="6" className="p-20 text-center">
                                                 <div className="flex flex-col items-center gap-3 text-gray-400">
                                                     <Inbox size={48} className="opacity-20" />
-                                                    <p className="text-xs font-black uppercase tracking-widest">No matching results found</p>
+                                                    <p className="text-xs   uppercase tracking-widest">No matching results found</p>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : (
                                         displayTransactions.map((txn, index) => (
                                             <tr key={txn._id} className="hover:bg-gray-50/30 transition-colors group">
-                                                <td className="p-5 text-center text-xs font-black text-gray-300">
+                                                <td className="p-5 text-center text-xs   text-gray-300">
                                                     {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                                 </td>
                                                 <td className="p-5">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className="text-sm font-black text-gray-800 font-mono tracking-tight">{txn.transactionId}</span>
+                                                        <span className="text-sm   text-gray-800 font-mono tracking-tight">{txn.transactionId}</span>
                                                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
                                                             <Wallet size={12} /> {txn.paymentGateway}
                                                         </div>
@@ -195,7 +195,7 @@ export default function TransactionListPage() {
                                                         <button onClick={() => handleCopy(txn.customerId?._id || txn.customerId)} className="text-[10px] text-gray-400 hover:cursor-pointer hover:text-indigo-600 flex items-center gap-1 transition-colors uppercase font-bold">
                                                            {txn.customerId?.name || 'User'}: {String(txn.customerId?._id || txn.customerId || "").slice(-6)}... <Copy size={10} />
                                                         </button>
-                                                        <span className="text-[10px] text-indigo-600 font-black uppercase tracking-tight">
+                                                        <span className="text-[10px] text-indigo-600   uppercase tracking-tight">
                                                             {courseMapping[txn.courseId] || `ID: ${txn.courseId}`}
                                                         </span>
                                                     </div>
@@ -205,7 +205,7 @@ export default function TransactionListPage() {
                                                     <div className="flex flex-col gap-0.5">
                                                         {txn.referredBy ? (
                                                             <>
-                                                                <div className="flex items-center gap-1 text-[9px] font-black text-amber-500 uppercase tracking-tighter">
+                                                                <div className="flex items-center gap-1 text-[9px]   text-amber-500 uppercase tracking-tighter">
                                                                     <UserCheck size={12} /> Referral
                                                                 </div>
                                                                 <span className="text-xs font-bold text-gray-700">{txn.referredBy.name}</span>
@@ -218,11 +218,11 @@ export default function TransactionListPage() {
                                                 </td>
                                                 <td className="p-5">
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-gray-900">₹{txn.finalAmount}</span>
+                                                        <span className="text-sm   text-gray-900">₹{txn.finalAmount}</span>
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-[10px] text-gray-400 line-through">₹{txn.amount}</span>
                                                             {txn.couponCode && (
-                                                                <span className="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-black border border-emerald-100 uppercase">
+                                                                <span className="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded   border border-emerald-100 uppercase">
                                                                     {txn.couponCode} (-₹{txn.discountAmount})
                                                                 </span>
                                                             )}
@@ -247,7 +247,7 @@ export default function TransactionListPage() {
 
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-indigo-400 uppercase">Showing {displayTransactions.length} of {totalRecords} Records</p>
                         </div>
                         <div className="flex gap-2">
@@ -274,7 +274,7 @@ const StatusBadge = ({ status }) => {
     const style = config[status?.toUpperCase()] || config.PENDING;
     const Icon = style.icon;
     return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-black border uppercase tracking-wider ${style.color}`}>
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px]   border uppercase tracking-wider ${style.color}`}>
             <Icon size={12} strokeWidth={3} />
             {status}
         </span>

@@ -100,7 +100,7 @@ export default function MainContentWrapper({ children }) {
                         {isFocused && suggestions.length > 0 && (
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="p-2 border-b border-gray-50 bg-gray-50/50">
-                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-2">Quick Results</p>
+                                    <p className="text-[9px]   text-gray-400 uppercase tracking-widest px-2">Quick Results</p>
                                 </div>
                                 {suggestions.map((item, idx) => (
                                     <button

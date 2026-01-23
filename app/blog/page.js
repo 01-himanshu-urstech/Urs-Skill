@@ -78,7 +78,7 @@ export default function BlogListPage() {
                 <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-6 text-center w-20">Index</th>
                                     <th className="p-6">Article Identity</th>
@@ -96,7 +96,7 @@ export default function BlogListPage() {
                                     displayBlogs.map((blog, index) => (
                                         <tr key={blog._id} className="hover:bg-gray-50/50 transition-colors group">
                                             {/*    5. Corrected Indexing: Page 2 starts at 11 */}
-                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                            <td className="p-6 text-center text-xs   text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
                                             <td className="p-6">
@@ -105,13 +105,13 @@ export default function BlogListPage() {
                                                         <BookOpen size={18} />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-gray-800 tracking-tight">{blog.title}</span>
+                                                        <span className="text-sm   text-gray-800 tracking-tight">{blog.title}</span>
                                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{new Date(blog.createdAt).toLocaleDateString('en-GB')}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="p-6">
-                                                <span className="text-[10px] font-black uppercase px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">
+                                                <span className="text-[10px]   uppercase px-2 py-1 bg-gray-100 text-gray-500 rounded-lg">
                                                     {blog.createdBy?.role || 'ADMIN'}
                                                 </span>
                                             </td>
@@ -138,7 +138,7 @@ export default function BlogListPage() {
                     {/*    6. PAGINATION FOOTER - Exact Coupon Design */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-purple-400 uppercase">Showing {displayBlogs.length} of {totalRecords} Records</p>
                         </div>
                         <div className="flex gap-2">

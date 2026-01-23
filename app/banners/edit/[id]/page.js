@@ -17,6 +17,7 @@ export default function EditBannerPage() {
     const [formData, setFormData] = useState({
         title: "", subtitle: "", link: "", position: "HOME", order: 1, isActive: true
     });
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (response?.data?.banner) {
@@ -27,6 +28,26 @@ export default function EditBannerPage() {
             });
         }
     }, [response]);
+    const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.title.trim())
+        newErrors.title = "Title is required";
+    else if (formData.title.length < 3)
+        newErrors.title = "Title must be at least 3 characters";
+    else if (formData.title.length > 18)
+        newErrors.title = "Title must not exceed 18 characters";
+
+    if (formData.subtitle && formData.subtitle.length > 26)
+        newErrors.subtitle = "Subtitle must not exceed 26 characters";
+
+    if (formData.order < 1)
+        newErrors.order = "Order must be positive";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+};
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,11 +75,33 @@ export default function EditBannerPage() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 sm:p-10 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-black">
-                                <InputField label="Heading *" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-                                <InputField label="Subtitle" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} />
+                               <InputField
+                                    label="Heading *"
+                                    value={formData.title}
+                                    maxLength={18}
+                                    error={errors.title}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, title: e.target.value })
+                                    }
+                                    />
+                                    <p className="text-[9px] text-gray-400 text-right font-bold">
+                                    {formData.title.length}/18
+                                    </p>
 
+                                    <InputField
+                                    label="Subtitle"
+                                    value={formData.subtitle}
+                                    maxLength={26}
+                                    error={errors.subtitle}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, subtitle: e.target.value })
+                                    }
+                                    />
+                                    <p className="text-[9px] text-gray-400 text-right font-bold">
+                                    {formData.subtitle.length}/26
+                                    </p>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Visibility Position</label>
+                                    <label className="text-[10px]      text-gray-400 uppercase tracking-[2px]">Visibility Position</label>
                                     <select
                                         value={formData.position}
                                         onChange={(e) => setFormData({ ...formData, position: e.target.value })}
@@ -73,14 +116,14 @@ export default function EditBannerPage() {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Banner Asset</label>
+                                <label className="text-[10px]      text-gray-400 uppercase tracking-[2px]">Banner Asset</label>
                                 <label className="relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-200 rounded-3xl hover:bg-gray-50 cursor-pointer overflow-hidden group">
                                     {selectedImage ? (
                                         <img src={URL.createObjectURL(selectedImage)} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="flex flex-col items-center gap-2">
                                             <Camera size={32} className="text-gray-300" />
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">Click to replace current image</span>
+                                            <span className="text-[10px]      text-gray-400 uppercase tracking-widest italic">Click to replace current image</span>
                                         </div>
                                     )}
                                     <input type="file" className="hidden" onChange={(e) => setSelectedImage(e.target.files[0])} accept="image/*" />
@@ -89,8 +132,8 @@ export default function EditBannerPage() {
                         </div>
 
                         <div className="flex gap-4">
-                            <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-emerald-500 hover:cursor-pointer text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
-                                {isUpdating ? "Processing..." : "Commit Changes"} <Check size={16} />
+                            <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-emerald-500 hover:cursor-pointer text-white rounded-2xl      uppercase tracking-widest text-[10px] shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
+                                {isUpdating ? "Processing..." : "Commit Changes"} <Check size={18} />
                             </button>
                         </div>
                     </form>
@@ -100,9 +143,20 @@ export default function EditBannerPage() {
     );
 }
 
-const InputField = ({ label, ...props }) => (
+const InputField = ({ label, error, ...props }) => (
     <div className="flex flex-col gap-2 w-full">
-        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">{label}</label>
-        <input {...props} className="text-black w-full h-14 px-5 bg-gray-50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-emerald-500 outline-none transition-all" />
+        <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">
+            {label}
+        </label>
+        <input
+            {...props}
+            className={`text-black w-full h-14 px-5 bg-gray-50 border-2 rounded-2xl font-bold text-sm outline-none transition-all
+                ${error ? "border-red-300 focus:border-red-500" : "border-gray-100 focus:border-emerald-500"}`}
+        />
+        {error && (
+            <p className="text-[9px] text-red-500 font-bold uppercase ml-1">
+                {error}
+            </p>
+        )}
     </div>
 );

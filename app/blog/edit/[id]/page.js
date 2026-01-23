@@ -21,8 +21,9 @@ export default function EditBlogPage() {
     const { id } = useParams();
     const router = useRouter();
 
-    // ✅ Hydration Fix
+    //  Hydration Fix
     const [mounted, setMounted] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const { data: response, isLoading: isFetching, isSuccess } = useGetBlogsQuery(id);
     const [updateBlog, { isLoading: isUpdating }] = useUpdateBlogMutation();
@@ -69,6 +70,35 @@ export default function EditBlogPage() {
         ],
     }), []);
 
+const validateSEO = () => {
+  const newErrors = {};
+
+  const titleLen = formData.seo.metaTitle.length;
+  const descLen = formData.seo.metaDescription.length;
+
+  // ✅ Meta Title: min 3, max 70
+  if (titleLen > 0 && titleLen < 3) {
+    newErrors.metaTitle = "Meta title must be at least 3 characters";
+  }
+
+  if (titleLen > 70) {
+    newErrors.metaTitle = "Meta title must not exceed 70 characters";
+  }
+
+  // ✅ Meta Description: min 50, max 325
+  if (descLen > 0 && descLen < 50) {
+    newErrors.metaDescription = "Meta description must be at least 50 characters";
+  }
+
+  if (descLen > 325) {
+    newErrors.metaDescription = "Meta description must not exceed 325 characters";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
     const handleUpdate = (field, value) => {
         if (field.startsWith("seo.")) {
             const seoField = field.split(".")[1];
@@ -89,6 +119,7 @@ export default function EditBlogPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        if (!validateSEO()) return;
 
         const cleanContent = DOMPurify.sanitize(formData.content);
         
@@ -136,7 +167,7 @@ export default function EditBlogPage() {
             <main className="p-4 sm:p-6 lg:p-10 min-h-screen bg-gray-50/30 w-full overflow-x-hidden">
                 <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <PageHeader title="Edit Article" description="Modify existing content and SEO." />
-                    <button onClick={() => router.back()} className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:shadow-md transition-all">
+                    <button onClick={() => router.back()} className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-500 rounded-2xl text-[10px]   uppercase tracking-widest hover:shadow-md transition-all">
                         <ArrowLeft size={16} /> Discard
                     </button>
                 </div>
@@ -144,18 +175,18 @@ export default function EditBlogPage() {
                 <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 xl:grid-cols-12 gap-8 lg:gap-10">
                     {/* Left: Content */}
                     <div className="xl:col-span-8 space-y-8">
-                        {error && <div className="p-5 bg-red-50 border-2 border-red-100 text-red-600 rounded-[1.5rem] flex items-center gap-3 text-[10px] font-black uppercase tracking-widest"><AlertCircle size={18} /> {error}</div>}
+                        {error && <div className="p-5 bg-red-50 border-2 border-red-100 text-red-600 rounded-[1.5rem] flex items-center gap-3 text-[10px]   uppercase tracking-widest"><AlertCircle size={18} /> {error}</div>}
                         
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl p-6 sm:p-10 lg:p-12 space-y-10">
                             <InputField label="Article Title *" value={formData.title} onChange={(e) => handleUpdate('title', e.target.value)} icon={<Type size={20} />} required />
                             
                             <div className="flex flex-col gap-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Excerpt</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">Excerpt</label>
                                 <textarea maxLength={160} rows={3} className="w-full p-6 bg-gray-50/50 border-2 border-gray-100 rounded-[2rem] focus:border-indigo-500 focus:bg-white outline-none transition-all text-sm font-medium" value={formData.excerpt} onChange={(e) => handleUpdate('excerpt', e.target.value)} />
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Main Content *</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-[2px]">Main Content *</label>
                                 <div className="rounded-[2rem] overflow-hidden border-2 border-gray-100 shadow-sm">
                                     <ReactQuill theme="snow" modules={quillModules} value={formData.content} onChange={(val) => handleUpdate('content', val)} className="bg-white min-h-[500px]" />
                                 </div>
@@ -168,20 +199,20 @@ export default function EditBlogPage() {
                         {/* Status Card */}
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-6">
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</span>
-                                <select value={formData.status} onChange={(e) => handleUpdate('status', e.target.value)} className={`px-5 py-2.5 rounded-full text-[10px] font-black border-0 outline-none cursor-pointer transition-colors ${formData.status === 'PUBLISHED' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
+                                <span className="text-[10px]   text-gray-400 uppercase tracking-widest">Status</span>
+                                <select value={formData.status} onChange={(e) => handleUpdate('status', e.target.value)} className={`px-5 py-2.5 rounded-full text-[10px]   border-0 outline-none cursor-pointer transition-colors ${formData.status === 'PUBLISHED' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
                                     <option value="DRAFT">DRAFT</option>
                                     <option value="PUBLISHED">PUBLISH</option>
                                 </select>
                             </div>
-                            <button type="submit" disabled={isUpdating} className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-[2px] shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50">
+                            <button type="submit" disabled={isUpdating} className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.5rem]   uppercase text-[10px] tracking-[2px] shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50">
                                 {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />} Update Post
                             </button>
                         </div>
 
                         {/* Image Card */}
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-4">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cover Image</label>
+                            <label className="text-[10px]   text-gray-400 uppercase tracking-widest">Cover Image</label>
                             <label className="relative flex flex-col items-center justify-center w-full h-56 border-2 border-dashed border-gray-100 rounded-[2rem] hover:bg-gray-50 cursor-pointer overflow-hidden group transition-all">
                                 {previewUrl ? <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" /> : <Camera size={32} className="text-indigo-500" />}
                                 <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
@@ -192,16 +223,73 @@ export default function EditBlogPage() {
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl p-8 space-y-6">
                             <div className="flex items-center gap-2 text-indigo-600 pb-3 border-b border-gray-50">
                                 <Globe size={18} />
-                                <h3 className="font-black text-[10px] uppercase tracking-widest">SEO Settings</h3>
+                                <h3 className="  text-[10px] uppercase tracking-widest">SEO Settings</h3>
                             </div>
-                            <InputField label="Meta Title" value={formData.seo.metaTitle} onChange={(e) => handleUpdate('seo.metaTitle', e.target.value)} placeholder="Browser title..." />
-                            
-                            <div className="flex flex-col gap-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Meta Description</label>
-                                <textarea rows={4} value={formData.seo.metaDescription} onChange={(e) => handleUpdate('seo.metaDescription', e.target.value)} placeholder="SEO description..." className="w-full p-5 bg-gray-50/50 border-2 border-gray-100 rounded-2xl focus:border-indigo-500 outline-none transition-all text-xs font-medium" />
-                            </div>
+                            <InputField
+                            label="Meta Title"
+                            value={formData.seo.metaTitle}
+                            maxLength={70} // HARD MAX ONLY
+                            onChange={(e) => handleUpdate('seo.metaTitle', e.target.value)}
+                            />
 
-                            <InputField label="SEO Keywords" placeholder="react, news, blog" value={formData.seo.keywords} onChange={(e) => handleUpdate('seo.keywords', e.target.value)} />
+<p
+  title="Recommended length: 30–60 characters"
+  className={`text-[9px] font-bold text-right cursor-help
+    ${
+      formData.seo.metaTitle.length >= 30 &&
+      formData.seo.metaTitle.length <= 60
+        ? "text-emerald-500"
+        : "text-gray-400"
+    }`}
+>
+  {formData.seo.metaTitle.length}/70
+</p>
+
+
+                            {errors.metaTitle && (
+                                <p className="text-[9px] text-red-500 font-bold uppercase">
+                                    {errors.metaTitle}
+                                </p>
+                            )}
+                                                        
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Meta Description</label>
+                               <textarea
+                                    rows={4}
+                                    maxLength={325} // HARD MAX ONLY
+                                    value={formData.seo.metaDescription}
+                                    onChange={(e) => handleUpdate('seo.metaDescription', e.target.value)}
+                                    className="w-full p-5 bg-gray-50/50 border-2 border-gray-100 rounded-2xl
+                                                focus:border-indigo-500 outline-none transition-all
+                                                text-xs font-medium"
+                                    />
+                                        <p
+                                        title="Recommended length: 120–320 characters"
+                                        className={`text-[9px] font-bold text-right cursor-help
+                                            ${
+                                            formData.seo.metaDescription.length >= 120 &&
+                                            formData.seo.metaDescription.length <= 320
+                                                ? "text-emerald-500"
+                                                : "text-gray-400"
+                                            }`}
+                                        >
+                                        {formData.seo.metaDescription.length}/325
+                                        </p>
+                                {errors.metaDescription && (
+                                    <p className="text-[9px] text-red-500 font-bold uppercase">
+                                        {errors.metaDescription}
+                                    </p>
+                                )}
+                            </div>
+                            <InputField
+                                label="SEO Keywords"
+                                placeholder="react, nextjs, seo, web development"
+                                value={formData.seo.keywords}
+                                onChange={(e) => handleUpdate('seo.keywords', e.target.value)}
+                            />
+                            <p className="text-[9px] text-gray-400 font-bold">
+                                Separate keywords using commas
+                            </p>
                         </div>
                     </div>
                 </form>
@@ -212,7 +300,7 @@ export default function EditBlogPage() {
 
 const InputField = ({ label, icon, ...props }) => (
     <div className="flex flex-col gap-3 w-full">
-        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
+        <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>}
             <input {...props} className={`w-full h-16 ${icon ? 'pl-14' : 'px-6'} text-black bg-gray-50/50 border-2 border-gray-100 rounded-2xl font-bold text-sm focus:border-indigo-500 outline-none transition-all shadow-sm`} />

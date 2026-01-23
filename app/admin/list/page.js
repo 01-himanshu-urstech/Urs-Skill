@@ -54,7 +54,7 @@ export default function AdminListPage() {
                         <div className="overflow-x-auto no-scrollbar">
                             <div className="min-w-[1000px]">
                                 <table className="w-full text-left border-collapse">
-                                    <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-[2px] border-b border-gray-100">
+                                    <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase   tracking-[2px] border-b border-gray-100">
                                         <tr>
                                             <th className="p-5 text-center w-20">S.No</th>
                                             <th className="p-5">Administrator Details</th>
@@ -75,22 +75,22 @@ export default function AdminListPage() {
                                             <tr>
                                                 <td colSpan="6" className="p-24 text-center">
                                                     <Inbox size={48} className="mx-auto mb-3 opacity-20 text-gray-400" />
-                                                    <p className="text-xs font-black uppercase tracking-widest text-gray-400 italic">No Administrators Found</p>
+                                                    <p className="text-xs   uppercase tracking-widest text-gray-400 italic">No Administrators Found</p>
                                                 </td>
                                             </tr>
                                         ) : (
                                             admins.map((admin, index) => (
                                                 <tr key={admin._id} className="hover:bg-gray-50/30 transition-colors group">
-                                                    <td className="p-5 text-center text-xs font-black text-gray-300">
+                                                    <td className="p-5 text-center text-xs   text-gray-300">
                                                         {String(index + 1).padStart(2, '0')}
                                                     </td>
                                                     <td className="p-5">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs border border-blue-100/50">
+                                                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600   text-xs border border-blue-100/50">
                                                                 {admin.name?.slice(0, 2).toUpperCase()}
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <span className="text-sm font-black text-gray-800 tracking-tight">{admin.name}</span>
+                                                                <span className="text-sm   text-gray-800 tracking-tight">{admin.name}</span>
                                                                 <span className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
                                                                     <Mail size={10} /> {admin.email}
                                                                 </span>
@@ -98,7 +98,7 @@ export default function AdminListPage() {
                                                         </div>
                                                     </td>
                                                     <td className="p-5">
-                                                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${admin.role === 'SUPERADMIN' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
+                                                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px]   uppercase tracking-wider ${admin.role === 'SUPERADMIN' ? 'bg-purple-50 text-purple-600 border border-purple-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
                                                             <ShieldCheck size={12} />
                                                             {admin.role}
                                                         </div>
@@ -128,7 +128,7 @@ export default function AdminListPage() {
                                                                 </button>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex items-center justify-end gap-2 text-gray-300 italic text-[10px] font-black uppercase tracking-widest">
+                                                            <div className="flex items-center justify-end gap-2 text-gray-300 italic text-[10px]   uppercase tracking-widest">
                                                                 <Lock size={14} /> Read Only
                                                             </div>
                                                         )}

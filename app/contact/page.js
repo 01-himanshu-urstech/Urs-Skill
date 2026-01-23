@@ -98,7 +98,7 @@ export default function ContactQueriesPage() {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full appearance-none pl-6 pr-12 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm font-black uppercase text-[10px] tracking-widest text-gray-500 cursor-pointer focus:border-indigo-500 transition-all"
+                                className="w-full appearance-none pl-6 pr-12 py-4 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm   uppercase text-[10px] tracking-widest text-gray-500 cursor-pointer focus:border-indigo-500 transition-all"
                             >
                                 <option value="ALL">All Entries</option>
                                 <option value="NEW">New</option>
@@ -126,7 +126,7 @@ export default function ContactQueriesPage() {
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-indigo-200/20 overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-6 text-center w-20">S.No</th>
                                     <th className="p-6">Sender Identity</th>
@@ -143,14 +143,14 @@ export default function ContactQueriesPage() {
                                     <tr>
                                         <td colSpan="6" className="p-24 text-center">
                                             <Inbox size={48} className="mx-auto mb-2 text-gray-200 opacity-20" />
-                                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 italic">No records matching your criteria</p>
+                                            <p className="text-xs   uppercase tracking-widest text-gray-400 italic">No records matching your criteria</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     displayQueries.map((query, index) => (
                                         <tr key={query._id} className="hover:bg-gray-50/30 transition-all group">
                                             {/*    5. Corrected Sequential Indexing */}
-                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                            <td className="p-6 text-center text-xs   text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
                                             <td className="p-6">
@@ -159,7 +159,7 @@ export default function ContactQueriesPage() {
                                                         {query.fullName.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-gray-800 uppercase tracking-tight">{query.fullName}</span>
+                                                        <span className="text-sm   text-gray-800 uppercase tracking-tight">{query.fullName}</span>
                                                         <span className="text-[9px] text-gray-400 font-bold mt-1 flex items-center gap-1">
                                                             <Clock size={10} /> {new Date(query.createdAt).toLocaleDateString('en-GB')}
                                                         </span>
@@ -174,7 +174,7 @@ export default function ContactQueriesPage() {
                                                 <p className="text-xs text-gray-400 italic line-clamp-1">{query.message}</p>
                                             </td>
                                             <td className="p-6 text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${query.status === 'NEW' ? 'bg-orange-50 text-orange-500 border-orange-100' :
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px]   uppercase tracking-widest border transition-all ${query.status === 'NEW' ? 'bg-orange-50 text-orange-500 border-orange-100' :
                                                     query.status === 'CONTACTED' ? 'bg-blue-50 text-blue-500 border-blue-100' :
                                                         'bg-emerald-50 text-emerald-500 border-emerald-100'
                                                     }`}>
@@ -198,7 +198,7 @@ export default function ContactQueriesPage() {
                     {/*    6. PAGINATION FOOTER */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-indigo-400 uppercase">
                                 Showing {displayQueries.length} of {totalRecords} Customer Entries
                             </p>
@@ -233,7 +233,7 @@ export default function ContactQueriesPage() {
                                         <MessageSquare size={20} />
                                     </div>
                                     <div>
-                                        <h3 className="text-base font-black text-gray-800 uppercase tracking-tight">Query Detail</h3>
+                                        <h3 className="text-base   text-gray-800 uppercase tracking-tight">Query Detail</h3>
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">ID: {selectedQuery._id}</p>
                                     </div>
                                 </div>
@@ -243,16 +243,16 @@ export default function ContactQueriesPage() {
                             <div className="p-10 space-y-8">
                                 <div className="grid grid-cols-2 gap-8 border-b border-gray-50 pb-8">
                                     <div>
-                                        <label className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block mb-2">Sender Name</label>
+                                        <label className="text-[9px]   text-indigo-400 uppercase tracking-widest block mb-2">Sender Name</label>
                                         <p className="font-bold text-gray-700">{selectedQuery.fullName}</p>
                                     </div>
                                     <div>
-                                        <label className="text-[9px] font-black text-indigo-400 uppercase tracking-widest block mb-2">Phone</label>
+                                        <label className="text-[9px]   text-indigo-400 uppercase tracking-widest block mb-2">Phone</label>
                                         <p className="font-bold text-gray-700">{selectedQuery.phone}</p>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-4 flex items-center gap-2">
+                                    <label className="text-[9px]   text-gray-400 uppercase tracking-widest block mb-4 flex items-center gap-2">
                                         <AlertCircle size={10} /> Customer Message
                                     </label>
                                     <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 text-gray-600 font-medium leading-relaxed italic text-sm">
@@ -265,14 +265,14 @@ export default function ContactQueriesPage() {
                                 <button
                                     onClick={() => handleStatusUpdate(selectedQuery._id, 'CONTACTED')}
                                     disabled={isUpdating}
-                                    className="px-8 py-4 bg-white text-blue-600 border border-blue-100 rounded-2xl font-black hover:cursor-pointer uppercase text-[10px] tracking-widest hover:bg-blue-50 transition-all disabled:opacity-50"
+                                    className="px-8 py-4 bg-white text-blue-600 border border-blue-100 rounded-2xl   hover:cursor-pointer uppercase text-[10px] tracking-widest hover:bg-blue-50 transition-all disabled:opacity-50"
                                 >
                                     Mark Contacted
                                 </button>
                                 <button
                                     onClick={() => handleStatusUpdate(selectedQuery._id, 'CLOSED')}
                                     disabled={isUpdating}
-                                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:cursor-pointer uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50"
+                                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl   hover:cursor-pointer uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50"
                                 >
                                     {isUpdating ? "Processing..." : "Close Ticket"}
                                 </button>

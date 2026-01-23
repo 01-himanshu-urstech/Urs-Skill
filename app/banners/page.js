@@ -83,7 +83,7 @@ export default function BannerPage() {
                     <button
                         onClick={() => refetch()}
                         disabled={isFetching}
-                        className="px-6 py-3.5 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 hover:cursor-pointer flex items-center gap-3 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                        className="px-6 py-3.5 bg-white border border-gray-100 rounded-2xl text-[10px]   uppercase tracking-widest text-gray-500 hover:bg-gray-50 hover:cursor-pointer flex items-center gap-3 transition-all shadow-sm active:scale-95 disabled:opacity-50"
                     >
                         <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
                         Sync Assets
@@ -94,7 +94,7 @@ export default function BannerPage() {
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-emerald-900/5 overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-6 text-center w-20">Index</th>
                                     <th className="p-6">Banner Preview</th>
@@ -111,14 +111,14 @@ export default function BannerPage() {
                                     <tr>
                                         <td colSpan="6" className="p-24 text-center">
                                             <Inbox size={48} className="mx-auto mb-3 opacity-20 text-gray-400" />
-                                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 italic">No Banners Configured</p>
+                                            <p className="text-xs   uppercase tracking-widest text-gray-400 italic">No Banners Configured</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     displayBanners.map((banner, index) => (
                                         <tr key={banner._id} className="hover:bg-gray-50/50 transition-colors group">
                                             {/*    4. Sequential Indexing logic */}
-                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                            <td className="p-6 text-center text-xs   text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
 
@@ -134,14 +134,14 @@ export default function BannerPage() {
 
                                             <td className="p-6">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-gray-800 uppercase tracking-tight">{banner.title}</span>
+                                                    <span className="text-sm   text-gray-800 uppercase tracking-tight">{banner.title}</span>
                                                     <span className="text-[10px] text-gray-400 font-bold mt-0.5 line-clamp-1">{banner.subtitle}</span>
                                                 </div>
                                             </td>
 
                                             <td className="p-6 text-center">
                                                 <div className="inline-flex flex-col items-center">
-                                                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                                                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px]   uppercase tracking-widest border border-indigo-100">
                                                         {banner.position}
                                                     </span>
                                                     <span className="text-[9px] font-bold text-gray-400 mt-1 uppercase">Order: {banner.order}</span>
@@ -149,7 +149,7 @@ export default function BannerPage() {
                                             </td>
 
                                             <td className="p-6 text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${banner.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-200'}`}>
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px]   uppercase tracking-widest ${banner.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-200'}`}>
                                                     <div className={`w-1.5 h-1.5 rounded-full ${banner.isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                                                     {banner.isActive ? 'Active' : 'Paused'}
                                                 </span>
@@ -175,7 +175,7 @@ export default function BannerPage() {
                     {/*    5. STANDARD PAGINATION FOOTER */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-emerald-500 uppercase">
                                 Showing {displayBanners.length} of {totalRecords} Asset Entries
                             </p>

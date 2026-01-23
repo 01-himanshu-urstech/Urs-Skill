@@ -86,7 +86,10 @@ const Sidebar = () => {
                 { id: 'coupon-add', name: 'Add', href: '/coupon/add' }
             ]
         },
-        { id: 'Enquiry', name: 'Enquiry', icon: <Mail size={20} />, subParts: [{ id: 'Enquiry-list', name: 'Contacts', href: '/contact' }] }
+        { id: 'Enquiry', name: 'Enquiry', icon: <Mail size={20} />, subParts: [{ id: 'Enquiry-list', name: 'Contacts', href: '/contact' },{
+            id:'Enquiry-help', name: 'Enquiries', href: '/enquiries-needhelp'
+        }]
+     }
     ];
 
     const filteredMenuItems = useMemo(() => {

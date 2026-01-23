@@ -94,7 +94,7 @@ export default function EditCustomerPage() {
                         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 sm:p-10">
                             <div className="flex items-center gap-3 mb-8 border-b border-gray-50 pb-6">
                                 <Shield className="text-emerald-500 w-6 h-6" />
-                                <h3 className="font-black text-gray-800 uppercase tracking-tight text-sm">Identity & Contact</h3>
+                                <h3 className="  text-gray-800 uppercase tracking-tight text-sm">Identity & Contact</h3>
                             </div>
 
                             {submitError && (
@@ -115,12 +115,12 @@ export default function EditCustomerPage() {
                             <button
                                 type="submit"
                                 disabled={isUpdating}
-                                className="px-12 py-4 bg-[#00C885] hover:bg-[#00B074] text-white hover:cursor-pointer rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                                className="px-12 py-4 bg-[#00C885] hover:bg-[#00B074] text-white hover:cursor-pointer rounded-2xl   uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
                             >
                                 {isUpdating ? "Syncing..." : "Update Profile"}
                                 {!isUpdating && <Check size={18} />}
                             </button>
-                            <Link href="/customer/list" className="px-12 py-4 bg-white border border-gray-100 text-gray-400 hover:cursor-pointer rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all text-center shadow-sm hover:bg-gray-50">
+                            <Link href="/customer/list" className="px-12 py-4 bg-white border border-gray-100 text-gray-400 hover:cursor-pointer rounded-2xl   uppercase tracking-widest text-[10px] transition-all text-center shadow-sm hover:bg-gray-50">
                                 Discard Changes
                             </Link>
                         </div>
@@ -133,7 +133,7 @@ export default function EditCustomerPage() {
 
 const InputField = ({ label, icon, ...props }) => (
     <div className="space-y-2">
-        <label className="block text-[10px] font-black uppercase tracking-[2px] text-gray-400">{label}</label>
+        <label className="block text-[10px]   uppercase tracking-[2px] text-gray-400">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2">{icon}</div>}
             <input {...props} className="text-black w-full pl-12 pr-4 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-emerald-500 transition-all duration-200 text-sm font-bold shadow-sm h-14" />

@@ -53,7 +53,7 @@ export default function LoginPage() {
                         <Image src="/assets/logo.png" alt="UrsSkill" width={40} height={40} priority />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-800 uppercase tracking-tight">Admin Portal</h1>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 text-center">Authentication Required to Access Dashboard</p>
+                    <p className="text-[10px]   text-gray-400 uppercase tracking-widest mt-1 text-center">Authentication Required to Access Dashboard</p>
                 </div>
 
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/50 p-10">
@@ -65,7 +65,7 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Official Email</label>
+                            <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Official Email</label>
                             <div className="relative group">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#7C3AED] transition-colors" size={18} />
                                 <input
@@ -79,7 +79,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Secret Password</label>
+                            <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Secret Password</label>
                             <div className="relative group">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#7C3AED] transition-colors" size={18} />
                                 <input
@@ -102,7 +102,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-5 bg-[#7C3AED] hover:bg-indigo-700 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95 mt-4"
+                            className="w-full py-5 bg-[#7C3AED] hover:bg-indigo-700 text-white rounded-2xl   uppercase text-[10px] tracking-widest transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95 mt-4"
                         >
                             {isLoading ? "Validating Session..." : "Authorize & Sign In"}
                             {!isLoading && <LogIn size={16} />}
@@ -110,7 +110,7 @@ export default function LoginPage() {
                     </form>
                 </div>
 
-                <div className="mt-8 flex items-center justify-center gap-2 text-gray-400 text-[9px] font-black uppercase tracking-[0.2em]">
+                <div className="mt-8 flex items-center justify-center gap-2 text-gray-400 text-[9px]   uppercase tracking-[0.2em]">
                     <ShieldCheck size={12} className="text-emerald-500" />
                     End-to-End Encrypted Access
                 </div>

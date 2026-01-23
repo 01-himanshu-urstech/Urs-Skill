@@ -40,7 +40,7 @@ export default function LogsPage() {
                 <div className="mt-8 bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-6 text-center w-24">S.No</th>
                                     <th className="p-6">Action & Event</th>
@@ -56,14 +56,14 @@ export default function LogsPage() {
                                     <tr>
                                         <td colSpan="5" className="p-24 text-center">
                                             <Inbox size={48} className="mx-auto mb-3 opacity-20 text-gray-400" />
-                                            <p className="text-xs font-black uppercase tracking-widest text-gray-400">No Logs Found</p>
+                                            <p className="text-xs   uppercase tracking-widest text-gray-400">No Logs Found</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     logsData.map((log, index) => (
                                         <tr key={log._id} className="hover:bg-gray-50/50 transition-colors group">
                                             {/*    Sequential Indexing based on Page */}
-                                            <td className="p-6 text-center text-xs font-black text-gray-300">
+                                            <td className="p-6 text-center text-xs   text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
 
@@ -72,7 +72,7 @@ export default function LogsPage() {
                                                     <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100/50">
                                                         <Activity size={18} />
                                                     </div>
-                                                    <span className="text-sm font-black text-gray-800 uppercase tracking-tight">
+                                                    <span className="text-sm   text-gray-800 uppercase tracking-tight">
                                                         {log.action?.replace('_', ' ')}
                                                     </span>
                                                 </div>
@@ -97,7 +97,7 @@ export default function LogsPage() {
 
                                             <td className="p-6 text-right pr-10">
                                                 <div className="flex flex-col items-end font-mono text-[11px]">
-                                                    <span className="font-black text-gray-600">{new Date(log.createdAt).toLocaleDateString('en-GB')}</span>
+                                                    <span className="  text-gray-600">{new Date(log.createdAt).toLocaleDateString('en-GB')}</span>
                                                     <span className="flex items-center gap-1 text-gray-400 font-bold">
                                                         <Clock size={10} /> {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
@@ -113,7 +113,7 @@ export default function LogsPage() {
                     {/*    Standardized Pagination Footer */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col gap-1">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">
                                 Page {page} of {totalPages}
                             </p>
                             <p className="text-[9px] font-bold text-indigo-500 uppercase">

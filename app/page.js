@@ -34,7 +34,7 @@ export default function DashboardPage() {
               <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
                 <Zap size={20} />
               </div>
-              <h3 className="font-black text-gray-800 uppercase tracking-tight text-sm">Shortcut Management</h3>
+              <h3 className="  text-gray-800 uppercase tracking-tight text-sm">Shortcut Management</h3>
             </div>
           </div>
 
@@ -49,7 +49,7 @@ export default function DashboardPage() {
         {/* System Status Card */}
         <div className="bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] rounded-[2.5rem] p-8 text-white shadow-xl shadow-indigo-200/50 flex flex-col justify-between">
           <div>
-            <h3 className="font-black uppercase tracking-[2px] text-xs opacity-70 mb-6">Database Health</h3>
+            <h3 className="  uppercase tracking-[2px] text-xs opacity-70 mb-6">Database Health</h3>
             <div className="space-y-6">
               <HealthItem label="API Connectivity" status="Stable" />
               <HealthItem label="Cloudinary Sync" status="Active" />
@@ -63,13 +63,13 @@ export default function DashboardPage() {
               <Clock size={80} />
             </div>
 
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2 flex items-center gap-2">
+            <p className="text-[10px]   uppercase tracking-widest opacity-80 mb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
               Live System Time
             </p>
 
             {/* tabular-nums ensures the width doesn't jump as seconds change */}
-            <p className="text-2xl font-black tracking-tighter tabular-nums">
+            <p className="text-2xl   tracking-tighter tabular-nums">
               {currentTime.toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -95,7 +95,7 @@ export default function DashboardPage() {
 function QuickActionLink({ title, href, color }) {
   return (
     <a href={href} className="group flex items-center justify-between p-5 bg-gray-50/50 hover:bg-white rounded-3xl border border-transparent hover:border-gray-100 hover:shadow-lg transition-all duration-300">
-      <span className={`text-[11px] font-black uppercase tracking-widest ${color}`}>{title}</span>
+      <span className={`text-[11px]   uppercase tracking-widest ${color}`}>{title}</span>
       <ArrowUpRight size={18} className="text-gray-300 group-hover:text-gray-900 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
     </a>
   );
@@ -105,7 +105,7 @@ function HealthItem({ label, status }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm font-bold opacity-90">{label}</span>
-      <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">
+      <span className="flex items-center gap-2 text-[10px]   uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">
         <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
         {status}
       </span>

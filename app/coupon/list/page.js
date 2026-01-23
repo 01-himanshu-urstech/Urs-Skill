@@ -90,7 +90,7 @@ export default function CouponListPage() {
                     <button
                         onClick={() => refetch()}
                         disabled={isFetching}
-                        className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-600 border border-gray-100 rounded-2xl hover:cursor-pointer font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all active:scale-95"
+                        className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-600 border border-gray-100 rounded-2xl hover:cursor-pointer   uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all active:scale-95"
                     >
                         <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} /> Sync Data
                     </button>
@@ -101,7 +101,7 @@ export default function CouponListPage() {
                     <div className="overflow-x-auto no-scrollbar">
                         <div className="min-w-[1100px]">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                                <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
                                     <tr>
                                         <th className="p-6 text-center w-20">Index</th>
                                         <th className="p-6">Rule Identity</th>
@@ -123,13 +123,13 @@ export default function CouponListPage() {
                                             const isExpired = new Date() > new Date(item.validTill);
                                             return (
                                                 <tr key={item._id} className="hover:bg-gray-50/50 transition-colors group">
-                                                    <td className="p-6 text-center text-xs font-black text-gray-300">
+                                                    <td className="p-6 text-center text-xs   text-gray-300">
                                                         {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                                     </td>
                                                     <td className="p-6">
                                                         <div className="flex flex-col">
-                                                            <span className={`text-sm font-black tracking-tight uppercase ${isExpired ? 'text-gray-400' : 'text-gray-800'}`}>{item.name}</span>
-                                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded w-fit mt-1 border ${isExpired ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-indigo-50 text-indigo-600 border-indigo-100'}`}>
+                                                            <span className={`text-sm   tracking-tight uppercase ${isExpired ? 'text-gray-400' : 'text-gray-800'}`}>{item.name}</span>
+                                                            <span className={`text-[10px]   uppercase tracking-widest px-2 py-0.5 rounded w-fit mt-1 border ${isExpired ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-indigo-50 text-indigo-600 border-indigo-100'}`}>
                                                                 {item.code}
                                                             </span>
                                                         </div>
@@ -140,7 +140,7 @@ export default function CouponListPage() {
     {/* Use assignedSubAdmins[0] because the API returns an array */}
     {item.assignedSubAdmins && item.assignedSubAdmins.length > 0 ? (
         <div className="flex flex-col">
-            <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-500 uppercase tracking-tighter">
+            <div className="flex items-center gap-1.5 text-[10px]   text-amber-500 uppercase tracking-tighter">
                 <UserCheck size={12} /> Assigned
             </div>
             <span className="text-xs font-bold text-gray-700">
@@ -157,7 +157,7 @@ export default function CouponListPage() {
     )}
 </td>
 
-                                                    <td className={`p-6 text-center font-black text-sm ${isExpired ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    <td className={`p-6 text-center   text-sm ${isExpired ? 'text-gray-300' : 'text-gray-700'}`}>
                                                         {item.discountType === "1" ? `${item.discountValue}%` : `₹${item.discountValue}`}
                                                     </td>
                                                     <td className="p-6 text-center">
@@ -165,23 +165,23 @@ export default function CouponListPage() {
         {/* Check for Date Expiry FIRST, then check for Manual Inactive Status */}
         {isExpired ? (
             <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-500 rounded-full border border-red-100">
-                <AlertTriangle size={12} /><span className="text-[10px] font-black uppercase tracking-widest">Expired</span>
+                <AlertTriangle size={12} /><span className="text-[10px]   uppercase tracking-widest">Expired</span>
             </div>
         ) : item.status === "INACTIVE" ? (
             <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-500 rounded-full border border-gray-200">
-                <AlertTriangle size={12} /><span className="text-[10px] font-black uppercase tracking-widest">Inactive</span>
+                <AlertTriangle size={12} /><span className="text-[10px]   uppercase tracking-widest">Inactive</span>
             </div>
         ) : (
             <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
-                <ShieldCheck size={12} /><span className="text-[10px] font-black uppercase tracking-widest">Active</span>
+                <ShieldCheck size={12} /><span className="text-[10px]   uppercase tracking-widest">Active</span>
             </div>
         )}
     </div>
 </td>
-                                                    <td className="p-6 text-center text-[10px] font-black uppercase text-gray-500">
+                                                    <td className="p-6 text-center text-[10px]   uppercase text-gray-500">
                                                         {item.usedCount} / {item.totalUsageLimit}
                                                     </td>
-                                                    <td className="p-6 text-[11px] font-black uppercase text-gray-500">
+                                                    <td className="p-6 text-[11px]   uppercase text-gray-500">
                                                         <div className="flex items-center gap-2">
                                                             <Calendar size={14} className="text-gray-300" />
                                                             {new Date(item.validTill).toLocaleDateString('en-GB')}
@@ -215,7 +215,7 @@ export default function CouponListPage() {
                     {/* Pagination */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]   uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-indigo-400 uppercase">Showing {allCoupons.length} of {totalRecords} Records</p>
                         </div>
                         <div className="flex gap-2">

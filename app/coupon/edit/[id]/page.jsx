@@ -89,11 +89,11 @@ const handleSubmit = async (e) => {
                         <div className="p-2 rounded-xl bg-white border border-gray-100 group-hover:border-indigo-100 group-hover:bg-indigo-50 transition-all">
                             <ChevronLeft size={20} />
                         </div>
-                        {/* <span className="text-[10px] font-black uppercase tracking-[2px]">Back to Rules</span> */}
+                        {/* <span className="text-[10px]   uppercase tracking-[2px]">Back to Rules</span> */}
                     </button>
 
                     <div className="text-right">
-                        <h1 className="text-2xl font-black text-gray-800 tracking-tight uppercase">Update Rule</h1>
+                        <h1 className="text-2xl   text-gray-800 tracking-tight uppercase">Update Rule</h1>
                         <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-1">
                             Modifying: {response?.data?.coupon?.code}
                         </p>
@@ -108,14 +108,14 @@ const handleSubmit = async (e) => {
                                 <Tag size={20} />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">General Information</h3>
+                                <h3 className="text-sm   text-gray-800 uppercase tracking-tight">General Information</h3>
                                 <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Base settings for this discount</p>
                             </div>
                         </div>
 
                         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Coupon Rule Name</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Coupon Rule Name</label>
                                 <input
                                     type="text"
                                     required
@@ -126,7 +126,7 @@ const handleSubmit = async (e) => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Status</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Status</label>
                                 <select
                                     value={formData.status}
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -138,7 +138,7 @@ const handleSubmit = async (e) => {
                             </div>
 
                             <div className="md:col-span-2 space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                                <label className="text-[10px]   text-gray-400 uppercase tracking-widest ml-1">Description</label>
                                 <textarea
                                     rows="3"
                                     value={formData.description}
@@ -154,19 +154,19 @@ const handleSubmit = async (e) => {
                         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl p-8">
                             <div className="flex items-center gap-3 mb-6">
                                 <Percent className="text-indigo-600" size={20} />
-                                <h3 className="text-sm font-black text-gray-800 uppercase">Discount Logic</h3>
+                                <h3 className="text-sm   text-gray-800 uppercase">Discount Logic</h3>
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</label>
+                                    <label className="text-[10px]   text-gray-400 uppercase tracking-widest">Type</label>
                                     <div className="flex gap-2 mt-2">
                                         {["1", "2"].map((t) => (
                                             <button
                                                 key={t}
                                                 type="button"
                                                 onClick={() => setFormData({ ...formData, discountType: t })}
-                                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all border ${formData.discountType === t
+                                                className={`flex-1 py-3 rounded-xl text-[10px]   uppercase transition-all border ${formData.discountType === t
                                                     ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100"
                                                     : "bg-white text-gray-400 border-gray-100 hover:bg-gray-50"
                                                     }`}
@@ -177,7 +177,7 @@ const handleSubmit = async (e) => {
                                     </div>
                                 </div>
                                 <div className="relative">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Value</label>
+                                    <label className="text-[10px]   text-gray-400 uppercase tracking-widest">Value</label>
                                     <div className="relative mt-2">
                                         <input
                                             type="number"
@@ -198,12 +198,12 @@ const handleSubmit = async (e) => {
                         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl p-8">
                             <div className="flex items-center gap-3 mb-6">
                                 <Calendar className="text-indigo-600" size={20} />
-                                <h3 className="text-sm font-black text-gray-800 uppercase">Constraints</h3>
+                                <h3 className="text-sm   text-gray-800 uppercase">Constraints</h3>
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Valid Till</label>
+                                    <label className="text-[10px]   text-gray-400 uppercase tracking-widest">Valid Till</label>
                                     <input
                                         type="date"
                                         value={formData.validTill}
@@ -212,7 +212,7 @@ const handleSubmit = async (e) => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Usage Cap</label>
+                                    <label className="text-[10px]   text-gray-400 uppercase tracking-widest">Total Usage Cap</label>
                                     <input
                                         type="number"
                                         value={formData.totalUsageLimit}
@@ -235,7 +235,7 @@ const handleSubmit = async (e) => {
                         <button
                             type="submit"
                             disabled={isUpdating}
-                            className="w-full sm:w-auto px-10 py-5 bg-white hover:bg-indigo-50 text-indigo-900 rounded-2xl font-black uppercase tracking-[2px] text-xs flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 hover:cursor-pointer"
+                            className="w-full sm:w-auto px-10 py-5 bg-white hover:bg-indigo-50 text-indigo-900 rounded-2xl   uppercase tracking-[2px] text-xs flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 hover:cursor-pointer"
                         >
                             {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                             Commit Changes
