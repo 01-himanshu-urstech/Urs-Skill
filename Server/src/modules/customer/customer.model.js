@@ -18,7 +18,7 @@ const customerSchema = new mongoose.Schema(
       required: true
     },
 
-    // 🔐 Email verification
+    //  Email verification
     isEmailVerified: {
       type: Boolean,
       default: false
@@ -33,7 +33,7 @@ const customerSchema = new mongoose.Schema(
       type: Date,
     },
 
-    // 🧠 IMPORTANT
+    //  IMPORTANT
     createdBy: {
       type: String,
       enum: ['SELF', 'ADMIN'],

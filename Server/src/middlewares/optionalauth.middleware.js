@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
+import { config } from '../config/config.js';
 
 export const optionalAuthMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
+  // 🟢 Guest user
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     req.user = null;
     return next();
@@ -10,17 +12,22 @@ export const optionalAuthMiddleware = (req, res, next) => {
 
   try {
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔑 IMPORTANT: match your JWT payload
+    // ✅ USE SAME SECRET AS TOKEN GENERATION
+    const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET);
+
+    // console.log('✅ Decoded JWT:', decoded);
+
     req.user = {
-      customerId: decoded.customerId,
-      email: decoded.email,
+      ...(req.user || {}),
+      ...decoded,
+      customerId: decoded.customerId || null,
     };
 
     next();
   } catch (err) {
+    console.log('❌ Optional auth failed:', err.message);
     req.user = null;
-    next(); // ❗ allow guest flow
+    next(); // allow guest flow
   }
 };
