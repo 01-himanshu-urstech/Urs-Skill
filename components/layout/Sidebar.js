@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
@@ -6,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard, BookOpen, Users,
     ShieldCheck, CreditCard, ChevronDown, Menu, X, LogOut,
-    ReceiptText, FileText, Percent, Mail, User
+    ReceiptText, FileText, Percent, Mail, User, Bot
 } from 'lucide-react';
 import { useLayout } from "../../context/LayoutContext";
 import { useSelector } from 'react-redux';
@@ -28,7 +29,6 @@ const Sidebar = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Mobile par navigate karne par sidebar band ho jaye
     useEffect(() => {
         if (isMobile) {
             const timer = setTimeout(() => {
@@ -45,16 +45,12 @@ const Sidebar = () => {
         window.location.replace("/login");
     }, []);
 
-    const handleprofile = useCallback(() => {
-        window.location.replace("/profile");
-    }, []);
-
     const toggleMenu = useCallback((id) => {
         if (isCollapsed) setIsCollapsed(false);
         setOpenMenuId(prev => (prev === id ? null : id));
     }, [isCollapsed, setIsCollapsed]);
 
-    const menuItems = [
+    const menuItems = useMemo(() => [
         { id: 'dashboard', name: 'Dashboard', href: '/', icon: <LayoutDashboard size={20} /> },
         {
             id: 'customers', name: 'Customers', icon: <Users size={20} />,
@@ -76,7 +72,8 @@ const Sidebar = () => {
             subParts: [
                 { id: 'customer-logs', name: 'Customer Logs', href: '/logs/customer-logs' },
                 { id: 'admin-logs', name: 'Admin Logs', href: '/logs/admin-logs' },
-                { id: 'all-logs', name: 'All Logs', href: '/logs/all-logs' }
+                { id: 'all-logs', name: 'All Logs', href: '/logs/all-logs' },
+                { id: 'raw-leads', name: 'Raw Leads', href: '/logs/raw-leads' },
             ]
         },
         {
@@ -86,12 +83,25 @@ const Sidebar = () => {
                 { id: 'coupon-add', name: 'Add', href: '/coupon/add' }
             ]
         },
-        { id: 'Enquiry', name: 'Enquiry', icon: <Mail size={20} />, subParts: [{ id: 'Enquiry-list', name: 'Contacts', href: '/contact' }] }
-    ];
+        {
+            id: 'Enquiry', name: 'Enquiry', icon: <Mail size={20} />,
+            subParts: [
+                { id: 'Enquiry-list', name: 'Contacts', href: '/contact' },
+                { id: 'Enquiry-help', name: 'Need Help', href: '/enquiries-needhelp' }
+            ]
+        },
+        {
+            id: 'Chatbot', name: 'AI Ursbot', icon: <Bot size={20} />,
+            subParts: [
+                { id: 'chatbot', name: 'Chatbot', href: '/chatbot' }
+            ]
+        }
+    ], []);
 
     const filteredMenuItems = useMemo(() => {
         if (!mounted || !user) return [];
         if (user?.role === 'SUPERADMIN') return menuItems;
+        // Check if user.permissions exists before filtering to prevent undefined errors
         return menuItems.filter(item => user?.permissions?.includes(item.id));
     }, [user, menuItems, mounted]);
 
@@ -99,7 +109,6 @@ const Sidebar = () => {
 
     return (
         <>
-            {/* Mobile Hamburger Button (Fixed Position) */}
             {isMobile && isCollapsed && (
                 <button
                     onClick={() => setIsCollapsed(false)}
@@ -114,7 +123,6 @@ const Sidebar = () => {
                 shadow-2xl md:shadow-none md:border-r md:border-gray-100
                 ${isMobile ? (!isCollapsed ? 'w-full translate-x-0 p-6' : 'w-0 -translate-x-full overflow-hidden') : (isCollapsed ? 'w-20 p-4' : 'w-64 p-4')}
             `}>
-                {/* Header Section */}
                 <div className="flex items-center justify-between mb-6 px-2 h-16 flex-shrink-0">
                     {(!isCollapsed || isMobile) && (
                         <div className="flex items-center gap-3 text-primary">
@@ -124,21 +132,21 @@ const Sidebar = () => {
                     )}
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className={`p-2 hover:bg-neutral rounded-lg text-gray-500 transition-all ${isCollapsed && !isMobile ? 'mx-auto' : ''}`}
+                        className={`p-2 hover:bg-gray-50 rounded-lg text-gray-500 transition-all ${isCollapsed && !isMobile ? 'mx-auto' : ''}`}
                     >
                         {isMobile && !isCollapsed ? <X size={24} className="text-gray-700" /> : <Menu size={20} />}
                     </button>
                 </div>
 
-                {/* Main Navigation */}
                 <nav className="flex-1 overflow-y-auto overflow-x-hidden space-y-1 no-scrollbar pb-4 px-1">
-                    {filteredMenuItems.map((item) => (
+                    {/*   Check if filteredMenuItems is an array before mapping */}
+                    {Array.isArray(filteredMenuItems) && filteredMenuItems.map((item) => (
                         <div key={item.id}>
                             {item.subParts ? (
                                 <>
                                     <button
                                         onClick={() => toggleMenu(item.id)}
-                                        className={`w-full flex items-center p-3 rounded-xl text-gray-500 hover:bg-neutral transition-all group ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} ${openMenuId === item.id ? 'text-primary' : ''}`}
+                                        className={`w-full flex items-center p-3 rounded-xl text-gray-500 hover:bg-gray-50 transition-all group ${isCollapsed && !isMobile ? 'justify-center' : 'justify-between'} ${openMenuId === item.id ? 'text-primary' : ''}`}
                                     >
                                         <div className={`flex items-center gap-3 min-w-0 ${isCollapsed && !isMobile ? 'w-full justify-center' : ''}`}>
                                             <span className={`flex justify-center flex-shrink-0 ${isCollapsed && !isMobile ? '' : 'min-w-[24px]'} ${openMenuId === item.id ? 'text-primary' : ''}`}>
@@ -151,14 +159,14 @@ const Sidebar = () => {
                                         )}
                                     </button>
 
-                                    {/* Smooth Sub-menu Transition */}
                                     <div className={`
                                         grid transition-all duration-300 ease-in-out
                                         ${((!isCollapsed || isMobile) && openMenuId === item.id) ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'}
                                     `}>
                                         <div className="overflow-hidden">
                                             <div className="ml-9 space-y-1 border-l-2 border-primary/10 pl-4">
-                                                {item.subParts.map(sub => (
+                                                {/*   Optional Chaining added to subParts.map */}
+                                                {item.subParts?.map(sub => (
                                                     <Link
                                                         key={sub.id}
                                                         href={sub.href}
@@ -174,7 +182,7 @@ const Sidebar = () => {
                             ) : (
                                 <Link
                                     href={item.href}
-                                    className={`flex items-center p-3 rounded-xl transition-all min-w-0 ${isCollapsed && !isMobile ? 'justify-center' : 'justify-start gap-3'} ${pathname === item.href ? 'bg-primary-light text-black font-bold shadow-sm' : 'text-gray-500 hover:bg-neutral'}`}
+                                    className={`flex items-center p-3 rounded-xl transition-all min-w-0 ${isCollapsed && !isMobile ? 'justify-center' : 'justify-start gap-3'} ${pathname === item.href ? 'bg-indigo-50 text-indigo-600 font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
                                 >
                                     <span className={`flex justify-center flex-shrink-0 ${isCollapsed && !isMobile ? '' : 'min-w-[24px]'}`}>
                                         {item.icon}
@@ -186,18 +194,15 @@ const Sidebar = () => {
                     ))}
                 </nav>
 
-                <div className="mt-auto pt-4 border-t border-gray-100">
-                    <button
-                        onClick={handleprofile}
-                        className={`w-full flex items-center p-3 rounded-xl text-black hover:bg-red-50 transition-all font-bold ${isCollapsed && !isMobile ? 'justify-center' : 'justify-start gap-3'}`}
+                <div className="mt-auto pt-4 space-y-2 border-t border-gray-100">
+                    <Link
+                        href="/profile"
+                        className={`w-full flex items-center p-3 rounded-xl text-gray-700 hover:bg-gray-50 transition-all font-bold ${isCollapsed && !isMobile ? 'justify-center' : 'justify-start gap-3'}`}
                     >
                         <User size={20} />
                         {(!isCollapsed || isMobile) && <span className="text-sm">Profile</span>}
-                    </button>
-                </div>
+                    </Link>
 
-                {/* Logout Button */}
-                <div className="mt-auto pt-4 border-t border-gray-100">
                     <button
                         onClick={handleLogout}
                         className={`w-full flex items-center p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-bold ${isCollapsed && !isMobile ? 'justify-center' : 'justify-start gap-3'}`}

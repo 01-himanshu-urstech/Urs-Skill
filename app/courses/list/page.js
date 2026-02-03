@@ -1,162 +1,121 @@
 "use client";
+import { useState, useMemo, useEffect } from "react";
 import PageHeader from "../../../components/ui/PageHeader";
-import { Edit2, Trash2, Eye, Users } from "lucide-react";
+import PermissionGuardian from "../../../components/auth/PermissionGuardian";
+import {
+    Eye, Edit2, Trash2, Loader2, Inbox, Users, ChevronLeft, ChevronRight, Search
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-// import PermissionGuardian from "../../../components/PermissionGuardian";
+import { useGetTransactionsQuery } from "../../../redux/service/adminApi";
+
+const courseMapping = {
+    "1": { name: "Full Stack Web Development", category: "Development", price: "₹49,999", color: "bg-purple-50 text-purple-600" },
+    "2": { name: "Business Administration", category: "Management", price: "₹49,999", color: "bg-blue-50 text-blue-600" }
+};
 
 export default function CourseListPage() {
     const router = useRouter();
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const limit = 10;
 
-    const courses = [
-        { id: "CRS-501", title: "Advanced React Patterns", category: "Development", price: "₹4,999", initials: "AR" },
-        { id: "CRS-502", title: "UI Design Fundamentals", category: "Design", price: "₹2,499", initials: "UF" },
-        { id: "CRS-503", title: "Backend Node.js Mastery", category: "Development", price: "Free", initials: "BN" },
-    ];
+    const { data: response, isLoading, isFetching } = useGetTransactionsQuery();
+    const allTransactions = response?.data?.transactions || [];
 
-    const handleViewEnrollments = (courseId) => {
-        // Navigate to: /course/enrollment/CRS-501
-        router.push(`/courses/enrollments/${courseId}`);
-    };
+    //   Sync logic: Search and Pagination like Customer Page
+    const { displayCourses, totalRecords } = useMemo(() => {
+        const baseCourses = Object.keys(courseMapping).map(id => {
+            const enrollCount = allTransactions.filter(txn => String(txn.courseId) === String(id) && txn.status === "SUCCESS").length;
+            return { id, ...courseMapping[id], enrollments: enrollCount };
+        });
+
+        const filtered = baseCourses.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        const startIndex = (page - 1) * limit;
+        return { displayCourses: filtered.slice(startIndex, startIndex + limit), totalRecords: filtered.length };
+    }, [allTransactions, searchTerm, page]);
+
+    const totalPages = Math.ceil(totalRecords / limit) || 1;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { setPage(1); }, [searchTerm]);
 
     return (
-        // <PermissionGuardian permissionId="courses">
-        <main className="p-2 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden max-w-7xl mx-auto">
-            <PageHeader
-                title="Courses Catalog"
-                description="Manage your educational content and pricing."
-                // addButtonLabel="Add New Course"
-                showExport={true}
-                onAddClick={() => router.push('/course/new')}
-                onExportClick={() => console.log("Export Courses Clicked")}
-            />
+        <PermissionGuardian permissionId="General">
+            <main className="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-50/30 overflow-x-hidden">
+                <PageHeader title="Course Management" description={`Managing ${totalRecords} active courses.`} />
 
-            <div className="mt-4 sm:mt-6 space-y-6">
-                {/* Filters/Search Section */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
-                    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                        <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0">
-                            <div className="relative flex-1">
-                                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <input
-                                    type="text"
-                                    placeholder="Search courses..."
-                                    className="text-black w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-                                />
-                            </div>
-                            <select className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white text-black">
-                                <option className="text-black" value="">All Categories</option>
-                                <option className="text-black" value="development">Development</option>
-                                <option className="text-black" value="design">Design</option>
-                                <option className="text-black" value="marketing">Marketing</option>
-                            </select>
-
-                        </div>
-                        <button className="px-6 py-2.5 bg-[#7C3AED] hover:bg-[#7C3AED]/90 text-white rounded-xl font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2">
-                            Filters
-                        </button>
-                    </div>
+                {/*   Responsive Search Bar */}
+                <div className="mt-6 mb-6 max-w-md relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                        type="text"
+                        placeholder="Search courses..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="text-black w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl outline-none shadow-sm focus:ring-4 focus:ring-emerald-500/5 transition-all text-sm font-medium"
+                    />
                 </div>
 
-                {/*    PERFECT TABLE - HORIZONTAL SCROLL ONLY */}
-                <div className="w-full">
-                    <div className="overflow-x-auto bg-white rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="min-w-[950px]">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-gray-50/50 text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                                    <tr>
-                                        <th className="p-4 font-semibold text-center w-16">S.No</th>
-                                        <th className="p-4 font-semibold whitespace-nowrap">Course Details</th>
-                                        <th className="p-4 font-semibold whitespace-nowrap">Category</th>
-                                        <th className="p-4 font-semibold whitespace-nowrap text-right w-32">Price</th>
-                                        <th className="p-4 font-semibold whitespace-nowrap text-right w-48">Enrollments</th>
-                                        <th className="p-4 font-semibold text-right whitespace-nowrap">Actions</th>
+                <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
+                    <div className="overflow-x-auto no-scrollbar">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase   tracking-[2px] text-gray-400 border-b border-gray-100">
+                                <tr>
+                                    <th className="p-5 text-center w-20">S.No</th>
+                                    <th className="p-5">Course Details</th>
+                                    <th className="p-5">Category</th>
+                                    <th className="p-5">Price</th>
+                                    <th className="p-5">Enrollments</th>
+                                    {/* <th className="p-5 text-right pr-8">Actions</th> */}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {isLoading ? (
+                                    <tr><td colSpan="6" className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-emerald-500" size={40} /></td></tr>
+                                ) : displayCourses.map((course, index) => (
+                                    <tr key={course.id} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="p-5 text-center text-xs   text-gray-300">{String((page - 1) * limit + index + 1).padStart(2, '0')}</td>
+                                        <td className="p-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center   text-xs ${course.color}`}>{course.name.slice(0, 2).toUpperCase()}</div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm   text-gray-800 tracking-tight">{course.name}</span>
+                                                    <span className="text-[10px] text-gray-400 font-mono">ID: CRS-{course.id}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-5"><span className="px-3 py-1 bg-gray-50 rounded-lg text-[10px]   uppercase text-gray-500 border">{course.category}</span></td>
+                                        <td className="p-5"><span className="text-sm   text-emerald-600">{course.price}</span></td>
+                                        <td className="p-5">
+                                            <button onClick={() => router.push(`/courses/enrollments/${course.id}`)} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#7C3AED] to-blue-600 text-white rounded-xl text-[10px]   uppercase tracking-widest shadow-lg shadow-indigo-100 hover:scale-[1.03] transition-all">
+                                                <Users size={14} /> {course.enrollments} ENROLLED
+                                            </button>
+                                        </td>
+                                        {/* <td className="p-5 text-right pr-8">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"><Eye size={18} /></button>
+                                                <button className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"><Trash2 size={18} /></button>
+                                            </div>
+                                        </td> */}
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {courses.map((course, index) => (
-                                        <tr key={course.id} className="hover:bg-gray-50/50 transition-colors group">
-                                            <td className="p-4 text-xs text-gray-400 font-medium text-center w-16">
-                                                {String(index + 1).padStart(2, '0')}
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-full bg-[#7C3AED15] flex items-center justify-center text-[#7C3AED] font-bold text-xs flex-shrink-0">
-                                                        {course.initials}
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="text-sm font-semibold text-gray-800 truncate" title={course.title}>
-                                                            {course.title}
-                                                        </span>
-                                                        <span className="text-xs text-[#7C3AED] font-mono font-bold uppercase">
-                                                            ID: {course.id}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className="px-2.5 py-1.5 bg-[#7C3AED10] text-[#7C3AED] rounded-lg text-xs font-semibold shadow-sm">
-                                                    {course.category}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <span className="text-lg font-bold text-[#10B981]">
-                                                    {course.price}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleViewEnrollments(course.id);
-                                                    }}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all transform hover:scale-[1.02] flex-shrink-0"
-                                                    title={`View ${course.id} Enrollments`}
-                                                >
-                                                    <Users size={14} />
-                                                    <span>View</span>
-                                                </button>
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button className="p-2.5 text-blue-600 hover:bg-blue-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="View Course">
-                                                        <Eye size={18} />
-                                                    </button>
-                                                    <button className="p-2.5 text-emerald-600 hover:bg-emerald-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="Edit Course">
-                                                        <Edit2 size={18} />
-                                                    </button>
-                                                    <button className="p-2.5 text-red-500 hover:bg-red-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="Delete Course">
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
 
-                    {/* Mobile Helper */}
-                    <p className="lg:hidden text-xs text-gray-400 mt-2 text-center italic">
-                        👉 Swipe horizontally to view full table
-                    </p>
-                </div>
-
-                {/* Pagination */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                    <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
-                        <span className="text-sm text-gray-500">Showing 1-3 of 124 courses</span>
-                        <div className="flex gap-1">
-                            <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-medium text-black">Previous</button>
-                            <button className="px-4 py-2 text-sm bg-[#7C3AED] text-white rounded-lg font-semibold shadow-sm">1</button>
-                            <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-medium text-black">Next</button>
+                    {/*   Responsive Pagination Footer */}
+                    <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <p className="text-[10px] uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[9px] font-bold text-emerald-500 uppercase">Total {totalRecords} Courses</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 bg-white border border-gray-200 rounded-xl hover:cursor-pointer disabled:opacity-30 active:scale-90 transition-all"><ChevronLeft size={18} /></button>
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-2 bg-white border border-gray-200 rounded-xl hover:cursor-pointer disabled:opacity-30 active:scale-90 transition-all"><ChevronRight size={18} /></button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
-        // </PermissionGuardian>
+            </main>
+        </PermissionGuardian>
     );
 }

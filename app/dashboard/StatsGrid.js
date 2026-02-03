@@ -66,17 +66,17 @@ export default function StatsGrid() {
                             {stat.icon}
                         </div>
                         <div className="flex flex-col items-end">
-                            <span className="flex items-center gap-1 text-[10px] font-black text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            <span className="flex items-center gap-1 text-[10px]      text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
                                 <TrendingUp size={12} /> {stat.trend}
                             </span>
                         </div>
                     </div>
 
                     <div className="relative z-10">
-                        <h3 className="text-3xl font-black text-gray-800 tracking-tighter mb-1">
+                        <h3 className="text-3xl      text-gray-800 tracking-tighter mb-1">
                             {stat.value.toString().padStart(2, '0')}
                         </h3>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
+                        <p className="text-[10px]      text-gray-400 uppercase tracking-[2px]">
                             {stat.title}
                         </p>
                         <p className="text-[9px] text-gray-300 font-bold uppercase mt-2 group-hover:text-gray-400 transition-colors">
@@ -105,3 +105,107 @@ function LoadingSkeleton() {
         </div>
     );
 }
+
+
+// "use client";
+// import { Users, BookOpen, Newspaper, Ticket, TrendingUp } from 'lucide-react';
+// import { useSelector } from 'react-redux';
+// import {
+//     useGetCustomersQuery,
+//     useGetCoursesQuery,
+//     useGetAllBlogsQuery,
+//     useGetCouponsQuery
+// } from '../../redux/service/adminApi';
+
+// export default function StatsGrid() {
+//     const { admin, isAuthenticated } = useSelector((state) => state.auth);
+
+//     // ✅ Superadmin check: Agar role SUPERADMIN hai ya permissions mein "ALL" hai
+//     const isSuperAdmin = admin?.role === 'SUPERADMIN' || admin?.permissions?.includes('ALL');
+//     const perms = admin?.permissions || [];
+
+//     // ✅ Logic: Superadmin ko hamesha TRUE milega
+//     const hasPermission = (p) => isSuperAdmin || perms.includes(p);
+
+//     // ✅ API Hooks with fixed keys matching your DB
+//     const { data: custData, isLoading: loadCust } = useGetCustomersQuery(undefined, { skip: !hasPermission('customers') });
+//     const { data: courData, isLoading: loadCour } = useGetCoursesQuery(undefined, { skip: !hasPermission('courses') });
+//     const { data: blogData, isLoading: loadBlog } = useGetAllBlogsQuery(undefined, { skip: !hasPermission('blogs') });
+//     const { data: coupData, isLoading: loadCoup } = useGetCouponsQuery(undefined, { skip: !hasPermission('coupons') });
+
+//     const isLoading = (hasPermission('customers') && loadCust) ||
+//         (hasPermission('courses') && loadCour) ||
+//         (hasPermission('blogs') && loadBlog) ||
+//         (hasPermission('coupons') && loadCoup);
+
+//     // ✅ Stats array matching your API response structure
+//     const stats = [
+//         {
+//             show: hasPermission('customers'),
+//             title: 'Total Customers',
+//             value: custData?.data?.customers?.length || 0,
+//             icon: <Users size={22} />,
+//             color: 'from-blue-500 to-indigo-600',
+//             label: 'Registered Users'
+//         },
+//         {
+//             show: hasPermission('courses'),
+//             title: 'Live Courses',
+//             value: courData?.data?.courses?.length || 0,
+//             icon: <BookOpen size={22} />,
+//             color: 'from-emerald-500 to-teal-600',
+//             label: 'Active Curriculum'
+//         },
+//         {
+//             show: hasPermission('blogs'),
+//             title: 'Published Blogs',
+//             value: blogData?.data?.blogs?.length || 0,
+//             icon: <Newspaper size={22} />,
+//             color: 'from-orange-500 to-amber-600',
+//             label: 'Articles Online'
+//         },
+//         {
+//             show: hasPermission('coupons'),
+//             title: 'Active Coupons',
+//             value: coupData?.data?.coupons?.filter(c => c.status === 'ACTIVE').length || 0,
+//             icon: <Ticket size={22} />,
+//             color: 'from-purple-500 to-pink-600',
+//             label: 'Promo Rules'
+//         },
+//     ].filter(item => item.show);
+
+//     if (isLoading) return <LoadingSkeleton />;
+
+//     // Agar Superadmin hai phir bhi stats khali hain, toh iska matlab API response structure check karna hoga
+//     if (stats.length === 0 && isAuthenticated) return null;
+
+//     return (
+//         <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${stats.length} gap-6 mb-10`}>
+//             {stats.map((stat, idx) => (
+//                 <div key={idx} className="group relative bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-500/5 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+//                     <div className="flex justify-between items-start mb-6">
+//                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br shadow-xl ${stat.color}`}>
+//                             {stat.icon}
+//                         </div>
+//                     </div>
+//                     <div className="relative z-10">
+//                         <h3 className="text-3xl font-bold text-gray-800 tracking-tighter mb-1">
+//                             {stat.value.toString().padStart(2, '0')}
+//                         </h3>
+//                         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-[2px]">{stat.title}</p>
+//                     </div>
+//                 </div>
+//             ))}
+//         </div>
+//     );
+// }
+
+// function LoadingSkeleton() {
+//     return (
+//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+//             {[1, 2, 3, 4].map((i) => (
+//                 <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 h-44 animate-pulse" />
+//             ))}
+//         </div>
+//     );
+// }

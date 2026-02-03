@@ -1,198 +1,132 @@
 "use client";
+import { useState, useMemo, useEffect, React } from "react";
 import PageHeader from "../../../../components/ui/PageHeader";
-import { Search, Filter, Eye, Edit2, Download, CheckCircle2, Clock, XCircle, Users } from "lucide-react";
 import PermissionGuardian from "../../../../components/auth/PermissionGuardian";
+import {
+    CheckCircle2, Loader2, Inbox, Mail, ChevronLeft, ChevronRight, Calendar, Ticket, FilterX
+} from "lucide-react";
+import { useGetTransactionsQuery } from "../../../../redux/service/adminApi";
+
 export default function CourseEnrollmentsPage({ params }) {
-    const { courseId } = params;
+    const [resolvedParams, setResolvedParams] = useState(null);
+    const [mounted, setMounted] = useState(false);
+    const [page, setPage] = useState(1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+    const [selectedMonth, setSelectedMonth] = useState("ALL");
+    const [selectedCoupon, setSelectedCoupon] = useState("ALL");
+    const limit = 10;
 
-    const enrollments = [
-        { id: "ENR-001", name: "Anish Kumar Mishra", email: "anish@email.com", phone: "9661329991", status: "paid", amount: "₹4,999", date: "Jan 12, 2026", progress: 85 },
-        { id: "ENR-002", name: "Priya Patel", email: "priya@email.com", phone: "9876543210", status: "pending", amount: "-", date: "Jan 11, 2026", progress: 0 },
-        { id: "ENR-003", name: "Rahul Sharma", email: "rahul@email.com", phone: "9123456789", status: "failed", amount: "₹4,999", date: "Jan 10, 2026", progress: 0 },
-        { id: "ENR-004", name: "Sarah Wilson", email: "sarah@email.com", phone: "9988776655", status: "paid", amount: "₹4,999", date: "Jan 9, 2026", progress: 62 },
-        { id: "ENR-005", name: "Mike Johnson", email: "mike@email.com", phone: "9444332211", status: "pending", amount: "-", date: "Jan 8, 2026", progress: 23 },
-    ];
+    const { data: response, isLoading, isFetching } = useGetTransactionsQuery();
 
-    const stats = {
-        total: 1247,
-        paid: 892,
-        pending: 245,
-        failed: 110
-    };
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
+        Promise.resolve(params).then(setResolvedParams);
+    }, [params]);
 
-    const getStatusConfig = (status) => {
-        const configs = {
-            paid: { color: "text-emerald-600 bg-emerald-50 border-emerald-100", icon: CheckCircle2 },
-            pending: { color: "text-amber-600 bg-amber-50 border-amber-100", icon: Clock },
-            failed: { color: "text-red-500 bg-red-50 border-red-100", icon: XCircle }
+    const targetId = resolvedParams?.id;
+
+    //   Combined Logic: Filtering SUCCESS, Date, Coupon, and Pagination
+    const { displayEnrollments, totalRecords, availableCoupons } = useMemo(() => {
+        const allTxns = response?.data?.transactions || [];
+
+        // Base Filtering
+        const filtered = allTxns.filter(txn => {
+            const matchesCourse = String(txn.courseId).trim() === String(targetId).trim();
+            const isSuccess = txn.status === "SUCCESS";
+            const txnDate = new Date(txn.createdAt);
+            const matchesYear = txnDate.getFullYear().toString() === selectedYear;
+            const matchesMonth = selectedMonth === "ALL" || txnDate.getMonth().toString() === selectedMonth;
+            const matchesCoupon = selectedCoupon === "ALL" || txn.couponCode === selectedCoupon;
+
+            return matchesCourse && isSuccess && matchesYear && matchesMonth && matchesCoupon;
+        });
+
+        const coupons = [...new Set(allTxns.filter(t => String(t.courseId) === String(targetId) && t.couponCode).map(t => t.couponCode))];
+        const startIndex = (page - 1) * limit;
+
+        return {
+            displayEnrollments: filtered.slice(startIndex, startIndex + limit),
+            totalRecords: filtered.length,
+            availableCoupons: coupons
         };
-        return configs[status] || configs.pending;
-    };
+    }, [response, targetId, selectedYear, selectedMonth, selectedCoupon, page]);
 
-    const StatCard = ({ label, value, icon: Icon, color }) => (
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-2xl font-bold text-gray-800">{value.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500 mt-1">{label}</p>
-                </div>
-                <div className={`p-2.5 ${color === 'blue' ? 'bg-blue-50' : color === 'emerald' ? 'bg-emerald-50' : color === 'amber' ? 'bg-amber-50' : 'bg-red-50'} rounded-lg`}>
-                    <Icon size={20} className={`${color === 'blue' ? 'text-blue-600' : color === 'emerald' ? 'text-emerald-600' : color === 'amber' ? 'text-amber-600' : 'text-red-500'}`} />
-                </div>
-            </div>
-        </div>
-    );
+    const totalPages = Math.ceil(totalRecords / limit) || 1;
 
-    const EnrollmentTableRow = ({ enrollment, index }) => {
-        const config = getStatusConfig(enrollment.status);
-        const Icon = config.icon;
-
-        return (
-            <tr className="hover:bg-gray-50/50 transition-colors group">
-                <td className="p-4 text-xs text-gray-400 font-medium text-center w-16">
-                    {String(index).padStart(2, '0')}
-                </td>
-                <td className="p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-emerald-600 font-bold text-xs">
-                            {enrollment.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <span className="text-sm font-semibold text-gray-800 block truncate" title={enrollment.name}>{enrollment.name}</span>
-                            <span className="text-xs text-[#7C3AED] font-mono font-bold uppercase block" title={enrollment.id}>ID: {enrollment.id}</span>
-                        </div>
-                    </div>
-                </td>
-                <td className="p-4 max-w-[220px]">
-                    <span className="text-sm text-gray-600 truncate block" title={enrollment.email}>{enrollment.email}</span>
-                </td>
-                <td className="p-4">
-                    <span className="text-sm font-mono text-gray-700">{enrollment.phone}</span>
-                </td>
-                <td className="p-4">
-                    <span className={`px-2.5 py-1.5 ${config.color} rounded-lg text-xs font-semibold shadow-sm inline-flex items-center gap-1`}>
-                        <Icon size={12} />
-                        {enrollment.status.toUpperCase()}
-                    </span>
-                </td>
-                <td className="p-4 text-right">
-                    <span className="text-lg font-bold text-[#10B981]">{enrollment.amount}</span>
-                </td>
-                <td className="p-4">
-                    <span className="text-sm text-gray-600">{enrollment.date}</span>
-                </td>
-                <td className="p-4">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                        <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${enrollment.progress}%` }} />
-                    </div>
-                    <span className="text-xs text-gray-600 ml-2">{enrollment.progress}%</span>
-                </td>
-                <td className="p-4 text-right w-32">
-                    <div className="flex items-center justify-end gap-2">
-                        <button className="p-2.5 text-blue-600 hover:bg-blue-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="View">
-                            <Eye size={18} />
-                        </button>
-                        <button className="p-2.5 text-emerald-600 hover:bg-emerald-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="Edit">
-                            <Edit2 size={18} />
-                        </button>
-                        <button className="p-2.5 text-red-500 hover:bg-red-50 hover:scale-105 rounded-lg transition-all shadow-sm hover:shadow-md" title="Invoice">
-                            <Download size={18} />
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        );
-    };
+    if (!mounted || !resolvedParams) return null;
 
     return (
         <PermissionGuardian permissionId="courses">
-            <main className="p-2 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
-                <PageHeader
-                    title={`CRS-${courseId} Enrollments`}
-                    description="Complete enrollment management and analytics"
-                    addButtonLabel="Export CSV"
-                    showExport={true}
-                    onAddClick={() => console.log("Export CSV")}
-                    onExportClick={() => console.log("Export Enrollments")}
-                    showBackButton={true}
-                    onBackClick={() => window.history.back()}
-                />
+            <main className="p-4 sm:p-6 md:p-8 min-h-screen bg-gray-50/30 overflow-x-hidden text-black">
+                <PageHeader title="Course Analytics" description={`Successful enrollments for Course: ${targetId}`} showBackButton={true} />
 
-                <div className="mt-4 sm:mt-6 space-y-6">
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <StatCard label="Total Enrollments" value={stats.total} icon={Users} color="blue" />
-                        <StatCard label="Paid" value={stats.paid} icon={CheckCircle2} color="emerald" />
-                        <StatCard label="Pending" value={stats.pending} icon={Clock} color="amber" />
-                        <StatCard label="Failed" value={stats.failed} icon={XCircle} color="red" />
+                {/*   Fully Responsive Filter Grid */}
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <FilterDropdown label="Year" value={selectedYear} onChange={setSelectedYear} options={[2024, 2025, 2026, 2027, 2028, 2029, 2030].map(String)} />
+                    <FilterDropdown label="Month" value={selectedMonth} onChange={setSelectedMonth} options={["ALL", ...Array.from({ length: 12 }, (_, i) => i.toString())]} monthLabels />
+                    <FilterDropdown label="Coupon" value={selectedCoupon} onChange={setSelectedCoupon} options={["ALL", ...availableCoupons]} />
+                    <div className="flex items-end">
+                        <button onClick={() => { setSelectedMonth("ALL"); setSelectedCoupon("ALL"); }} className="w-full py-3 bg-red-50 text-red-600 rounded-xl   text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-100 border border-red-100 transition-all"><FilterX size={14} /> Reset</button>
                     </div>
+                </div>
 
-                    {/* Filters & Search */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-6">
-                        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                            <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0">
-                                <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search by name, email, phone..."
-                                        className=" text-black w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-                                    />
-                                </div>
-                                <select className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white text-black">
-                                    <option>All Status</option>
-                                    <option>Paid</option>
-                                    <option>Pending</option>
-                                    <option>Failed</option>
-                                </select>
-                            </div>
-                            <button className="px-6 py-2.5 bg-[#7C3AED] hover:bg-[#7C3AED]/90 text-white rounded-xl font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2">
-                                <Filter size={16} /> Filters
-                            </button>
-                        </div>
-                    </div>
-
-                    {/*    SAME TABLE EVERYWHERE - HORIZONTAL SCROLL ONLY */}
-                    <div className="w-full">
-                        <div className="overflow-x-auto bg-white rounded-2xl border border-gray-100 shadow-sm">
-                            <div className="min-w-[1400px]">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-gray-50/50 text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                                        <tr>
-                                            <th className="p-4 font-semibold text-center w-16">#</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap">Student Details</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap max-w-[220px]">Email</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap">Phone</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap">Status</th>
-                                            <th className="p-4 font-semibold text-right whitespace-nowrap w-28">Amount</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap">Date</th>
-                                            <th className="p-4 font-semibold whitespace-nowrap">Progress</th>
-                                            <th className="p-4 font-semibold text-right whitespace-nowrap w-32">Actions</th>
+                <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mt-8 mb-10">
+                    <div className="overflow-x-auto no-scrollbar">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-gray-50/50 text-[10px]   uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                <tr>
+                                    <th className="p-5 text-center w-20">S.No</th>
+                                    <th className="p-5">Student Info</th>
+                                    <th className="p-5">Offer / Coupon</th>
+                                    <th className="p-5">Investment</th>
+                                    <th className="p-5 text-center">Payment</th>
+                                    <th className="p-5">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {isLoading ? (
+                                    <tr><td colSpan="6" className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-emerald-500" /></td></tr>
+                                ) : displayEnrollments.length === 0 ? (
+                                    <tr><td colSpan="6" className="p-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs"><Inbox size={48} className="mx-auto mb-2 opacity-20" /> No Successful Records</td></tr>
+                                ) : (
+                                    displayEnrollments.map((txn, index) => (
+                                        <tr key={txn._id} className="hover:bg-gray-50/30 transition-colors group">
+                                            <td className="p-5 text-center text-xs   text-gray-300">{String((page - 1) * limit + index + 1).padStart(2, '0')}</td>
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center   text-xs border border-indigo-100">{txn.customerId?.name?.slice(0, 2).toUpperCase()}</div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm   text-gray-800 tracking-tight">{txn.customerId?.name}</span>
+                                                        <span className="text-[9px] text-gray-400 font-bold flex items-center gap-1"><Mail size={10} /> {txn.customerId?.email}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-5">{txn.couponCode ? <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px]   border border-blue-100 uppercase">{txn.couponCode}</span> : <span className="text-gray-300 text-[10px] font-bold italic">N/A</span>}</td>
+                                            <td className="p-5"><span className="text-sm   text-gray-900">₹{txn.finalAmount}</span></td>
+                                            <td className="p-5 text-center"><span className="px-3 py-1 rounded-lg text-[9px]   border uppercase tracking-wider bg-emerald-50 text-emerald-600 border-emerald-100">PAID</span></td>
+                                            <td className="p-5">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs   text-gray-700">{new Date(txn.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                                                    <span className="text-[9px] text-gray-400 font-bold">{new Date(txn.createdAt).getFullYear()}</span>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {enrollments.slice(0, 20).map((enroll, index) => (
-                                            <EnrollmentTableRow key={enroll.id} enrollment={enroll} index={index + 1} />
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {/* Mobile Helper */}
-                        <p className="lg:hidden text-xs text-gray-400 mt-2 text-center italic">
-                            👉 Swipe horizontally to view full table
-                        </p>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
 
-                    {/* Pagination */}
-                    <div className="mt-6 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                        <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
-                            <span className="text-sm text-gray-500">Showing 1-20 of {stats.total} enrollments</span>
-                            <div className="flex gap-1">
-                                <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-medium text-black">Previous</button>
-                                <button className="px-4 py-2 text-sm bg-[#7C3AED] text-white rounded-lg font-semibold shadow-sm">1</button>
-                                <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-medium text-black">Next</button>
-                            </div>
+                    {/*   Standard Pagination Footer */}
+                    <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <p className="text-[10px] uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[9px] font-bold text-indigo-400 uppercase">Showing {displayEnrollments.length} of {totalRecords} Verified Students</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 bg-white border border-gray-200 rounded-xl hover:cursor-pointer disabled:opacity-30 active:scale-90 transition-all"><ChevronLeft size={18} /></button>
+                            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-2 bg-white border border-gray-200 rounded-xl hover:cursor-pointer disabled:opacity-30 active:scale-90 transition-all"><ChevronRight size={18} /></button>
                         </div>
                     </div>
                 </div>
@@ -200,3 +134,38 @@ export default function CourseEnrollmentsPage({ params }) {
         </PermissionGuardian>
     );
 }
+
+// 🎨 Utility Component for Filters
+const FilterDropdown = ({ label, value, onChange, options, monthLabels }) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    return (
+        <div className="relative">
+            <label className="text-[9px]   uppercase text-gray-400 ml-1 mb-1 block">
+                {label}
+            </label>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full pl-4 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm appearance-none text-black cursor-pointer"
+            >
+                {options.map(opt => (
+                    <option key={opt} value={opt}>
+                        {/*   Fix: Check if it's 'ALL' and then show relevant label based on the dropdown 'label' prop */}
+                        {opt === "ALL"
+                            ? (label === "Month" ? "All Months" : "All Coupons")
+                            : (monthLabels ? months[parseInt(opt)] : opt)
+                        }
+                    </option>
+                ))}
+            </select>
+
+            {/* Custom Arrow Icon */}
+            <div className="absolute right-4 top-[34px] pointer-events-none text-gray-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
+    );
+};

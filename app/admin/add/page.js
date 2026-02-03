@@ -16,7 +16,8 @@ const PERMISSION_MODULES = [
     { id: 'General', label: 'General' },
     { id: 'coupons', label: 'Coupon Management' },
     { id: 'Enquiry', label: 'Enquiry' },
-    { id: 'logs', label: 'System Logs' }             // New
+    { id: 'logs', label: 'System Logs' },
+    { id: 'Chatbot', label: 'Chatbot'}             // New
 ];
 
 export default function AddAdminPage() {
@@ -134,7 +135,7 @@ export default function AddAdminPage() {
                                 />
 
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">System Role</label>
+                                    <label className="text-[10px]      text-gray-400 uppercase tracking-widest ml-1">System Role</label>
                                     <select
                                         name="role"
                                         value={formData.role}
@@ -156,7 +157,7 @@ export default function AddAdminPage() {
                                     <h3 className="font-bold text-gray-800 uppercase tracking-tight text-sm">Access Permissions</h3>
                                 </div>
                                 {formData.role === "SUPERADMIN" && (
-                                    <span className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[9px] font-black uppercase border border-amber-100">Full System Access Enabled</span>
+                                    <span className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[9px]      uppercase border border-amber-100">Full System Access Enabled</span>
                                 )}
                             </div>
 
@@ -172,7 +173,7 @@ export default function AddAdminPage() {
                                             : 'border-gray-100 text-gray-400 hover:border-gray-200 bg-white'
                                             }`}
                                     >
-                                        <span className="text-[11px] font-black uppercase tracking-tight">{module.label}</span>
+                                        <span className="text-[11px]      uppercase tracking-tight">{module.label}</span>
                                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center hover:cursor-pointer justify-center transition-all ${formData.permissions.includes(module.id)
                                             ? 'bg-[#7C3AED] border-[#7C3AED]'
                                             : 'border-gray-200 bg-gray-50'
@@ -222,14 +223,14 @@ export default function AddAdminPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full sm:w-auto px-12 py-5 bg-[#7C3AED] hover:bg-[#5B21B6] hover:cursor-pointer text-white rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-purple-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95"
+                                className="w-full sm:w-auto px-12 py-5 bg-[#7C3AED] hover:bg-[#5B21B6] hover:cursor-pointer text-white rounded-[1.2rem]      uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-purple-100 flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95"
                             >
                                 {isLoading ? "Synchronizing..." : "Create Admin Account"}
                                 {!isLoading && <Check size={18} />}
                             </button>
                             <Link
                                 href="/admin/list"
-                                className="w-full sm:w-auto px-12 py-5 bg-white border border-gray-200 text-gray-400 hover:text-gray-600 rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] transition-all text-center"
+                                className="w-full sm:w-auto px-12 py-5 bg-white border border-gray-200 text-gray-400 hover:text-gray-600 rounded-[1.2rem]      uppercase tracking-widest text-[10px] transition-all text-center"
                             >
                                 Cancel Process
                             </Link>
@@ -243,7 +244,7 @@ export default function AddAdminPage() {
 
 const InputField = ({ label, icon, ...props }) => (
     <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
+        <label className="text-[10px]      text-gray-400 uppercase tracking-widest ml-1">{label}</label>
         <div className="relative group">
             {icon && (
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#7C3AED] transition-colors">

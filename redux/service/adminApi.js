@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const adminApi = createApi({
     reducerPath: 'adminApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:5000/api/v1',
+        baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
         prepareHeaders: (headers) => {
             const token = document.cookie
                 .split('; ')
@@ -16,7 +16,7 @@ export const adminApi = createApi({
         },
     }),
     keepUnusedDataFor: 90,
-    tagTypes: ['Settings', 'Admins', 'Customers', 'Courses', 'Logs', 'Blogs', 'Backlinks', 'Banners', 'Coupons', 'Contacts', 'Transactions'],
+    tagTypes: ['Settings', 'Admins', 'Customers', 'Courses', 'Logs', 'Blogs', 'Backlinks', 'Banners', 'Coupons', 'Contacts', 'Transactions', 'Enquiries', 'Chatbot', 'AdminProfile', 'Leads'],
 
     endpoints: (builder) => ({
         // ==========================================
@@ -26,11 +26,7 @@ export const adminApi = createApi({
             query: (credentials) => ({ url: '/auth/admin/login', method: 'POST', body: credentials }),
         }),
         getMe: builder.query({ query: () => '/auth/me' }),
-
         // ==========================================
-        // 2. ADMIN MANAGEMENT (6 Routes)
-        // ==========================================
-// ==========================================
         // 2. ADMIN MANAGEMENT (Optimized for Sub-Admin Selection)
         // ==========================================
         getAdmins: builder.query({
@@ -135,30 +131,30 @@ export const adminApi = createApi({
                 } catch { }
             },
         }),
-            updateBlog: builder.mutation({
-                    // We expect { id, formData, patch } where 'patch' is a plain object { title, status, etc. }
-                    query: ({ id, formData }) => ({ 
-                        url: `/blogs/update/${id}`, 
-                        method: 'PATCH', 
-                        body: formData // This goes to the server
-                    }),
-                    async onQueryStarted({ id, patch }, { dispatch, queryFulfilled }) {
-                        // We only use the plain 'patch' object to update the local Redux state
-                        const patchResult = dispatch(
-                            adminApi.util.updateQueryData('getAllBlogs', undefined, (draft) => {
-                                const blog = draft.data.blogs.find(b => b._id === id);
-                                // ✅ We spread 'patch' (plain object), NOT 'formData'
-                                if (blog && patch) Object.assign(blog, patch);
-                            })
-                        );
-                        try {
-                            await queryFulfilled;
-                        } catch {
-                            patchResult.undo();
-                        }
-                    },
-                    invalidatesTags: ['Blogs'],
-                }),
+        updateBlog: builder.mutation({
+            // We expect { id, formData, patch } where 'patch' is a plain object { title, status, etc. }
+            query: ({ id, formData }) => ({
+                url: `/blogs/update/${id}`,
+                method: 'PATCH',
+                body: formData // This goes to the server
+            }),
+            async onQueryStarted({ id, patch }, { dispatch, queryFulfilled }) {
+                // We only use the plain 'patch' object to update the local Redux state
+                const patchResult = dispatch(
+                    adminApi.util.updateQueryData('getAllBlogs', undefined, (draft) => {
+                        const blog = draft.data.blogs.find(b => b._id === id);
+                        //   We spread 'patch' (plain object), NOT 'formData'
+                        if (blog && patch) Object.assign(blog, patch);
+                    })
+                );
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            },
+            invalidatesTags: ['Blogs'],
+        }),
         deleteBlog: builder.mutation({
             query: (id) => ({ url: `/blogs/delete/${id}`, method: 'DELETE' }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
@@ -192,7 +188,7 @@ export const adminApi = createApi({
             },
         }),
 
-       // ==========================================
+        // ==========================================
         // 6. COUPON MANAGEMENT (Enhanced for Assignments)
         // ==========================================
         getCoupons: builder.query({
@@ -209,11 +205,11 @@ export const adminApi = createApi({
             // ensure the backend is using .populate('assignedSubAdmin')
             providesTags: ['Coupons'],
         }),
-        
+
         createCoupon: builder.mutation({
-            query: (newCoupon) => ({ 
-                url: '/coupons/create-coupons', 
-                method: 'POST', 
+            query: (newCoupon) => ({
+                url: '/coupons/create-coupons',
+                method: 'POST',
                 body: newCoupon // This body should now include assignedSubAdmin ID
             }),
             async onQueryStarted(args, { dispatch, queryFulfilled }) {
@@ -227,7 +223,7 @@ export const adminApi = createApi({
                     }));
                 } catch { }
             },
-            invalidatesTags: ['Coupons'], 
+            invalidatesTags: ['Coupons'],
         }),
         getCouponById: builder.query({
             query: (id) => `/coupons/${id}`,
@@ -238,34 +234,34 @@ export const adminApi = createApi({
         // ADDED: Mutation to re-assign or update coupon details
         // Mutation to update coupon details with Optimistic Updates for status changes
         updateCoupon: builder.mutation({
-                query: ({ id, ...data }) => ({
-                    url: `/coupons/editcoupon/${id}`,
-                    method: 'PATCH',
-                    body: data
-                }),
-                // This part handles the immediate UI update before the server responds
-                async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
-                    // Only attempt optimistic update if 'status' is being changed
-                    if (status) {
-                        const patchResult = dispatch(
-                            adminApi.util.updateQueryData('getCoupons', undefined, (draft) => {
-                                const coupon = draft.data.coupons.find(c => c._id === id);
-                                if (coupon) {
-                                    coupon.status = status;
-                                }
-                            })
-                        );
-                        try {
-                            await queryFulfilled;
-                        } catch {
-                            // If the API call fails, roll back the UI to the previous state
-                            patchResult.undo();
-                        }
-                    }
-                },
-                // Standard cache invalidation to ensure data consistency
-                invalidatesTags: ['Coupons'],
+            query: ({ id, ...data }) => ({
+                url: `/coupons/editcoupon/${id}`,
+                method: 'PATCH',
+                body: data
             }),
+            // This part handles the immediate UI update before the server responds
+            async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
+                // Only attempt optimistic update if 'status' is being changed
+                if (status) {
+                    const patchResult = dispatch(
+                        adminApi.util.updateQueryData('getCoupons', undefined, (draft) => {
+                            const coupon = draft.data.coupons.find(c => c._id === id);
+                            if (coupon) {
+                                coupon.status = status;
+                            }
+                        })
+                    );
+                    try {
+                        await queryFulfilled;
+                    } catch {
+                        // If the API call fails, roll back the UI to the previous state
+                        patchResult.undo();
+                    }
+                }
+            },
+            // Standard cache invalidation to ensure data consistency
+            invalidatesTags: ['Coupons'],
+        }),
         deleteCoupon: builder.mutation({
             query: (id) => ({ url: `/coupons/delete/${id}`, method: 'DELETE' }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
@@ -304,6 +300,43 @@ export const adminApi = createApi({
         }),
 
         // ==========================================
+        // 8.5 ENQUIRIES (ADMIN PANEL)
+        // ==========================================
+
+        getAllEnquiries: builder.query({
+            query: () => '/enquiries/admin',
+            providesTags: ['Enquiries'],
+        }),
+
+        updateEnquiryStatus: builder.mutation({
+            query: ({ id, status }) => ({
+                url: `/enquiries/status/${id}`,
+                method: 'PATCH',
+                body: { status },
+            }),
+            async onQueryStarted({ id, status }, { dispatch, queryFulfilled }) {
+                const patchResult = dispatch(
+                    adminApi.util.updateQueryData(
+                        'getAllEnquiries',
+                        undefined,
+                        (draft) => {
+                            const enquiry = draft.data.enquiries.find(e => e._id === id);
+                            if (enquiry) enquiry.status = status;
+                        }
+                    )
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            },
+            invalidatesTags: ['Enquiries'],
+        }),
+
+
+        // ==========================================
         // 9. LOGS & TRANSACTIONS (6 Routes)
         // ==========================================
         getAdminLogs: builder.query({ query: () => '/logs/admin', providesTags: ['Logs'] }),
@@ -312,6 +345,62 @@ export const adminApi = createApi({
         getTransactions: builder.query({ query: () => '/transactions', providesTags: ['Transactions'] }),
         getCourses: builder.query({ query: () => '/courses', providesTags: ['Courses'] }),
         getSettings: builder.query({ query: () => '/admin/settings', providesTags: ['Settings'] }),
+        //   10. CHATBOT MANAGEMENT (NEW)
+        // ==========================================
+        getChatbotKnowledge: builder.query({
+            query: () => '/chatbot/knowledge',
+            providesTags: ['Chatbot'],
+        }),
+
+        trainChatbot: builder.mutation({
+            query: (data) => ({
+                url: '/chatbot/train',
+                method: 'POST',
+                body: data
+            }),
+            invalidatesTags: ['Chatbot'],
+        }),
+
+        deleteChatbotKnowledge: builder.mutation({
+            query: (id) => ({
+                url: `/chatbot/knowledge/${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['Chatbot'],
+        }),
+
+        testChatbotAsk: builder.mutation({
+            query: (data) => ({
+                url: '/chatbot/ask',
+                method: 'POST',
+                body: data // e.g. { question: "..." }
+            })
+        }),
+
+        getChatbotUsage: builder.query({
+            query: () => '/chatbot/usage',
+            providesTags: ['Chatbot'],
+        }),
+
+        //   Get Profile
+        getAdminProfile: builder.query({
+            query: () => '/admins/me',
+            // Response mapping for image_1b5252.png structure
+            transformResponse: (response) => response.data.admin,
+        }),
+        getRawLeads: builder.query({
+            //   Params ko explicitly URL query mein map karein
+            query: (params) => {
+                const { page = 1, source = "", eventType = "" } = params || {};
+                // Template literal se clean URL banayein
+                return `/leads?page=${page}&limit=10&source=${source}&eventType=${eventType}`;
+            },
+            transformResponse: (response) => ({
+                leads: response.data?.leads || [],
+                hasNextPage: response.data?.hasNextPage || false
+            }),
+            providesTags: ["Leads"],
+        })
     }),
 });
 
@@ -323,7 +412,14 @@ export const {
     useGetBlogsQuery, useGetAllBlogsQuery, useGetWebBlogsQuery, useGetBlogBySlugQuery, useCreateBlogMutation, useUpdateBlogMutation, useDeleteBlogMutation,
     useGetBacklinksQuery, useCreateBacklinkMutation, useUpdateBacklinkMutation, useDeleteBacklinkByIdMutation,
     useGetBannersQuery, useGetBannerByIdQuery, useCreateBannerMutation, useUpdateBannerMutation, useDeleteBannerMutation,
-    useGetCouponsQuery, useCreateCouponMutation,useGetCouponByIdQuery, useUpdateCouponMutation, useDeleteCouponMutation,
+    useGetCouponsQuery, useCreateCouponMutation, useGetCouponByIdQuery, useUpdateCouponMutation, useDeleteCouponMutation,
     useGetContactsQuery, useGetAllContactsQuery, useUpdateContactStatusMutation,
-    useGetTransactionsQuery, useGetCoursesQuery, useGetSettingsQuery
+    useGetTransactionsQuery, useGetCoursesQuery, useGetSettingsQuery,
+    useGetAllEnquiriesQuery, useUpdateEnquiryStatusMutation, useGetChatbotKnowledgeQuery,
+    useTrainChatbotMutation,
+    useDeleteChatbotKnowledgeMutation,
+    useTestChatbotAskMutation,
+    useGetChatbotUsageQuery,
+    useGetAdminProfileQuery,
+    useGetRawLeadsQuery,
 } = adminApi;

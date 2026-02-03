@@ -71,6 +71,7 @@ export default function CustomerListPage() {
 
     //    5. Auto-reset to page 1 on search
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPage(1);
     }, [searchTerm]);
 
@@ -115,7 +116,7 @@ export default function CustomerListPage() {
                 <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden mb-10">
                     <div className="overflow-x-auto no-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50/50 text-[10px] uppercase font-black tracking-[2px] text-gray-400 border-b border-gray-100">
+                            <thead className="bg-gray-50/50 text-[10px] uppercase      tracking-[2px] text-gray-400 border-b border-gray-100">
                                 <tr>
                                     <th className="p-5 text-center w-20">S.No</th>
                                     <th className="p-5">Customer Profile</th>
@@ -133,16 +134,16 @@ export default function CustomerListPage() {
                                 ) : (
                                     displayCustomers.map((user, index) => (
                                         <tr key={user._id} className="hover:bg-gray-50/50 transition-colors group">
-                                            <td className="p-5 text-center text-xs font-black text-gray-300">
+                                            <td className="p-5 text-center text-xs      text-gray-300">
                                                 {String((page - 1) * limit + index + 1).padStart(2, '0')}
                                             </td>
                                             <td className="p-5">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-black text-xs border border-emerald-100/50">
+                                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600      text-xs border border-emerald-100/50">
                                                         {user.name?.slice(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-black text-gray-800 tracking-tight">{user.name}</span>
+                                                        <span className="text-sm      text-gray-800 tracking-tight">{user.name}</span>
                                                         <span className="text-[10px] text-gray-400 font-mono">UID: {user._id?.slice(-8)}</span>
                                                     </div>
                                                 </div>
@@ -185,7 +186,7 @@ export default function CustomerListPage() {
                     {/*    Original Pagination Footer */}
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
+                            <p className="text-[10px]      uppercase text-gray-400 tracking-widest">Page {page} of {totalPages}</p>
                             <p className="text-[9px] font-bold text-emerald-500 uppercase">Showing {displayCustomers.length} of {totalRecords} Customer Accounts</p>
                         </div>
                         <div className="flex gap-2">

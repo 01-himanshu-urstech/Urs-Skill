@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLayout } from "../../context/LayoutContext";
-import { Menu, Search, X, Command, LayoutDashboard, Ticket, FileText, Users, Image as ImageIcon, Mail } from "lucide-react";
+import { Menu, Search, X, Command, LayoutDashboard, Ticket, FileText, Users, Image as ImageIcon, Mail, BookOpen } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { title } from 'node:process';
 
 export default function MainContentWrapper({ children }) {
     const { isCollapsed, setIsCollapsed } = useLayout();
@@ -16,8 +17,9 @@ export default function MainContentWrapper({ children }) {
     //    DEFINED SEARCHABLE TABS
     const navigationLinks = [
         { title: "Dashboard Overview", path: "/", icon: <LayoutDashboard size={14} /> },
-        { title: "Discount Coupons", path: "/coupon", icon: <Ticket size={14} /> },
+        { title: "Discount Coupons", path: "/coupon/list", icon: <Ticket size={14} /> },
         { title: "Manage Blogs", path: "/blog", icon: <FileText size={14} /> },
+        { title: "Manage Courses", path: "/courses/list", icon: <BookOpen size={14} />},
         { title: "Customer List", path: "/customer/list", icon: <Users size={14} /> },
         { title: "Home Banners", path: "/banners", icon: <ImageIcon size={14} /> },
         { title: "Enquiry", path: "/contact", icon: <Mail size={14} /> },
@@ -100,7 +102,7 @@ export default function MainContentWrapper({ children }) {
                         {isFocused && suggestions.length > 0 && (
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="p-2 border-b border-gray-50 bg-gray-50/50">
-                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-2">Quick Results</p>
+                                    <p className="text-[9px]      text-gray-400 uppercase tracking-widest px-2">Quick Results</p>
                                 </div>
                                 {suggestions.map((item, idx) => (
                                     <button
